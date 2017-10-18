@@ -55,7 +55,7 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) eventHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("print headers in request: %v", r.Header)
-	eventType := r.Header.Get("X-Github-Events")
+	eventType := r.Header.Get("X-Github-Event")
 	logrus.Infof("received a event whose type is: %s", eventType)
 
 	data, err := ioutil.ReadAll(r.Body)
