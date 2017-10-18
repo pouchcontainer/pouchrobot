@@ -46,6 +46,8 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 		return err
 	}
 
+	logrus.Infof("received event type [issues], action type [%s]", actionType)
+
 	issue, err := ExactIssue(data)
 	if err != nil {
 		return err
@@ -73,6 +75,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpen(issue *github.Issue) error {
 		logrus.Errorf("failed to add labels %v to issue %d: %v", labels, *(issue.Number), err)
 		return err
 	}
+	logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
 
 	return nil
 }

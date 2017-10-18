@@ -6,7 +6,6 @@ import (
 	"github.com/allencloud/automan/server/gh"
 
 	"github.com/allencloud/automan/server/processor/issueProcessor"
-	"github.com/sirupsen/logrus"
 )
 
 type processor interface {
@@ -30,7 +29,6 @@ func NewProcessor(client *gh.Client) *Processor {
 
 // HandleEvent processes an event received from github
 func (p *Processor) HandleEvent(eventType string, data []byte) error {
-	logrus.Info("")
 	switch eventType {
 	case "issues":
 		p.IssueProcessor.Process(data)
