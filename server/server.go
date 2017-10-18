@@ -4,6 +4,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/allencloud/automan/server/config"
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/processor"
@@ -45,12 +47,16 @@ func (s *Server) Run() error {
 }
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
+	logrus.Info("_ping request received")
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte{'O', 'K'})
 	return
 }
 
 func (s *Server) eventHandler(w http.ResponseWriter, r *http.Request) {
+	logrus.Infof("print headers in request: %v", r.Header)
 	eventType := r.Header.Get("X-Github-Events")
+	logrus.Infof("received a event whose type is: %s", eventType)
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
