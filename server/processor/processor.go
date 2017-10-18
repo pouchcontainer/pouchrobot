@@ -14,7 +14,7 @@ type processor interface {
 	Process(data []byte) error
 }
 
-// Processor containers several specific processors
+// Processor contains several specific processors
 type Processor struct {
 	IssueProcessor *issueProcessor.TriggeredIssueProcessor
 }

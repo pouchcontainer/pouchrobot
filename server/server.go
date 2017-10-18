@@ -18,7 +18,6 @@ var DefaultAddress = ":6789"
 // Server refers to a
 type Server struct {
 	config    config.Config
-	ghClient  *gh.Client
 	processor *processor.Processor
 }
 
@@ -26,7 +25,7 @@ type Server struct {
 func NewServer(config config.Config) *Server {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	return &Server{
-		ghClient:  ghClient,
+		config:    config,
 		processor: processor.NewProcessor(ghClient),
 	}
 }
@@ -54,6 +53,7 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) eventHandler(w http.ResponseWriter, r *http.Request) {
+	logrus.Info("/events request received")
 	logrus.Infof("print headers in request: %v", r.Header)
 	eventType := r.Header.Get("X-Github-Event")
 	logrus.Infof("received event type: %s", eventType)
