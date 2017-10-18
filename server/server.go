@@ -24,9 +24,9 @@ type Server struct {
 
 // NewServer constructs a brand new automan server
 func NewServer(config config.Config) *Server {
-	ghClient := gh.NewClient(config.Owner, config.Repo)
+	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	return &Server{
-		ghClient:  gh.NewClient(config.Owner, config.Repo),
+		ghClient:  ghClient,
 		processor: processor.NewProcessor(ghClient),
 	}
 }
@@ -47,7 +47,7 @@ func (s *Server) Run() error {
 }
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
-	logrus.Info("_ping request received")
+	logrus.Info("/_ping request received")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte{'O', 'K'})
 	return
@@ -56,7 +56,7 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) eventHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("print headers in request: %v", r.Header)
 	eventType := r.Header.Get("X-Github-Event")
-	logrus.Infof("received a event whose type is: %s", eventType)
+	logrus.Infof("received event type: %s", eventType)
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {

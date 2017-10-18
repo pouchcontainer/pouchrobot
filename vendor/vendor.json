@@ -54,6 +54,13 @@
 			"tree": true
 		},
 		{
+			"checksumSHA1": "9y2ZEmwfyB0KbsS5bSkXzLMwmbo=",
+			"path": "golang.org/x/oauth2",
+			"revision": "bb50c06baba3d0c76f9d125c0719093e315b5b44",
+			"revisionTime": "2017-09-28T00:25:42Z",
+			"tree": true
+		},
+		{
 			"checksumSHA1": "EveOzYPCTHTDrTjRLYcS/RzV984=",
 			"path": "golang.org/x/sys/unix",
 			"revision": "a45f55524b7ec57890cfa6c6bc06b47f877be0d1",

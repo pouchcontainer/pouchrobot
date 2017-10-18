@@ -2,9 +2,10 @@ package config
 
 // Config refers
 type Config struct {
-	Owner      string
-	Repo       string
-	HTTPListen string
+	Owner       string
+	Repo        string
+	HTTPListen  string
+	AccessToken string
 }
 
 // NewConfig creates a

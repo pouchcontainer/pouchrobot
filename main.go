@@ -26,6 +26,7 @@ func main() {
 	flagSet.StringVarP(&cfg.Owner, "owner", "o", "", "github ID to which connect in GitHub")
 	flagSet.StringVarP(&cfg.Repo, "repo", "r", "", "github repo to which connect in GitHub")
 	flagSet.StringVarP(&cfg.HTTPListen, "listen", "l", "127.0.0.1:6789", "where does automan listened on")
+	flagSet.StringVarP(&cfg.HTTPListen, "token", "t", "", "access token to have some control on resources")
 
 	cmdServe.Execute()
 }
