@@ -102,3 +102,14 @@ func (c *Client) AddCommentToIssue(ctx context.Context, num int, comment *github
 	}
 	return nil
 }
+
+// AssignIssueToUsers assigns users to the specified issue.
+func (c *Client) AssignIssueToUsers(ctx context.Context, num int, users []string) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	if _, _, err := c.Client.Issues.AddAssignees(ctx, c.owner, c.repo, num, users); err != nil {
+		return err
+	}
+	return nil
+}

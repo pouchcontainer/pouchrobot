@@ -2,8 +2,8 @@ package issueProcessor
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -47,7 +47,7 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 		return err
 	}
 
-	logrus.Infof("received event type [issues], action type [%s]", actionType)
+	logrus.Infof("received event type [issues] or [issue_comment], action type [%s]", actionType)
 
 	issue, err := ExactIssue(data)
 	if err != nil {
@@ -56,14 +56,22 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 
 	switch actionType {
 	case "opened":
-		if err := fIP.ActToIssueOpen(&issue); err != nil {
+		if err := fIP.ActToIssueOpenOrEdit(&issue); err != nil {
+			return err
+		}
+	case "edited":
+		if err := fIP.ActToIssueOpenOrEdit(&issue); err != nil {
+			return err
+		}
+	case "created":
+		comment, err := ExactIssueComment(data)
+		if err != nil {
+			return err
+		}
+		if err := fIP.ActToIssueComment(&issue, &comment); err != nil {
 			return err
 		}
 	case "reopened":
-	case "edited":
-		if err := fIP.ActToIssueOpen(&issue); err != nil {
-			return err
-		}
 	default:
 		return fmt.Errorf("unknown action type %s in issue: ", actionType)
 	}
@@ -71,19 +79,22 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 	return nil
 }
 
-// ActToIssueOpen acts to opened issue
+// ActToIssueOpenOrEdit acts to opened issue
 // This function covers the following part:
 // generate labels;
 // attach comments;
 // assign issue to specific user;
-func (fIP *TriggeredIssueProcessor) ActToIssueOpen(issue *github.Issue) error {
+func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) error {
 	// generate labels
 	labels := open.ParseToGenerateLabels(issue)
-	if err := fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels); err != nil {
-		logrus.Errorf("failed to add labels %v to issue %d: %v", labels, *(issue.Number), err)
-		return err
+	if len(labels) != 0 {
+		// only labels generated do we attach labels to issue
+		if err := fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels); err != nil {
+			logrus.Errorf("failed to add labels %v to issue %d: %v", labels, *(issue.Number), err)
+			return err
+		}
+		logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
 	}
-	logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
 
 	// attach comment
 	newComment := &github.IssueComment{}
@@ -139,35 +150,25 @@ ping @allencloud , PTAL.
 	return nil
 }
 
-// ExtractActionType extracts the action type.
-func ExtractActionType(data []byte) (string, error) {
-	var m struct {
-		Action string `json:"action"`
+// ActToIssueComment acts to issue comment.
+// It covers the following parts:
+// assign to user if he comments `#dibs`
+func (fIP *TriggeredIssueProcessor) ActToIssueComment(issue *github.Issue, comment *github.IssueComment) error {
+	if comment == nil || issue == nil {
+		return nil
 	}
-	if err := json.Unmarshal(data, &m); err != nil {
-		return "", err
-	}
-	return m.Action, nil
-}
 
-// ExactIssue extracts the issue from request body.
-func ExactIssue(data []byte) (github.Issue, error) {
-	var m struct {
-		Issue github.Issue `json:"issue"`
-	}
-	if err := json.Unmarshal(data, &m); err != nil {
-		return github.Issue{}, err
-	}
-	return m.Issue, nil
-}
+	commentUser := *(comment.User.Login)
+	commentBody := *(comment.Body)
+	users := []string{commentUser}
 
-// ExactPR extracts the pull request from request body.
-func ExactPR(data []byte) (github.PullRequest, error) {
-	var m struct {
-		PullRequest github.PullRequest `json:"pull_reques"`
+	if strings.Contains(strings.ToLower(commentBody), "#dibs") {
+		if err := fIP.Client.AssignIssueToUsers(context.Background(), *(issue.Number), users); err != nil {
+			logrus.Errorf("failed to asign users %v to issue %d", users, *(issue.Number))
+			return err
+		}
+		logrus.Infof("secceed in assigning users %v for issue %d", users, *(issue.Number))
 	}
-	if err := json.Unmarshal(data, &m); err != nil {
-		return github.PullRequest{}, err
-	}
-	return m.PullRequest, nil
+
+	return nil
 }

@@ -32,6 +32,8 @@ func (p *Processor) HandleEvent(eventType string, data []byte) error {
 	switch eventType {
 	case "issues":
 		p.IssueProcessor.Process(data)
+	case "issue_comment":
+		p.IssueProcessor.Process(data)
 	case "pull_request":
 		//processPullRequestEvent(data)
 	default:
