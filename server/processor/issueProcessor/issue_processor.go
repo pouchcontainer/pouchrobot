@@ -100,11 +100,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 	newComment := &github.IssueComment{}
 
 	// check if the title is too short or the body empty.
-	needUpdate := false
-	fmt.Printf("Title: %v\n", *(issue.Title))
-
 	if len(*(issue.Title)) < 20 {
-		needUpdate = true
 		body := fmt.Sprintf(`
 Thanks for your contribution. 🍻  @%s 
 While we thought **ISSUE TITLE** could be more specific.
@@ -125,7 +121,6 @@ More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTR
 	}
 
 	if issue.Body == nil || *(issue.Body) == "" || len(*(issue.Body)) < 50 {
-		needUpdate = true
 		body := fmt.Sprintf(`
 Thanks for your contribution. 🍻  @%s 
 While we thought **ISSUE DESCRIPTION** should not be empty or too short.
