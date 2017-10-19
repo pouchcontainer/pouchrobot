@@ -26,7 +26,6 @@ type Server struct {
 func NewServer(config config.Config) *Server {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	return &Server{
-		config:    config,
 		processor: processor.NewProcessor(ghClient),
 	}
 }
