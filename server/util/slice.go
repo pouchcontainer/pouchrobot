@@ -20,3 +20,13 @@ func uniqueSlice(input []string) []string {
 	}
 	return result
 }
+
+// SliceContainsElement judges whether an element is includes in an slice
+func SliceContainsElement(origin []string, input string) bool {
+	for _, value := range origin {
+		if value == input {
+			return true
+		}
+	}
+	return false
+}

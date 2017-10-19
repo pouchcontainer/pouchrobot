@@ -91,3 +91,14 @@ func (c *Client) AddLabelsToIssue(ctx context.Context, num int, labels []string)
 	}
 	return nil
 }
+
+// AddCommentToIssue adds comment to an issue
+func (c *Client) AddCommentToIssue(ctx context.Context, num int, comment *github.IssueComment) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	if _, _, err := c.Client.Issues.CreateComment(ctx, c.owner, c.repo, num, comment); err != nil {
+		return err
+	}
+	return nil
+}

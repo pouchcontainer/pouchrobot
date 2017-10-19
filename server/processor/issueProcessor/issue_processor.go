@@ -9,6 +9,7 @@ import (
 
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/processor/issueProcessor/open"
+	"github.com/allencloud/automan/server/util"
 	"github.com/google/go-github/github"
 )
 
@@ -60,6 +61,9 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 		}
 	case "reopened":
 	case "edited":
+		if err := fIP.ActToIssueOpen(&issue); err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("unknown action type %s in issue: ", actionType)
 	}
@@ -76,6 +80,21 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpen(issue *github.Issue) error {
 		return err
 	}
 	logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
+
+	// check if this is the first issue of the contributor
+
+	// check if this is a P0 priority issue, if that mention maintainers.
+	if util.SliceContainsElement(labels, "priority/P0") {
+		body := fmt.Sprintf(":scream \nThis is a priority/P0 issue reported by @%v.\nPlease get it as soon as possible. \n ping @allencloud ", issue.User.Login)
+		newComment := &github.IssueComment{
+			Body: &body,
+		}
+		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
+			logrus.Errorf("failed to add P0 comments to issue %d", *(issue.Number))
+			return err
+		}
+	}
+	logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))
 
 	return nil
 }
