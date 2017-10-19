@@ -100,10 +100,14 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 	newComment := &github.IssueComment{}
 
 	// check if the title is too short or the body empty.
+	needUpdate := false
+	fmt.Printf("Title: %v\n", *(issue.Title))
+
 	if len(*(issue.Title)) < 20 {
+		needUpdate = true
 		body := fmt.Sprintf(`
 Thanks for your contribution. 🍻  @%s 
-While we thought issue title could be more specific.
+While we thought **ISSUE TITLE** could be more specific.
 Please edit issue title intead of opening a new one.
 More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`,
 			*(issue.User.Login))
@@ -117,9 +121,10 @@ More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTR
 	}
 
 	if issue.Body == nil || *(issue.Body) == "" || len(*(issue.Body)) < 50 {
+		needUpdate = true
 		body := fmt.Sprintf(`
 Thanks for your contribution. 🍻  @%s 
-While we thought issue desciprtion should not be empty or too short.
+While we thought **ISSUE DESCRIPTION** should not be empty or too short.
 Please edit this issue description intead of opening a new one.
 More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`,
 			*(issue.User.Login))
@@ -146,6 +151,15 @@ ping @allencloud , PTAL.
 		}
 	}
 	logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))
+
+	if needUpdate {
+		labels := []string{"status/more-info-needed"}
+		if err := fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels); err != nil {
+			logrus.Errorf("failed to add labels %v to issue %d: %v", labels, *(issue.Number), err)
+			return err
+		}
+		logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
+	}
 
 	return nil
 }
