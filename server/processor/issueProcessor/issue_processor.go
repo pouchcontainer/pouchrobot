@@ -83,6 +83,9 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpen(issue *github.Issue) error {
 
 	// check if this is the first issue of the contributor
 
+	// test to see what is in emoji
+	logrus.Infof("Here is the issue Body:%s", issue.Body)
+
 	// check if this is a P0 priority issue, if that mention maintainers.
 	if util.SliceContainsElement(labels, "priority/P0") {
 		body := fmt.Sprintf(":scream \nThis is a priority/P0 issue reported by @%v.\nPlease get it as soon as possible. \n ping @allencloud ", issue.User.Login)
