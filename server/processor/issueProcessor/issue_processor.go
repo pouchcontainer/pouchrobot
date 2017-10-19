@@ -117,6 +117,10 @@ More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTR
 			return err
 		}
 		logrus.Infof("secceed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
+
+		labels := []string{"status/more-info-needed"}
+		fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels)
+
 		return nil
 	}
 
@@ -134,6 +138,10 @@ More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTR
 			return err
 		}
 		logrus.Infof("secceed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
+
+		labels := []string{"status/more-info-needed"}
+		fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels)
+
 		return nil
 	}
 
@@ -151,15 +159,6 @@ ping @allencloud , PTAL.
 		}
 	}
 	logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))
-
-	if needUpdate {
-		labels := []string{"status/more-info-needed"}
-		if err := fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels); err != nil {
-			logrus.Errorf("failed to add labels %v to issue %d: %v", labels, *(issue.Number), err)
-			return err
-		}
-		logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
-	}
 
 	return nil
 }
