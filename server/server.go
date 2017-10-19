@@ -17,14 +17,16 @@ var DefaultAddress = ":6789"
 
 // Server refers to a
 type Server struct {
-	config    config.Config
-	processor *processor.Processor
+	config          config.Config
+	processor       *processor.Processor
+	maintainersTeam string
 }
 
 // NewServer constructs a brand new automan server
 func NewServer(config config.Config) *Server {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	return &Server{
+		config:    config,
 		processor: processor.NewProcessor(ghClient),
 	}
 }

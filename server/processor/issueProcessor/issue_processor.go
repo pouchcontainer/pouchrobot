@@ -81,17 +81,34 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpen(issue *github.Issue) error {
 	}
 	logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
 
-	// check if this is the first issue of the contributor
+	// attach comment
+	newComment := &github.IssueComment{}
+
+	// check if the title too short or the body empty.
+	if len(*(issue.Title)) < 20 {
+		body := fmt.Sprintf("Thanks for your contribution.\nWe suggest that issue PR should be as detailed as possible. @%s\n More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md .\nThanks.", *(issue.User.Login))
+		newComment.Body = &body
+		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
+			logrus.Errorf("failed to add TOO SHORT TITLE comment to issue %d", *(issue.Number))
+		}
+		return nil
+	}
+
+	if issue.Body == nil || *(issue.Body) == "" {
+		body := fmt.Sprintf("Thanks for your contribution. @%s\nWhile we suggest issue desciprtion should not be empty. Please edit this issue to add description intead of opening a new one.", *(issue.User.Login))
+		newComment.Body = &body
+		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
+			logrus.Errorf("failed to add EMPTY ISSUE BODY comment to issue %d", *(issue.Number))
+		}
+	}
 
 	// test to see what is in emoji
 	logrus.Infof("Here is the issue Body:%s", *(issue.Body))
 
 	// check if this is a P0 priority issue, if that mention maintainers.
 	if util.SliceContainsElement(labels, "priority/P0") {
-		body := fmt.Sprintf(":scream \nThis is a **priority/P0** issue reported by @%v.\nPlease get it as soon as possible. \n ping @allencloud ", issue.User.Login)
-		newComment := &github.IssueComment{
-			Body: &body,
-		}
+		body := fmt.Sprintf("😱 \nThis is a **priority/P0** issue reported by @%s.\nSeems to be severe enough. \nping @allencloud , PTAL. ", *(issue.User.Login))
+		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
 			logrus.Errorf("failed to add P0 comments to issue %d", *(issue.Number))
 			return err
