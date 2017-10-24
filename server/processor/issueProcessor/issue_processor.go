@@ -105,7 +105,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 	newComment := &github.IssueComment{}
 
 	// check if the title is too short or the body empty.
-	if len(*(issue.Title)) < 20 {
+	if issue.Title == nil || len(*(issue.Title)) < 20 {
 		body := fmt.Sprintf(putils.IssueTitleTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
@@ -120,7 +120,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 		return nil
 	}
 
-	if issue.Body == nil || *(issue.Body) == "" || len(*(issue.Body)) < 50 {
+	if issue.Body == nil || len(*(issue.Body)) < 50 {
 		body := fmt.Sprintf(putils.IssueDescriptionTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {

@@ -89,7 +89,7 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 	newComment := &github.PullRequestComment{}
 
 	// check if the title is too short or the body empty.
-	if len(*(pr.Title)) < 20 {
+	if pr.Title == nil || len(*(pr.Title)) < 20 {
 		body := fmt.Sprintf(putils.PRTitleTooShort, *(pr.User.Login))
 		newComment.Body = &body
 		if err := prp.Client.AddCommentToPR(context.Background(), *(pr.Number), newComment); err != nil {
@@ -101,7 +101,7 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 		return nil
 	}
 
-	if pr.Body == nil || *(pr.Body) == "" || len(*(pr.Body)) < 50 {
+	if pr.Body == nil || len(*(pr.Body)) < 50 {
 		body := fmt.Sprintf(putils.PRDescriptionTooShort, *(pr.User.Login))
 		newComment.Body = &body
 		if err := prp.Client.AddCommentToPR(context.Background(), *(pr.Number), newComment); err != nil {
