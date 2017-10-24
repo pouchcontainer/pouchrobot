@@ -52,13 +52,16 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 	case "synchronize":
 		logrus.Info("-------------------------------------Got a synchronized event")
 		logrus.Infof("the mergeable is %v", pr.Mergeable)
+		if pr.Mergeable != nil && *(pr.Mergeable) == true {
+			// remove the conflict comment for the PR
+		}
 	case "edited":
 		if err := prp.ActToPROpenOrEdit(&pr); err != nil {
 			return err
 		}
 	case "pull_request_review":
 	case "created":
-		logrus.Infof("Got an issue: %v", issue)
+		//logrus.Infof("Got an issue: %v", issue)
 		if err := prp.ActToPRCommented(&issue, &comment); err != nil {
 			return nil
 		}
@@ -119,9 +122,11 @@ func (prp *PullRequestProcessor) ActToPRCommented(issue *github.Issue, comment *
 	body := *(comment.Body)
 	user := *(issue.User.Login)
 	logrus.Infof("body: %s, user:%s", body, user)
+
 	if hasLGTMFromMaintainer(user, body) && noLGTMInLabels(issue) {
 		prp.Client.AddLabelsToPR(context.Background(), *(issue.Number), []string{"LGTM"})
 	}
+	// FIXME: one maintainer attached two LGTMs, it will attach an APPROVED
 	if hasLGTMFromMaintainer(user, body) && hasLGTMInLabels(issue) {
 		prp.Client.AddLabelsToPR(context.Background(), *(issue.Number), []string{"APPROVED"})
 	}

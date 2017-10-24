@@ -20,6 +20,9 @@ func ParseToGenerateLabels(issue *github.Issue) []string {
 func ParseTitleToGenerateLabels(issue github.Issue) []string {
 	var labels []string
 	title := issue.Title
+	if title == nil {
+		return labels
+	}
 	for label, matchedSlice := range putils.TitleMatches {
 		for _, pattern := range matchedSlice {
 			lowerCaseTitle := strings.ToLower(*title)
@@ -36,6 +39,9 @@ func ParseTitleToGenerateLabels(issue github.Issue) []string {
 func ParseBodyToGenerateLabels(issue github.Issue) []string {
 	var labels []string
 	content := issue.Body
+	if content == nil {
+		return labels
+	}
 	for label, matchedSlice := range putils.BodyMatches {
 		for _, pattern := range matchedSlice {
 			lowerCaseBody := strings.ToLower(*content)
