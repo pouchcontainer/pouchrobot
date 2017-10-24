@@ -33,6 +33,11 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 		return err
 	}
 
+	comment, err := utils.ExactIssueComment(data)
+	if err != nil {
+		return nil
+	}
+
 	pr, err := utils.ExactPR(data)
 	if err != nil {
 		return err
@@ -54,7 +59,7 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 	case "pull_request_review":
 	case "created":
 		logrus.Infof("Got an issue: %v", issue)
-		if err := prp.ActToPRCommented(&issue); err != nil {
+		if err := prp.ActToPRCommented(&issue, &comment); err != nil {
 			return nil
 		}
 
@@ -110,8 +115,8 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 // Here are the rules:
 // 1. if maintainers attached LGTM and currently no LGTM, add a label "LGTM";
 // 2. if maintainers attached LGTM and already has a LGTM, add a label "APPROVED";
-func (prp *PullRequestProcessor) ActToPRCommented(issue *github.Issue) error {
-	body := *(issue.Body)
+func (prp *PullRequestProcessor) ActToPRCommented(issue *github.Issue, comment *github.IssueComment) error {
+	body := *(comment.Body)
 	user := *(issue.User.Login)
 	logrus.Infof("body: %s, user:%s", body, user)
 	if hasLGTMFromMaintainer(user, body) && noLGTMInLabels(issue) {
