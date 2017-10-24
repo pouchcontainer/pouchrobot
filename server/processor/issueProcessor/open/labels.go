@@ -13,6 +13,17 @@ func ParseToGenerateLabels(issue *github.Issue) []string {
 	var labels []string
 	labels = append(labels, ParseTitleToGenerateLabels(*issue)...)
 	labels = append(labels, ParseBodyToGenerateLabels(*issue)...)
+
+	dataMap := make(map[string]struct{}, len(labels))
+	for _, value := range labels {
+		if _, exist := dataMap[value]; !exist {
+			dataMap[value] = struct{}{}
+		}
+	}
+	labels = []string{}
+	for key := range dataMap {
+		labels = append(labels, key)
+	}
 	return labels
 }
 
