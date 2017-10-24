@@ -1,5 +1,19 @@
 package utils
 
+// Maintainers is a list of the maintainers
+var Maintainers = []string{
+	"allencloud",
+	"yyb196",
+	"Ace-Tang",
+	"skoo87",
+	"sunyuan3",
+	"furykerry",
+	"WIZARD-CXY",
+	"skyline09",
+	"rudyfly",
+	"houqianming",
+}
+
 // TitleMatches is a map in which key is the label, and value is a slice of string
 // which can be treated as the label.
 var TitleMatches = map[string][]string{

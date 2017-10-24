@@ -3,6 +3,7 @@ package pullRequestProcessor
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/processor/pullRequestProcessor/open"
@@ -27,12 +28,15 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 
 	logrus.Infof("received event type [pull request], action type [%s]", actionType)
 
-	pr, err := utils.ExactPR(data)
+	issue, err := utils.ExactIssue(data)
 	if err != nil {
 		return err
 	}
 
-	logrus.Infof("Received a PR: %v", pr)
+	pr, err := utils.ExactPR(data)
+	if err != nil {
+		return err
+	}
 
 	switch actionType {
 	case "opened":
@@ -48,6 +52,11 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 			return err
 		}
 	case "pull_request_review":
+	case "created":
+		logrus.Infof("Got an issue: %v", issue)
+		if err := prp.ActToPRCommented(&issue); err != nil {
+			return nil
+		}
 
 	default:
 		return fmt.Errorf("unknown action type %s in pull request: ", actionType)
@@ -95,4 +104,52 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 		return nil
 	}
 	return nil
+}
+
+// ActToPRCommented acts added comment to the PR
+// Here are the rules:
+// 1. if maintainers attached LGTM and currently no LGTM, add a label "LGTM";
+// 2. if maintainers attached LGTM and already has a LGTM, add a label "APPROVED";
+func (prp *PullRequestProcessor) ActToPRCommented(issue *github.Issue) error {
+	body := *(issue.Body)
+	user := *(issue.User.Login)
+	logrus.Infof("body: %s, user:%s", body, user)
+	if hasLGTMFromMaintainer(user, body) && noLGTMInLabels(issue) {
+		prp.Client.AddLabelsToPR(context.Background(), *(issue.Number), []string{"LGTM"})
+	}
+	if hasLGTMFromMaintainer(user, body) && hasLGTMInLabels(issue) {
+		prp.Client.AddLabelsToPR(context.Background(), *(issue.Number), []string{"APPROVED"})
+	}
+	return nil
+}
+
+func hasLGTMFromMaintainer(user string, body string) bool {
+	if !strings.Contains(strings.ToLower(body), "lgtm") {
+		return false
+	}
+
+	for _, maintainerID := range putils.Maintainers {
+		if strings.ToLower(user) == strings.ToLower(maintainerID) {
+			return true
+		}
+	}
+	return false
+}
+
+func noLGTMInLabels(issue *github.Issue) bool {
+	for _, label := range issue.Labels {
+		if label.GetName() == "LGTM" {
+			return false
+		}
+	}
+	return true
+}
+
+func hasLGTMInLabels(issue *github.Issue) bool {
+	for _, label := range issue.Labels {
+		if label.GetName() == "LGTM" {
+			return true
+		}
+	}
+	return false
 }
