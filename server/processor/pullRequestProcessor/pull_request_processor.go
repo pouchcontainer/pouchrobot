@@ -42,11 +42,13 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 	case "review_requested":
 	case "synchronize":
 		logrus.Info("-------------------------------------Got a synchronized event")
-		logrus.Infof("the mergeable is %s", *(pr.Mergeable))
+		logrus.Infof("the mergeable is %v", pr.Mergeable)
 	case "edited":
 		if err := prp.ActToPROpenOrEdit(&pr); err != nil {
 			return err
 		}
+	case "pull_request_review":
+
 	default:
 		return fmt.Errorf("unknown action type %s in pull request: ", actionType)
 	}

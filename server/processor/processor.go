@@ -7,6 +7,7 @@ import (
 
 	"github.com/allencloud/automan/server/processor/issueProcessor"
 	"github.com/allencloud/automan/server/processor/pullRequestProcessor"
+	"github.com/allencloud/automan/server/utils"
 )
 
 type processor interface {
@@ -34,6 +35,14 @@ func NewProcessor(client *gh.Client) *Processor {
 
 // HandleEvent processes an event received from github
 func (p *Processor) HandleEvent(eventType string, data []byte) error {
+	// since pr is also a kind of issue, we need to first make it clear
+	issueType := judgeIssueOrPR(data)
+	if issueType == "issue" {
+		eventType = "issues"
+	} else if issueType == "pull_request" {
+		eventType = "pull_request"
+	}
+
 	switch eventType {
 	case "issues":
 		p.IssueProcessor.Process(data)
@@ -45,4 +54,16 @@ func (p *Processor) HandleEvent(eventType string, data []byte) error {
 		return fmt.Errorf("unknown event type %s", eventType)
 	}
 	return nil
+}
+
+func judgeIssueOrPR(data []byte) string {
+	issue, err := utils.ExactIssue(data)
+	if err != nil {
+		return ""
+	}
+
+	if issue.PullRequestLinks == nil {
+		return "issue"
+	}
+	return "pull_request"
 }
