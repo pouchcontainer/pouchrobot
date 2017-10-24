@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/allencloud/automan/server/gh"
+	"github.com/sirupsen/logrus"
 
 	"github.com/allencloud/automan/server/processor/issueProcessor"
 	"github.com/allencloud/automan/server/processor/pullRequestProcessor"
@@ -37,6 +38,7 @@ func NewProcessor(client *gh.Client) *Processor {
 func (p *Processor) HandleEvent(eventType string, data []byte) error {
 	// since pr is also a kind of issue, we need to first make it clear
 	issueType := judgeIssueOrPR(data)
+	logrus.Infof("get issueType: %s", issueType)
 	if issueType == "issue" {
 		eventType = "issues"
 	} else if issueType == "pull_request" {
