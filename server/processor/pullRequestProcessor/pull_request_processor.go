@@ -41,6 +41,8 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 		}
 	case "review_requested":
 	case "synchronize":
+		logrus.Info("-------------------------------------Got a synchronized event")
+		logrus.Infof("the mergeable is %s", *(pr.Mergeable))
 	case "edited":
 		if err := prp.ActToPROpenOrEdit(&pr); err != nil {
 			return err

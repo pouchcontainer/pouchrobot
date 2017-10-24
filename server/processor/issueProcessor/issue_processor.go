@@ -182,7 +182,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueLabeled(issue *github.Issue) error
 			logrus.Errorf("failed to add P0 comments to issue %d", *(issue.Number))
 			return err
 		}
+		logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))
 	}
-	logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))
 	return nil
 }
