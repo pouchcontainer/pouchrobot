@@ -1,4 +1,4 @@
-package issueProcessor
+package utils
 
 import (
 	"encoding/json"
@@ -48,4 +48,15 @@ func ExactIssueComment(data []byte) (github.IssueComment, error) {
 		return github.IssueComment{}, err
 	}
 	return m.IssueComment, nil
+}
+
+// ExactIssueLables extracts the issue labels from request body.
+func ExactIssueLables(data []byte) ([]string, error) {
+	var m struct {
+		Labels []string `json:"labels"`
+	}
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, err
+	}
+	return m.Labels, nil
 }

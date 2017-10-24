@@ -6,6 +6,7 @@ import (
 	"github.com/allencloud/automan/server/gh"
 
 	"github.com/allencloud/automan/server/processor/issueProcessor"
+	"github.com/allencloud/automan/server/processor/pullRequestProcessor"
 )
 
 type processor interface {
@@ -15,13 +16,17 @@ type processor interface {
 
 // Processor contains several specific processors
 type Processor struct {
-	IssueProcessor *issueProcessor.TriggeredIssueProcessor
+	IssueProcessor       *issueProcessor.TriggeredIssueProcessor
+	PullRequestProcessor *pullRequestProcessor.PullRequestProcessor
 }
 
 // NewProcessor creates
 func NewProcessor(client *gh.Client) *Processor {
 	return &Processor{
 		IssueProcessor: &issueProcessor.TriggeredIssueProcessor{
+			Client: client,
+		},
+		PullRequestProcessor: &pullRequestProcessor.PullRequestProcessor{
 			Client: client,
 		},
 	}
@@ -35,7 +40,7 @@ func (p *Processor) HandleEvent(eventType string, data []byte) error {
 	case "issue_comment":
 		p.IssueProcessor.Process(data)
 	case "pull_request":
-		//processPullRequestEvent(data)
+		p.PullRequestProcessor.Process(data)
 	default:
 		return fmt.Errorf("unknown event type %s", eventType)
 	}

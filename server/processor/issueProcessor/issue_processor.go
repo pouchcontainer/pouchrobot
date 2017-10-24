@@ -9,7 +9,8 @@ import (
 
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/processor/issueProcessor/open"
-	"github.com/allencloud/automan/server/util"
+	putils "github.com/allencloud/automan/server/processor/utils"
+	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
 )
 
@@ -42,14 +43,14 @@ type TriggeredIssueProcessor struct {
 // Process processes
 func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 	// process details
-	actionType, err := ExtractActionType(data)
+	actionType, err := utils.ExtractActionType(data)
 	if err != nil {
 		return err
 	}
 
 	logrus.Infof("received event type [issues] or [issue_comment], action type [%s]", actionType)
 
-	issue, err := ExactIssue(data)
+	issue, err := utils.ExactIssue(data)
 	if err != nil {
 		return err
 	}
@@ -64,12 +65,16 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 			return err
 		}
 	case "created":
-		comment, err := ExactIssueComment(data)
+		comment, err := utils.ExactIssueComment(data)
 		if err != nil {
 			return err
 		}
 		if err := fIP.ActToIssueComment(&issue, &comment); err != nil {
 			return err
+		}
+	case "labeled":
+		if err := fIP.ActToIssueLabeled(&issue); err != nil {
+			return nil
 		}
 	case "reopened":
 	default:
@@ -101,18 +106,13 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 
 	// check if the title is too short or the body empty.
 	if len(*(issue.Title)) < 20 {
-		body := fmt.Sprintf(`
-Thanks for your contribution. 🍻  @%s 
-While we thought **ISSUE TITLE** could be more specific.
-Please edit issue title intead of opening a new one.
-More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`,
-			*(issue.User.Login))
+		body := fmt.Sprintf(putils.IssueTitleTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
 			logrus.Errorf("failed to add TOO SHORT TITLE comment to issue %d", *(issue.Number))
 			return err
 		}
-		logrus.Infof("secceed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
+		logrus.Infof("succeed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
 
 		labels := []string{"status/more-info-needed"}
 		fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels)
@@ -121,12 +121,7 @@ More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTR
 	}
 
 	if issue.Body == nil || *(issue.Body) == "" || len(*(issue.Body)) < 50 {
-		body := fmt.Sprintf(`
-Thanks for your contribution. 🍻  @%s 
-While we thought **ISSUE DESCRIPTION** should not be empty or too short.
-Please edit this issue description intead of opening a new one.
-More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`,
-			*(issue.User.Login))
+		body := fmt.Sprintf(putils.IssueDescriptionTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
 			logrus.Errorf("failed to add EMPTY OR TOO SHORT ISSUE BODY comment to issue %d", *(issue.Number))
@@ -139,21 +134,6 @@ More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTR
 
 		return nil
 	}
-
-	// check if this is a P0 priority issue, if that mention maintainers.
-	if util.SliceContainsElement(labels, "priority/P0") {
-		body := fmt.Sprintf(`
-😱 This is a **priority/P0** issue reported by @%s.
-Seems to be severe enough. 
-ping @allencloud , PTAL. 
-			`, *(issue.User.Login))
-		newComment.Body = &body
-		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
-			logrus.Errorf("failed to add P0 comments to issue %d", *(issue.Number))
-			return err
-		}
-	}
-	logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))
 
 	return nil
 }
@@ -172,11 +152,37 @@ func (fIP *TriggeredIssueProcessor) ActToIssueComment(issue *github.Issue, comme
 
 	if strings.Contains(strings.ToLower(commentBody), "#dibs") {
 		if err := fIP.Client.AssignIssueToUsers(context.Background(), *(issue.Number), users); err != nil {
-			logrus.Errorf("failed to asign users %v to issue %d", users, *(issue.Number))
+			logrus.Errorf("failed to assign users %v to issue %d", users, *(issue.Number))
 			return err
 		}
-		logrus.Infof("secceed in assigning users %v for issue %d", users, *(issue.Number))
+		logrus.Infof("succeed in assigning users %v for issue %d", users, *(issue.Number))
 	}
 
+	return nil
+}
+
+// ActToIssueLabeled acts to issue labeled events
+func (fIP *TriggeredIssueProcessor) ActToIssueLabeled(issue *github.Issue) error {
+	// check if this is a P0 priority issue, if that mention maintainers.
+	var needP0Comment = false
+
+	for _, label := range issue.Labels {
+		if *(label.Name) == "priority/P0" {
+			needP0Comment = true
+			break
+		}
+	}
+
+	if needP0Comment {
+		body := fmt.Sprintf(putils.IssueNeedPOComment, *(issue.User.Login))
+		newComment := &github.IssueComment{
+			Body: &body,
+		}
+		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
+			logrus.Errorf("failed to add P0 comments to issue %d", *(issue.Number))
+			return err
+		}
+	}
+	logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))
 	return nil
 }

@@ -113,3 +113,27 @@ func (c *Client) AssignIssueToUsers(ctx context.Context, num int, users []string
 	}
 	return nil
 }
+
+// AddLabelsToPR adds labels to a pull request.
+// since in github pull request is a kind of issue as well,
+// we just use Client.Issues.AddLabelsToIssue to make, still need test
+func (c *Client) AddLabelsToPR(ctx context.Context, num int, labels []string) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	if _, _, err := c.Client.Issues.AddLabelsToIssue(ctx, c.owner, c.repo, num, labels); err != nil {
+		return err
+	}
+	return nil
+}
+
+// AddCommentToPR adds a comment to a pull request
+func (c *Client) AddCommentToPR(ctx context.Context, num int, comment *github.PullRequestComment) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	if _, _, err := c.Client.PullRequests.CreateComment(ctx, c.owner, c.repo, num, comment); err != nil {
+		return err
+	}
+	return nil
+}

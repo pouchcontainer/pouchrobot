@@ -1,4 +1,4 @@
-package open
+package utils
 
 // TitleMatches is a map in which key is the label, and value is a slice of string
 // which can be treated as the label.
