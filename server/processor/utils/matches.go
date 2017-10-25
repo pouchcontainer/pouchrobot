@@ -17,18 +17,54 @@ var Maintainers = []string{
 // TitleMatches is a map in which key is the label, and value is a slice of string
 // which can be treated as the label.
 var TitleMatches = map[string][]string{
+	"areas/log": []string{
+		"gelf",
+		"fluentd",
+		"journald",
+		"splunk",
+		"syslog",
+	},
+	"areas/monitoring": []string{
+		"monitoring",
+		"prometheus",
+	},
+	"areas/network": []string{
+		"cni",
+		"network",
+		"overlay",
+		"vxlan",
+	},
+	"areas/orchestration": []string{
+		"kubernetes",
+		"marathon",
+		"mesos",
+		"swarm",
+		"swarmkit",
+	},
+	"areas/runv": []string{
+		"runv",
+	},
+	"areas/storage": []string{
+		"csi",
+		"storage",
+		"volume",
+	},
+	"areas/test": []string{
+		"ci",
+		"test",
+	},
 	"kind/bug": []string{
 		"bug",
-		"error",
-		"failure",
-		"failed to ",
 		"cannot",
 		"can not",
 		"can't",
+		"error",
+		"failure",
+		"failed to ",
 	},
 	"kind/panic": []string{
-		"panic",
 		"invalid memory address or nil pointer",
+		"panic",
 	},
 	"kind/propasal": []string{
 		"proposal",
@@ -45,34 +81,13 @@ var TitleMatches = map[string][]string{
 		"feature_request",
 	},
 	"kind/question": []string{
-		"question",
-		"confusion",
-		"how to",
 		"can i",
-		"does pouch",
 		"can you",
+		"confusion",
+		"does pouch",
+		"how to",
+		"question",
 		"where to",
-	},
-	"areas/network": []string{
-		"network",
-		"cni",
-		"vxlan",
-		"overlay",
-	},
-	"areas/storage": []string{
-		"volume",
-		"storage",
-		"csi",
-	},
-	"areas/orchestration": []string{
-		"kubernetes",
-	},
-	"areas/runv": []string{
-		"runv",
-	},
-	"areas/test": []string{
-		"ci",
-		"test",
 	},
 	"os/windows": []string{
 		"windows",
