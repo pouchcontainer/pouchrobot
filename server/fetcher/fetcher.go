@@ -30,9 +30,9 @@ func NewFetcher(client *gh.Client) *Fetcher {
 // Work starts periodical work
 func (f *Fetcher) Work() {
 	for {
-		f.CheckPRsConflict()
-
 		time.Sleep(FETCHINTERVAL)
+
+		f.CheckPRsConflict()
 	}
 }
 

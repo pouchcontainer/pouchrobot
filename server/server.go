@@ -35,6 +35,10 @@ func NewServer(config config.Config) *Server {
 
 // Run runs the server.
 func (s *Server) Run() error {
+	// start fetcher in a goroutine
+	go s.fetcher.Work()
+
+	// start webserver
 	listenAddress := s.config.HTTPListen
 	if listenAddress == "" {
 		listenAddress = DefaultAddress
