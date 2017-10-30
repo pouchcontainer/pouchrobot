@@ -6,8 +6,11 @@ import (
 	"github.com/allencloud/automan/server/gh"
 	"github.com/sirupsen/logrus"
 
+	"github.com/allencloud/automan/server/processor/issueCommentProcessor"
 	"github.com/allencloud/automan/server/processor/issueProcessor"
+	"github.com/allencloud/automan/server/processor/prCommentProcessor"
 	"github.com/allencloud/automan/server/processor/pullRequestProcessor"
+
 	"github.com/allencloud/automan/server/utils"
 )
 
@@ -18,8 +21,10 @@ type processor interface {
 
 // Processor contains several specific processors
 type Processor struct {
-	IssueProcessor       *issueProcessor.TriggeredIssueProcessor
-	PullRequestProcessor *pullRequestProcessor.PullRequestProcessor
+	IssueProcessor        *issueProcessor.TriggeredIssueProcessor
+	PullRequestProcessor  *pullRequestProcessor.PullRequestProcessor
+	IssueCommentProcessor *issueCommentProcessor.IssueCommentProcessor
+	PRCommentProcessor    *prCommentProcessor.PRCommentProcessor
 }
 
 // NewProcessor creates
@@ -36,22 +41,24 @@ func NewProcessor(client *gh.Client) *Processor {
 
 // HandleEvent processes an event received from github
 func (p *Processor) HandleEvent(eventType string, data []byte) error {
-	// since pr is also a kind of issue, we need to first make it clear
-	issueType := judgeIssueOrPR(data)
-	logrus.Infof("get issueType: %s", issueType)
-	if issueType == "issue" {
-		eventType = "issues"
-	} else if issueType == "pull_request" {
-		eventType = "pull_request"
-	}
-
 	switch eventType {
 	case "issues":
 		p.IssueProcessor.Process(data)
-	case "issue_comment":
-		p.IssueProcessor.Process(data)
 	case "pull_request":
 		p.PullRequestProcessor.Process(data)
+	case "issue_comment":
+		// since pr is also a kind of issue, we need to first make it clear
+		issueType := judgeIssueOrPR(data)
+		logrus.Infof("get issueType: %s", issueType)
+		if issueType == "issue" {
+			p.IssueCommentProcessor.Process(data)
+			return nil
+		}
+		if issueType == "pull_request" {
+			p.PRCommentProcessor.Process(data)
+			return nil
+		}
+		return nil
 	default:
 		return fmt.Errorf("unknown event type %s", eventType)
 	}

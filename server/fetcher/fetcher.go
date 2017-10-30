@@ -2,78 +2,75 @@ package fetcher
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/allencloud/automan/server/gh"
+	putils "github.com/allencloud/automan/server/processor/utils"
 	"github.com/google/go-github/github"
+
 	"github.com/sirupsen/logrus"
 )
 
 // FETCHINTERVAL refers the interval of fetch action
-const FETCHINTERVAL = 24 * time.Hour
+const FETCHINTERVAL = 1 * time.Minute
 
-// StartFetcherProcess starts to interact with GitHub every 24 hours to fetch items.
-func StartFetcherProcess() {
-	logrus.Info("Starting fetcher process to get github items periodically")
-
-	//ticker := time.NewTicker(FETCHINTERVAL)
-
-	//for {
-	//	select {
-	//	case <-ticker.C:
-	// is there any possibility that items are so many that it consumes so much memory?
-	// TODO split all below into a single goroutine to avoid that all these things cannot
-	// be done in a single period.
-	issues, _, err := fetchGitHubItems()
-	if err != nil {
-		logrus.Errorf("failed to fetch GitHub items: %v", err)
-		// TODO: add a retry here
-		//continue
-	}
-
-	logrus.Infof("get %d issues from the repo", len(issues))
-	for _, issue := range issues {
-		processSingleItem(issue)
-	}
-
-	//for _, pr := range pullRequests {
-	//pr.processSingleItem()
-	//	}
-	//}
-	//}
+// Fetcher is a worker to periodically get elements from github
+type Fetcher struct {
+	client *gh.Client
 }
 
-func fetchGitHubItems() ([]*github.Issue, []*github.PullRequest, error) {
-	client := github.NewClient(nil)
-
-	ctx := context.Background()
-	// fetch opened issues
-	issues, _, err := client.Issues.ListByRepo(ctx, "allencloud", "daoker", &github.IssueListByRepoOptions{})
-	if err != nil {
-		logrus.Errorf("failed to fetch issue list: %v", err)
+// NewFetcher creates
+func NewFetcher(client *gh.Client) *Fetcher {
+	return &Fetcher{
+		client: client,
 	}
-
-	// fetch opened pull request
-	owner := "allencloud"
-	repo := "daoker"
-	pullRequests, _, err := client.PullRequests.List(ctx, owner, repo, &github.PullRequestListOptions{})
-	if err != nil {
-		logrus.Errorf("failed to fetch pull request list: %v", err)
-	}
-
-	return issues, pullRequests, nil
 }
 
-func processSingleItem(issue *github.Issue) error {
-	client := github.NewClient(nil)
-	ctx := context.Background()
+// Work starts periodical work
+func (f *Fetcher) Work() {
+	for {
+		f.CheckPRsConflict()
 
-	labels, _, err := client.Issues.ListLabels(ctx, "allencloud", "daoker", nil)
+		time.Sleep(FETCHINTERVAL)
+	}
+}
+
+// CheckPRsConflict checks that if a PR is conflict with the against branch.
+func (f *Fetcher) CheckPRsConflict() error {
+	opt := &github.PullRequestListOptions{
+		State: "open",
+	}
+	prs, err := f.client.GetPullRequests(context.Background(), opt)
 	if err != nil {
-		logrus.Errorf("failed to list issue labels: %v", err)
 		return err
 	}
-	for _, label := range labels {
-		logrus.Info("%v", label)
+
+	for _, pr := range prs {
+		if pr.Mergeable != nil && *(pr.Mergeable) == false {
+			// attach a comment to the pr,
+			// and attach a lable confilct/need-rebase to pr
+			f.AddConflictCommentToPR(pr)
+			f.AddConflictLabelToPR(pr)
+		}
 	}
 	return nil
+}
+
+// AddConflictCommentToPR adds
+func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
+	newComment := &github.IssueComment{}
+	if pr.User == nil || pr.User.Login == nil {
+		logrus.Infof("failed to get user from PR %d: empty User", *(pr.Number))
+		return nil
+	}
+	body := fmt.Sprintf(putils.PRConflictComment, *(pr.User.Login))
+	newComment.Body = &body
+	return f.client.AddCommentToIssue(context.Background(), *(pr.Number), newComment)
+}
+
+// AddConflictLabelToPR adds a label of conflict/need-rebase for pr
+func (f *Fetcher) AddConflictLabelToPR(pr *github.PullRequest) error {
+	labels := []string{"conflict/need-rebase"}
+	return f.client.AddLabelsToIssue(context.Background(), *(pr.Number), labels)
 }

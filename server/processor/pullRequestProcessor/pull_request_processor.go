@@ -13,6 +13,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var (
+	// ConflictLabel means a label
+	ConflictLabel = "conflict/needs-rebase"
+	// SizePrefix means the prefix of a size label
+	SizePrefix = "SIZE/"
+)
+
 // PullRequestProcessor is
 type PullRequestProcessor struct {
 	Client *gh.Client
@@ -28,16 +35,6 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 
 	logrus.Infof("received event type [pull request], action type [%s]", actionType)
 
-	issue, err := utils.ExactIssue(data)
-	if err != nil {
-		return err
-	}
-
-	comment, err := utils.ExactIssueComment(data)
-	if err != nil {
-		return nil
-	}
-
 	pr, err := utils.ExactPR(data)
 	if err != nil {
 		return err
@@ -50,22 +47,14 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 		}
 	case "review_requested":
 	case "synchronize":
-		logrus.Info("-------------------------------------Got a synchronized event")
-		logrus.Infof("the mergeable is %v", pr.Mergeable)
-		if pr.Mergeable != nil && *(pr.Mergeable) == true {
-			// remove the conflict comment for the PR
+		if err := prp.ActToPRSynchronized(&pr); err != nil {
+			return err
 		}
 	case "edited":
 		if err := prp.ActToPROpenOrEdit(&pr); err != nil {
 			return err
 		}
 	case "pull_request_review":
-	case "created":
-		//logrus.Infof("Got an issue: %v", issue)
-		if err := prp.ActToPRCommented(&issue, &comment); err != nil {
-			return nil
-		}
-
 	default:
 		return fmt.Errorf("unknown action type %s in pull request: ", actionType)
 	}
@@ -78,26 +67,20 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 	labels := open.ParseToGeneratePRLabels(pr)
 	if len(labels) != 0 {
 		// only labels generated do we attach labels to issue
-		if err := prp.Client.AddLabelsToPR(context.Background(), *(pr.Number), labels); err != nil {
-			logrus.Errorf("failed to add labels %v to issue %d: %v", labels, *(pr.Number), err)
+		if err := prp.Client.AddLabelsToIssue(context.Background(), *(pr.Number), labels); err != nil {
 			return err
 		}
-		logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(pr.Number))
 	}
 
 	// attach comment
 	newComment := &github.PullRequestComment{}
-
 	// check if the title is too short or the body empty.
 	if pr.Title == nil || len(*(pr.Title)) < 20 {
 		body := fmt.Sprintf(putils.PRTitleTooShort, *(pr.User.Login))
 		newComment.Body = &body
 		if err := prp.Client.AddCommentToPR(context.Background(), *(pr.Number), newComment); err != nil {
-			logrus.Errorf("failed to add TITLE TOO SHORT comment to pr %d", *(pr.Number))
 			return err
 		}
-		logrus.Infof("succeed in attaching TITLE TOO SHORT comment for pr %d", *(pr.Number))
-
 		return nil
 	}
 
@@ -105,61 +88,63 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 		body := fmt.Sprintf(putils.PRDescriptionTooShort, *(pr.User.Login))
 		newComment.Body = &body
 		if err := prp.Client.AddCommentToPR(context.Background(), *(pr.Number), newComment); err != nil {
-			logrus.Errorf("failed to add EMPTY OR TOO SHORT PR BODY comment to pr %d", *(pr.Number))
 			return err
 		}
-		logrus.Infof("succeed in attaching BODY TOO SHORT comment for pr %d", *(pr.Number))
 		return nil
 	}
 	return nil
 }
 
-// ActToPRCommented acts added comment to the PR
-// Here are the rules:
-// 1. if maintainers attached LGTM and currently no LGTM, add a label "LGTM";
-// 2. if maintainers attached LGTM and already has a LGTM, add a label "APPROVED";
-func (prp *PullRequestProcessor) ActToPRCommented(issue *github.Issue, comment *github.IssueComment) error {
-	body := *(comment.Body)
-	user := *(issue.User.Login)
-	logrus.Infof("body: %s, user:%s", body, user)
+// ActToPRSynchronized acts to event that a pr is synchronized.
+func (prp *PullRequestProcessor) ActToPRSynchronized(pr *github.PullRequest) error {
+	// check if this pr is updated to solve the conflict,
+	// if that remove label 'conflict/needs-rebase' and remove the relating comment.
+	if prp.Client.IssueHasLabel(*(pr.Number), ConflictLabel) {
+		if pr.Mergeable != nil && *(pr.Mergeable) == true {
+			// remove conflict label
+			prp.Client.RemoveLabelForIssue(context.Background(), *(pr.Number), ConflictLabel)
 
-	if hasLGTMFromMaintainer(user, body) && noLGTMInLabels(issue) {
-		prp.Client.AddLabelsToPR(context.Background(), *(issue.Number), []string{"LGTM"})
+			// remove conflict comment
+			prp.RemoveConflictComment(context.Background(), *(pr.Number))
+		}
 	}
-	// FIXME: one maintainer attached two LGTMs, it will attach an APPROVED
-	if hasLGTMFromMaintainer(user, body) && hasLGTMInLabels(issue) {
-		prp.Client.AddLabelsToPR(context.Background(), *(issue.Number), []string{"APPROVED"})
+
+	// check if we need to change the PR size label
+	newSizeLabel := open.ParseToGetPRSize(pr)
+	if !prp.Client.IssueHasLabel(*(pr.Number), newSizeLabel) {
+		// first remove the original size label
+		originalLabels, err := prp.Client.GetLabelsInIssue(context.Background(), *(pr.Number))
+		if err != nil {
+			return err
+		}
+		for _, label := range originalLabels {
+			if strings.HasPrefix(label.GetName(), SizePrefix) {
+				prp.Client.RemoveLabelForIssue(context.Background(), *(pr.Number), label.GetName())
+				break
+			}
+		}
+		newLabels := []string{newSizeLabel}
+		prp.Client.AddLabelsToIssue(context.Background(), *(pr.Number), newLabels)
 	}
+
 	return nil
 }
 
-func hasLGTMFromMaintainer(user string, body string) bool {
-	if !strings.Contains(strings.ToLower(body), "lgtm") {
-		return false
+// RemoveConflictComment removes a conflict comment for a pull request
+func (prp *PullRequestProcessor) RemoveConflictComment(ctx context.Context, num int) error {
+	prComments, err := prp.Client.ListPRComments(context.Background(), num)
+	if err != nil {
+		return err
 	}
-
-	for _, maintainerID := range putils.Maintainers {
-		if strings.ToLower(user) == strings.ToLower(maintainerID) {
-			return true
+	for _, comment := range prComments {
+		commentBody := comment.GetBody()
+		subBody := `
+Conflict happens after merging a previous commit.
+Please rebase the branch against master and push it again.
+Thanks a lot.`
+		if strings.HasSuffix(commentBody, subBody) {
+			return prp.Client.RemoveCommentForPR(context.Background(), *(comment.ID))
 		}
 	}
-	return false
-}
-
-func noLGTMInLabels(issue *github.Issue) bool {
-	for _, label := range issue.Labels {
-		if label.GetName() == "LGTM" {
-			return false
-		}
-	}
-	return true
-}
-
-func hasLGTMInLabels(issue *github.Issue) bool {
-	for _, label := range issue.Labels {
-		if label.GetName() == "LGTM" {
-			return true
-		}
-	}
-	return false
+	return nil
 }

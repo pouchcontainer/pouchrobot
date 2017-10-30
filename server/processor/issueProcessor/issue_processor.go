@@ -3,7 +3,6 @@ package issueProcessor
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 
@@ -65,14 +64,6 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 		if err := fIP.ActToIssueOpenOrEdit(&issue); err != nil {
 			return err
 		}
-	case "created":
-		comment, err := utils.ExactIssueComment(data)
-		if err != nil {
-			return err
-		}
-		if err := fIP.ActToIssueComment(&issue, &comment); err != nil {
-			return err
-		}
 	case "labeled":
 		if err := fIP.ActToIssueLabeled(&issue); err != nil {
 			return nil
@@ -96,7 +87,6 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 	if len(labels) != 0 {
 		// only labels generated do we attach labels to issue
 		if err := fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels); err != nil {
-			logrus.Errorf("failed to add labels %v to issue %d: %v", labels, *(issue.Number), err)
 			return err
 		}
 		logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
@@ -110,7 +100,6 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 		body := fmt.Sprintf(putils.IssueTitleTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
-			logrus.Errorf("failed to add TOO SHORT TITLE comment to issue %d", *(issue.Number))
 			return err
 		}
 		logrus.Infof("succeed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
@@ -125,7 +114,6 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 		body := fmt.Sprintf(putils.IssueDescriptionTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
-			logrus.Errorf("failed to add EMPTY OR TOO SHORT ISSUE BODY comment to issue %d", *(issue.Number))
 			return err
 		}
 		logrus.Infof("secceed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
@@ -139,51 +127,29 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 	return nil
 }
 
-// ActToIssueComment acts to issue comment.
-// It covers the following parts:
-// assign to user if he comments `#dibs`
-func (fIP *TriggeredIssueProcessor) ActToIssueComment(issue *github.Issue, comment *github.IssueComment) error {
-	if comment == nil || issue == nil {
-		return nil
-	}
-
-	commentUser := *(comment.User.Login)
-	commentBody := *(comment.Body)
-	users := []string{commentUser}
-
-	if strings.Contains(strings.ToLower(commentBody), "#dibs") {
-		if err := fIP.Client.AssignIssueToUsers(context.Background(), *(issue.Number), users); err != nil {
-			logrus.Errorf("failed to assign users %v to issue %d", users, *(issue.Number))
-			return err
-		}
-		logrus.Infof("succeed in assigning users %v for issue %d", users, *(issue.Number))
-	}
-
-	return nil
-}
-
 // ActToIssueLabeled acts to issue labeled events
 func (fIP *TriggeredIssueProcessor) ActToIssueLabeled(issue *github.Issue) error {
 	// check if this is a P0 priority issue, if that mention maintainers.
 	var needP0Comment = false
 
 	for _, label := range issue.Labels {
-		if *(label.Name) == "priority/P0" {
+		if label.Name != nil && *(label.Name) == "priority/P0" {
 			needP0Comment = true
 			break
 		}
 	}
 
-	if needP0Comment {
-		body := fmt.Sprintf(putils.IssueNeedPOComment, *(issue.User.Login))
-		newComment := &github.IssueComment{
-			Body: &body,
-		}
-		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
-			logrus.Errorf("failed to add P0 comments to issue %d", *(issue.Number))
-			return err
-		}
-		logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))
+	if !needP0Comment {
+		return nil
 	}
+
+	body := fmt.Sprintf(putils.IssueNeedPOComment, *(issue.User.Login))
+	newComment := &github.IssueComment{
+		Body: &body,
+	}
+	if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
+		return err
+	}
+	logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))
 	return nil
 }

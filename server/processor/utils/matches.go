@@ -21,17 +21,23 @@ var TitleMatches = map[string][]string{
 		"gelf",
 		"fluentd",
 		"journald",
+		"log",
 		"splunk",
 		"syslog",
 	},
 	"areas/monitoring": []string{
 		"monitoring",
 		"prometheus",
+		"health check",
 	},
 	"areas/network": []string{
 		"cni",
+		"ipvlan",
+		"ipsec",
+		"macvlan",
 		"network",
 		"overlay",
+		"vlan",
 		"vxlan",
 	},
 	"areas/orchestration": []string{
@@ -55,6 +61,7 @@ var TitleMatches = map[string][]string{
 	},
 	"kind/bug": []string{
 		"bug",
+		"bugfix",
 		"cannot",
 		"can not",
 		"can't",
@@ -74,6 +81,9 @@ var TitleMatches = map[string][]string{
 	},
 	"kind/performance": []string{
 		"performance",
+	},
+	"kind/feature": []string{
+		"feature",
 	},
 	"kind/feature-request": []string{
 		"feature request",
@@ -116,6 +126,14 @@ var TitleMatches = map[string][]string{
 	"priority/P0": []string{
 		"panic",
 		"invalid memory address or nil pointer",
+	},
+	"areas/typo": []string{
+		"typo",
+	},
+	"DO-NOT-MERGE": []string{
+		"do not merge",
+		"do-not-merge",
+		"don't merge",
 	},
 }
 

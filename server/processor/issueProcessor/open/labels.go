@@ -3,37 +3,32 @@ package open
 import (
 	"strings"
 
+	"github.com/sirupsen/logrus"
+
 	putils "github.com/allencloud/automan/server/processor/utils"
+	"github.com/allencloud/automan/server/utils"
 
 	"github.com/google/go-github/github"
 )
 
-// ParseToGenerateLabels parses
+// ParseToGenerateLabels parses issue title and issue body to generate a slice
+// with no element duplicated.
 func ParseToGenerateLabels(issue *github.Issue) []string {
 	var labels []string
-	labels = append(labels, ParseTitleToGenerateLabels(*issue)...)
-	labels = append(labels, ParseBodyToGenerateLabels(*issue)...)
+	labels = append(labels, ParseTitleToGenerateLabels(issue)...)
+	labels = append(labels, ParseBodyToGenerateLabels(issue)...)
 
-	dataMap := make(map[string]struct{}, len(labels))
-	for _, value := range labels {
-		if _, exist := dataMap[value]; !exist {
-			dataMap[value] = struct{}{}
-		}
-	}
-	labels = []string{}
-	for key := range dataMap {
-		labels = append(labels, key)
-	}
-	return labels
+	return utils.UniqueElementSlice(labels)
 }
 
-// ParseTitleToGenerateLabels parses
-func ParseTitleToGenerateLabels(issue github.Issue) []string {
+// ParseTitleToGenerateLabels parses issue title to generate a slice.
+func ParseTitleToGenerateLabels(issue *github.Issue) []string {
+	if issue.Title == nil {
+		logrus.Errorf("issue %d has no title when ParseTitleToGenerateLabels", *(issue.Number))
+		return nil
+	}
 	var labels []string
 	title := issue.Title
-	if title == nil {
-		return labels
-	}
 	for label, matchedSlice := range putils.TitleMatches {
 		for _, pattern := range matchedSlice {
 			lowerCaseTitle := strings.ToLower(*title)
@@ -46,13 +41,14 @@ func ParseTitleToGenerateLabels(issue github.Issue) []string {
 	return labels
 }
 
-// ParseBodyToGenerateLabels parses
-func ParseBodyToGenerateLabels(issue github.Issue) []string {
+// ParseBodyToGenerateLabels parses issue title to generate a slice.
+func ParseBodyToGenerateLabels(issue *github.Issue) []string {
+	if issue.Body == nil {
+		logrus.Errorf("issue %d has no body when ParseBodyToGenerateLabels", *(issue.Number))
+		return nil
+	}
 	var labels []string
 	content := issue.Body
-	if content == nil {
-		return labels
-	}
 	for label, matchedSlice := range putils.BodyMatches {
 		for _, pattern := range matchedSlice {
 			lowerCaseBody := strings.ToLower(*content)

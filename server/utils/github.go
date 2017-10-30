@@ -50,8 +50,8 @@ func ExactIssueComment(data []byte) (github.IssueComment, error) {
 	return m.IssueComment, nil
 }
 
-// ExactIssueLables extracts the issue labels from request body.
-func ExactIssueLables(data []byte) ([]string, error) {
+// ExactIssueLabels extracts the issue labels from request body.
+func ExactIssueLabels(data []byte) ([]string, error) {
 	var m struct {
 		Labels []string `json:"labels"`
 	}

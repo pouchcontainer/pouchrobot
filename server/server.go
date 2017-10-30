@@ -4,12 +4,13 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/allencloud/automan/server/config"
+	"github.com/allencloud/automan/server/fetcher"
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/processor"
+
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 // DefaultAddress is the default address daemon will listen to.
@@ -19,6 +20,7 @@ var DefaultAddress = ":6789"
 type Server struct {
 	config          config.Config
 	processor       *processor.Processor
+	fetcher         *fetcher.Fetcher
 	maintainersTeam string
 }
 
@@ -27,6 +29,7 @@ func NewServer(config config.Config) *Server {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	return &Server{
 		processor: processor.NewProcessor(ghClient),
+		fetcher:   fetcher.NewFetcher(ghClient),
 	}
 }
 
