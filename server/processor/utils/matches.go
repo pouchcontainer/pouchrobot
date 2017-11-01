@@ -73,7 +73,7 @@ var TitleMatches = map[string][]string{
 		"invalid memory address or nil pointer",
 		"panic",
 	},
-	"kind/propasal": []string{
+	"kind/proposal": []string{
 		"proposal",
 	},
 	"kind/design": []string{
