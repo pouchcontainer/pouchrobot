@@ -19,7 +19,6 @@ var DefaultAddress = ":6789"
 // Server refers to a
 type Server struct {
 	listenAddress   string
-	config          config.Config
 	processor       *processor.Processor
 	fetcher         *fetcher.Fetcher
 	maintainersTeam string
@@ -41,7 +40,7 @@ func (s *Server) Run() error {
 	go s.fetcher.Work()
 
 	// start webserver
-	listenAddress := s.config.HTTPListen
+	listenAddress := s.listenAddress
 	if listenAddress == "" {
 		listenAddress = DefaultAddress
 	}
