@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/allencloud/automan/server"
 	"github.com/allencloud/automan/server/config"
 
@@ -11,7 +9,6 @@ import (
 )
 
 func main() {
-	fmt.Println("haha")
 	var cfg config.Config
 	var cmdServe = &cobra.Command{
 		Use:  "",

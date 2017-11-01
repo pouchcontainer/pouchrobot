@@ -145,11 +145,11 @@ func (c *Client) AddCommentToIssue(ctx context.Context, num int, comment *github
 }
 
 // AddCommentToPR adds comment to a pull request
-func (c *Client) AddCommentToPR(ctx context.Context, num int, comment *github.PullRequestComment) error {
+func (c *Client) AddCommentToPR(ctx context.Context, num int, comment *github.IssueComment) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	if _, _, err := c.Client.PullRequests.CreateComment(ctx, c.owner, c.repo, num, comment); err != nil {
+	if _, _, err := c.Client.Issues.CreateComment(ctx, c.owner, c.repo, num, comment); err != nil {
 		logrus.Errorf("failed to add comment %s to pr %d: %v", *(comment.Body), num, err)
 		return err
 	}

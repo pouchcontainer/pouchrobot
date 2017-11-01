@@ -73,7 +73,7 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 	}
 
 	// attach comment
-	newComment := &github.PullRequestComment{}
+	newComment := &github.IssueComment{}
 	// check if the title is too short or the body empty.
 	if pr.Title == nil || len(*(pr.Title)) < 20 {
 		body := fmt.Sprintf(putils.PRTitleTooShort, *(pr.User.Login))
