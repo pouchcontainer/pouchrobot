@@ -1,7 +1,6 @@
 package prCommentProcessor
 
 import (
-	"context"
 	"strings"
 
 	"github.com/allencloud/automan/server/gh"
@@ -55,11 +54,11 @@ func (prcp *PRCommentProcessor) ActToPRCommented(issue *github.Issue, comment *g
 	logrus.Infof("body: %s, user:%s", body, user)
 
 	if hasLGTMFromMaintainer(user, body) && noLGTMInLabels(issue) {
-		prcp.Client.AddLabelsToIssue(context.Background(), *(issue.Number), []string{"LGTM"})
+		prcp.Client.AddLabelsToIssue(*(issue.Number), []string{"LGTM"})
 	}
 	// FIXME: one maintainer attached two LGTMs, it will attach an APPROVED
 	if hasLGTMFromMaintainer(user, body) && hasLGTMInLabels(issue) {
-		prcp.Client.AddLabelsToIssue(context.Background(), *(issue.Number), []string{"APPROVED"})
+		prcp.Client.AddLabelsToIssue(*(issue.Number), []string{"APPROVED"})
 	}
 	return nil
 }

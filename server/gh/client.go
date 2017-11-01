@@ -36,11 +36,11 @@ func NewClient(owner, repo, token string) *Client {
 }
 
 // GetIssues gets issues of a repo.
-func (c *Client) GetIssues(ctx context.Context, opt *github.IssueListByRepoOptions) ([]*github.Issue, error) {
+func (c *Client) GetIssues(opt *github.IssueListByRepoOptions) ([]*github.Issue, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	issues, _, err := c.Client.Issues.ListByRepo(ctx, c.owner, c.repo, opt)
+	issues, _, err := c.Client.Issues.ListByRepo(context.Background(), c.owner, c.repo, opt)
 	if err != nil {
 		logrus.Errorf("failed to list issues in repo %s: %v", c.repo, err)
 		return nil, err
@@ -50,11 +50,11 @@ func (c *Client) GetIssues(ctx context.Context, opt *github.IssueListByRepoOptio
 }
 
 // GetPullRequests gets pull request list for a repo.
-func (c *Client) GetPullRequests(ctx context.Context, opt *github.PullRequestListOptions) ([]*github.PullRequest, error) {
+func (c *Client) GetPullRequests(opt *github.PullRequestListOptions) ([]*github.PullRequest, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	pullRequests, _, err := c.Client.PullRequests.List(ctx, c.owner, c.repo, opt)
+	pullRequests, _, err := c.Client.PullRequests.List(context.Background(), c.owner, c.repo, opt)
 	if err != nil {
 		logrus.Errorf("failed to list pull request in repo %s: %v", c.repo, err)
 		return nil, err
@@ -64,11 +64,11 @@ func (c *Client) GetPullRequests(ctx context.Context, opt *github.PullRequestLis
 }
 
 // GetAllLabels gets all labels of a repo, not an issue, nor a pull request
-func (c *Client) GetAllLabels(ctx context.Context) ([]*github.Label, error) {
+func (c *Client) GetAllLabels() ([]*github.Label, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	labels, _, err := c.Client.Issues.ListLabels(ctx, c.owner, c.repo, nil)
+	labels, _, err := c.Client.Issues.ListLabels(context.Background(), c.owner, c.repo, nil)
 	if err != nil {
 		logrus.Errorf("failed to get labels in repo %s: %v", c.repo, err)
 		return nil, err
@@ -78,11 +78,11 @@ func (c *Client) GetAllLabels(ctx context.Context) ([]*github.Label, error) {
 }
 
 // GetLabelsInIssue gets labels attached on a single issue whose id is num.
-func (c *Client) GetLabelsInIssue(ctx context.Context, num int) ([]*github.Label, error) {
+func (c *Client) GetLabelsInIssue(num int) ([]*github.Label, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	labels, _, err := c.Client.Issues.ListLabelsByIssue(ctx, c.owner, c.repo, num, nil)
+	labels, _, err := c.Client.Issues.ListLabelsByIssue(context.Background(), c.owner, c.repo, num, nil)
 	if err != nil {
 		logrus.Errorf("failed to get labels in issue %d: %v", num, err)
 		return nil, err
@@ -92,11 +92,11 @@ func (c *Client) GetLabelsInIssue(ctx context.Context, num int) ([]*github.Label
 }
 
 // AddLabelsToIssue adds labels to an issue
-func (c *Client) AddLabelsToIssue(ctx context.Context, num int, labels []string) error {
+func (c *Client) AddLabelsToIssue(num int, labels []string) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	if _, _, err := c.Client.Issues.AddLabelsToIssue(ctx, c.owner, c.repo, num, labels); err != nil {
+	if _, _, err := c.Client.Issues.AddLabelsToIssue(context.Background(), c.owner, c.repo, num, labels); err != nil {
 		logrus.Errorf("failed to add labels %s to issue(pr) %d: %v", labels, num, err)
 		return err
 	}
@@ -105,11 +105,11 @@ func (c *Client) AddLabelsToIssue(ctx context.Context, num int, labels []string)
 }
 
 // RemoveLabelForIssue removes a label from an issue
-func (c *Client) RemoveLabelForIssue(ctx context.Context, num int, label string) error {
+func (c *Client) RemoveLabelForIssue(num int, label string) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	if _, err := c.Client.Issues.RemoveLabelForIssue(ctx, c.owner, c.repo, num, label); err != nil {
+	if _, err := c.Client.Issues.RemoveLabelForIssue(context.Background(), c.owner, c.repo, num, label); err != nil {
 		logrus.Errorf("failed to remove label %s for issue(pr) %d: %v", label, num, err)
 		return err
 	}
@@ -118,11 +118,11 @@ func (c *Client) RemoveLabelForIssue(ctx context.Context, num int, label string)
 }
 
 // ListPRComments lists comments for a pull request
-func (c *Client) ListPRComments(ctx context.Context, num int) ([]*github.PullRequestComment, error) {
+func (c *Client) ListPRComments(num int) ([]*github.PullRequestComment, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	prComments, _, err := c.Client.PullRequests.ListComments(ctx, c.owner, c.repo, num, nil)
+	prComments, _, err := c.Client.PullRequests.ListComments(context.Background(), c.owner, c.repo, num, nil)
 	if err != nil {
 		logrus.Errorf("failed to list comments for pr %d: %v", num, err)
 		return nil, err
@@ -132,11 +132,11 @@ func (c *Client) ListPRComments(ctx context.Context, num int) ([]*github.PullReq
 }
 
 // AddCommentToIssue adds comment to an issue
-func (c *Client) AddCommentToIssue(ctx context.Context, num int, comment *github.IssueComment) error {
+func (c *Client) AddCommentToIssue(num int, comment *github.IssueComment) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	if _, _, err := c.Client.Issues.CreateComment(ctx, c.owner, c.repo, num, comment); err != nil {
+	if _, _, err := c.Client.Issues.CreateComment(context.Background(), c.owner, c.repo, num, comment); err != nil {
 		logrus.Errorf("failed to add comment %s to issue(pr) %d: %v", *(comment.Body), num, err)
 		return err
 	}
@@ -145,11 +145,11 @@ func (c *Client) AddCommentToIssue(ctx context.Context, num int, comment *github
 }
 
 // AddCommentToPR adds comment to a pull request
-func (c *Client) AddCommentToPR(ctx context.Context, num int, comment *github.IssueComment) error {
+func (c *Client) AddCommentToPR(num int, comment *github.IssueComment) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	if _, _, err := c.Client.Issues.CreateComment(ctx, c.owner, c.repo, num, comment); err != nil {
+	if _, _, err := c.Client.Issues.CreateComment(context.Background(), c.owner, c.repo, num, comment); err != nil {
 		logrus.Errorf("failed to add comment %s to pr %d: %v", *(comment.Body), num, err)
 		return err
 	}
@@ -158,11 +158,11 @@ func (c *Client) AddCommentToPR(ctx context.Context, num int, comment *github.Is
 }
 
 // RemoveCommentForPR removes a comment for a pull request
-func (c *Client) RemoveCommentForPR(ctx context.Context, num int) error {
+func (c *Client) RemoveCommentForPR(num int) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	if _, err := c.Client.PullRequests.DeleteComment(ctx, c.owner, c.repo, num); err != nil {
+	if _, err := c.Client.PullRequests.DeleteComment(context.Background(), c.owner, c.repo, num); err != nil {
 		logrus.Errorf("failed to remove comment %d: %v", num, err)
 		return err
 	}
@@ -170,12 +170,23 @@ func (c *Client) RemoveCommentForPR(ctx context.Context, num int) error {
 	return nil
 }
 
+// ListCommits lists all commits in a pull request.
+func (c *Client) ListCommits(num int) ([]*github.RepositoryCommit, error) {
+	commits, _, err := c.PullRequests.ListCommits(context.Background(), c.owner, c.repo, num, nil)
+	if err != nil {
+		logrus.Errorf("failed to list commits in pull request %d: %v", num, err)
+		return nil, err
+	}
+	logrus.Debugf("succeed in listing commits in pull request %d", num)
+	return commits, nil
+}
+
 // AssignIssueToUsers assigns users to the specified issue.
-func (c *Client) AssignIssueToUsers(ctx context.Context, num int, users []string) error {
+func (c *Client) AssignIssueToUsers(num int, users []string) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	if _, _, err := c.Client.Issues.AddAssignees(ctx, c.owner, c.repo, num, users); err != nil {
+	if _, _, err := c.Client.Issues.AddAssignees(context.Background(), c.owner, c.repo, num, users); err != nil {
 		logrus.Errorf("failed to assign users %s to issue(pr) %d: %v", users, num, err)
 		return err
 	}
@@ -184,11 +195,11 @@ func (c *Client) AssignIssueToUsers(ctx context.Context, num int, users []string
 }
 
 // UnassignIssueToUsers assigns users to the specified issue.
-func (c *Client) UnassignIssueToUsers(ctx context.Context, num int, users []string) error {
+func (c *Client) UnassignIssueToUsers(num int, users []string) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	if _, _, err := c.Client.Issues.AddAssignees(ctx, c.owner, c.repo, num, users); err != nil {
+	if _, _, err := c.Client.Issues.AddAssignees(context.Background(), c.owner, c.repo, num, users); err != nil {
 		logrus.Errorf("failed to assign users %s to issue(pr) %d: %v", users, num, err)
 		return err
 	}
@@ -198,7 +209,7 @@ func (c *Client) UnassignIssueToUsers(ctx context.Context, num int, users []stri
 
 // IssueHasLabel judges if an issue has a specified label.
 func (c *Client) IssueHasLabel(num int, inputLabel string) bool {
-	labels, err := c.GetLabelsInIssue(context.Background(), num)
+	labels, err := c.GetLabelsInIssue(num)
 	if err != nil {
 		return false
 	}

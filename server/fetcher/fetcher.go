@@ -1,7 +1,6 @@
 package fetcher
 
 import (
-	"context"
 	"fmt"
 	"time"
 
@@ -38,16 +37,18 @@ func (f *Fetcher) Work() {
 
 // CheckPRsConflict checks that if a PR is conflict with the against branch.
 func (f *Fetcher) CheckPRsConflict() error {
+	logrus.Info("start to check PR's conflict")
 	opt := &github.PullRequestListOptions{
 		State: "open",
 	}
-	prs, err := f.client.GetPullRequests(context.Background(), opt)
+	prs, err := f.client.GetPullRequests(opt)
 	if err != nil {
 		return err
 	}
 
 	for _, pr := range prs {
 		if pr.Mergeable != nil && *(pr.Mergeable) == false {
+			logrus.Infof("found pull request %d conflict", *(pr.Number))
 			// attach a comment to the pr,
 			// and attach a lable confilct/need-rebase to pr
 			f.AddConflictCommentToPR(pr)
@@ -57,7 +58,7 @@ func (f *Fetcher) CheckPRsConflict() error {
 	return nil
 }
 
-// AddConflictCommentToPR adds
+// AddConflictCommentToPR adds conflict comments to specific pull request.
 func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
 	newComment := &github.IssueComment{}
 	if pr.User == nil || pr.User.Login == nil {
@@ -66,11 +67,11 @@ func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
 	}
 	body := fmt.Sprintf(putils.PRConflictComment, *(pr.User.Login))
 	newComment.Body = &body
-	return f.client.AddCommentToIssue(context.Background(), *(pr.Number), newComment)
+	return f.client.AddCommentToIssue(*(pr.Number), newComment)
 }
 
-// AddConflictLabelToPR adds a label of conflict/need-rebase for pr
+// AddConflictLabelToPR adds a label of conflict/need-rebase for pull request.
 func (f *Fetcher) AddConflictLabelToPR(pr *github.PullRequest) error {
 	labels := []string{"conflict/need-rebase"}
-	return f.client.AddLabelsToIssue(context.Background(), *(pr.Number), labels)
+	return f.client.AddLabelsToIssue(*(pr.Number), labels)
 }

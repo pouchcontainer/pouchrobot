@@ -3,6 +3,7 @@ package pullRequestProcessor
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/allencloud/automan/server/gh"
@@ -18,6 +19,7 @@ var (
 	ConflictLabel = "conflict/needs-rebase"
 	// SizePrefix means the prefix of a size label
 	SizePrefix = "SIZE/"
+	dcoRegex   = regexp.MustCompile("(?m)(Docker-DCO-1.1-)?Signed-off-by: ([^<]+) <([^<>@]+@[^<>]+)>( \\(github: ([a-zA-Z0-9][a-zA-Z0-9-]+)\\))?")
 )
 
 // PullRequestProcessor is
@@ -67,7 +69,7 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 	labels := open.ParseToGeneratePRLabels(pr)
 	if len(labels) != 0 {
 		// only labels generated do we attach labels to issue
-		if err := prp.Client.AddLabelsToIssue(context.Background(), *(pr.Number), labels); err != nil {
+		if err := prp.Client.AddLabelsToIssue(*(pr.Number), labels); err != nil {
 			return err
 		}
 	}
@@ -78,7 +80,7 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 	if pr.Title == nil || len(*(pr.Title)) < 20 {
 		body := fmt.Sprintf(putils.PRTitleTooShort, *(pr.User.Login))
 		newComment.Body = &body
-		if err := prp.Client.AddCommentToPR(context.Background(), *(pr.Number), newComment); err != nil {
+		if err := prp.Client.AddCommentToPR(*(pr.Number), newComment); err != nil {
 			return err
 		}
 		return nil
@@ -87,11 +89,25 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 	if pr.Body == nil || len(*(pr.Body)) < 50 {
 		body := fmt.Sprintf(putils.PRDescriptionTooShort, *(pr.User.Login))
 		newComment.Body = &body
-		if err := prp.Client.AddCommentToPR(context.Background(), *(pr.Number), newComment); err != nil {
+		if err := prp.Client.AddCommentToPR(*(pr.Number), newComment); err != nil {
 			return err
 		}
 		return nil
 	}
+
+	commits, err := prp.Client.ListCommits(*(pr.Number))
+	if err != nil {
+		return err
+	}
+
+	for _, commit := range commits {
+		if commit.Commit != nil && !dcoRegex.MatchString(*commit.Commit.Message) {
+			// pull request is not signed
+			// TODO add implementation
+			break
+		}
+	}
+
 	return nil
 }
 
@@ -102,7 +118,7 @@ func (prp *PullRequestProcessor) ActToPRSynchronized(pr *github.PullRequest) err
 	if prp.Client.IssueHasLabel(*(pr.Number), ConflictLabel) {
 		if pr.Mergeable != nil && *(pr.Mergeable) == true {
 			// remove conflict label
-			prp.Client.RemoveLabelForIssue(context.Background(), *(pr.Number), ConflictLabel)
+			prp.Client.RemoveLabelForIssue(*(pr.Number), ConflictLabel)
 
 			// remove conflict comment
 			prp.RemoveConflictComment(context.Background(), *(pr.Number))
@@ -113,18 +129,18 @@ func (prp *PullRequestProcessor) ActToPRSynchronized(pr *github.PullRequest) err
 	newSizeLabel := open.ParseToGetPRSize(pr)
 	if !prp.Client.IssueHasLabel(*(pr.Number), newSizeLabel) {
 		// first remove the original size label
-		originalLabels, err := prp.Client.GetLabelsInIssue(context.Background(), *(pr.Number))
+		originalLabels, err := prp.Client.GetLabelsInIssue(*(pr.Number))
 		if err != nil {
 			return err
 		}
 		for _, label := range originalLabels {
 			if strings.HasPrefix(label.GetName(), SizePrefix) {
-				prp.Client.RemoveLabelForIssue(context.Background(), *(pr.Number), label.GetName())
+				prp.Client.RemoveLabelForIssue(*(pr.Number), label.GetName())
 				break
 			}
 		}
 		newLabels := []string{newSizeLabel}
-		prp.Client.AddLabelsToIssue(context.Background(), *(pr.Number), newLabels)
+		prp.Client.AddLabelsToIssue(*(pr.Number), newLabels)
 	}
 
 	return nil
@@ -132,7 +148,7 @@ func (prp *PullRequestProcessor) ActToPRSynchronized(pr *github.PullRequest) err
 
 // RemoveConflictComment removes a conflict comment for a pull request
 func (prp *PullRequestProcessor) RemoveConflictComment(ctx context.Context, num int) error {
-	prComments, err := prp.Client.ListPRComments(context.Background(), num)
+	prComments, err := prp.Client.ListPRComments(num)
 	if err != nil {
 		return err
 	}
@@ -143,7 +159,7 @@ Conflict happens after merging a previous commit.
 Please rebase the branch against master and push it again.
 Thanks a lot.`
 		if strings.HasSuffix(commentBody, subBody) {
-			return prp.Client.RemoveCommentForPR(context.Background(), *(comment.ID))
+			return prp.Client.RemoveCommentForPR(*(comment.ID))
 		}
 	}
 	return nil

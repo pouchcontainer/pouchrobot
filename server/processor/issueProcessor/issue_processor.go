@@ -1,7 +1,6 @@
 package issueProcessor
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
@@ -86,7 +85,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 	labels := open.ParseToGenerateLabels(issue)
 	if len(labels) != 0 {
 		// only labels generated do we attach labels to issue
-		if err := fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels); err != nil {
+		if err := fIP.Client.AddLabelsToIssue(*(issue.Number), labels); err != nil {
 			return err
 		}
 		logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
@@ -99,13 +98,13 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 	if issue.Title == nil || len(*(issue.Title)) < 20 {
 		body := fmt.Sprintf(putils.IssueTitleTooShort, *(issue.User.Login))
 		newComment.Body = &body
-		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
+		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
 			return err
 		}
 		logrus.Infof("succeed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
 
 		labels := []string{"status/more-info-needed"}
-		fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels)
+		fIP.Client.AddLabelsToIssue(*(issue.Number), labels)
 
 		return nil
 	}
@@ -113,13 +112,13 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 	if issue.Body == nil || len(*(issue.Body)) < 50 {
 		body := fmt.Sprintf(putils.IssueDescriptionTooShort, *(issue.User.Login))
 		newComment.Body = &body
-		if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
+		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
 			return err
 		}
 		logrus.Infof("secceed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
 
 		labels := []string{"status/more-info-needed"}
-		fIP.Client.AddLabelsToIssue(context.Background(), *(issue.Number), labels)
+		fIP.Client.AddLabelsToIssue(*(issue.Number), labels)
 
 		return nil
 	}
@@ -147,7 +146,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueLabeled(issue *github.Issue) error
 	newComment := &github.IssueComment{
 		Body: &body,
 	}
-	if err := fIP.Client.AddCommentToIssue(context.Background(), *(issue.Number), newComment); err != nil {
+	if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
 		return err
 	}
 	logrus.Infof("secceed in attaching P0 comment for issue %d", *(issue.Number))

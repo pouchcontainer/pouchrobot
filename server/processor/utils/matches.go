@@ -25,6 +25,10 @@ var TitleMatches = map[string][]string{
 		"splunk",
 		"syslog",
 	},
+	"areas/images": []string{
+		"docker image",
+		"image-spec",
+	},
 	"areas/monitoring": []string{
 		"monitoring",
 		"prometheus",

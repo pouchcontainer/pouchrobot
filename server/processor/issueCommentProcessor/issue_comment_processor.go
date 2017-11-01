@@ -1,7 +1,6 @@
 package issueCommentProcessor
 
 import (
-	"context"
 	"strings"
 
 	"github.com/allencloud/automan/server/gh"
@@ -59,7 +58,7 @@ func (icp *IssueCommentProcessor) ActToIssueCommentCreated(issue *github.Issue, 
 	users := []string{commentUser}
 
 	if strings.Contains(strings.ToLower(commentBody), "#dibs") {
-		if err := icp.Client.AssignIssueToUsers(context.Background(), *(issue.Number), users); err != nil {
+		if err := icp.Client.AssignIssueToUsers(*(issue.Number), users); err != nil {
 			return err
 		}
 	}
