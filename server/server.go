@@ -18,6 +18,7 @@ var DefaultAddress = ":6789"
 
 // Server refers to a
 type Server struct {
+	listenAddress   string
 	config          config.Config
 	processor       *processor.Processor
 	fetcher         *fetcher.Fetcher
@@ -28,8 +29,9 @@ type Server struct {
 func NewServer(config config.Config) *Server {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	return &Server{
-		processor: processor.NewProcessor(ghClient),
-		fetcher:   fetcher.NewFetcher(ghClient),
+		processor:     processor.NewProcessor(ghClient),
+		listenAddress: config.HTTPListen,
+		fetcher:       fetcher.NewFetcher(ghClient),
 	}
 }
 
