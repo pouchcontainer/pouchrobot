@@ -51,7 +51,7 @@ func (prcp *PRCommentProcessor) Process(data []byte) error {
 func (prcp *PRCommentProcessor) ActToPRCommented(issue *github.Issue, comment *github.IssueComment) error {
 	body := *(comment.Body)
 	user := *(issue.User.Login)
-	logrus.Infof("body: %s, user:%s", body, user)
+	logrus.Infof("body: %s, user:%s, issue: %v", body, user, *issue)
 
 	if hasLGTMFromMaintainer(user, body) && noLGTMInLabels(issue) {
 		prcp.Client.AddLabelsToIssue(*(issue.Number), []string{"LGTM"})
