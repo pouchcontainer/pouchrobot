@@ -36,6 +36,12 @@ func NewProcessor(client *gh.Client) *Processor {
 		PullRequestProcessor: &pullRequestProcessor.PullRequestProcessor{
 			Client: client,
 		},
+		IssueCommentProcessor: &issueCommentProcessor.IssueCommentProcessor{
+			Client: client,
+		},
+		PRCommentProcessor: &prCommentProcessor.PRCommentProcessor{
+			Client: client,
+		},
 	}
 }
 
