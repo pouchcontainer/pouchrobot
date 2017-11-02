@@ -7,7 +7,6 @@ import (
 	putils "github.com/allencloud/automan/server/processor/utils"
 	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
-	"github.com/sirupsen/logrus"
 )
 
 // PRCommentProcessor is
@@ -50,8 +49,8 @@ func (prcp *PRCommentProcessor) Process(data []byte) error {
 // 2. if maintainers attached LGTM and already has a LGTM, add a label "APPROVED";
 func (prcp *PRCommentProcessor) ActToPRCommented(issue *github.Issue, comment *github.IssueComment) error {
 	body := *(comment.Body)
-	user := *(issue.User.Login)
-	logrus.Infof("body: %s, user:%s, issue: %v", body, user, *issue)
+	user := *(comment.User.Login)
+	//logrus.Infof("body: %s, user:%s, issue: %v", body, user, *issue)
 
 	if hasLGTMFromMaintainer(user, body) && noLGTMInLabels(issue) {
 		prcp.Client.AddLabelsToIssue(*(issue.Number), []string{"LGTM"})
