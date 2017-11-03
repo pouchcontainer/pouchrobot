@@ -18,7 +18,7 @@ type Client struct {
 	repo  string
 }
 
-// NewClient constructs a new instance of Client
+// NewClient constructs a new instance of Client.
 func NewClient(owner, repo, token string) *Client {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
@@ -104,7 +104,7 @@ func (c *Client) AddLabelsToIssue(num int, labels []string) error {
 	return nil
 }
 
-// RemoveLabelForIssue removes a label from an issue
+// RemoveLabelForIssue removes a label from an issue.
 func (c *Client) RemoveLabelForIssue(num int, label string) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
@@ -117,7 +117,17 @@ func (c *Client) RemoveLabelForIssue(num int, label string) error {
 	return nil
 }
 
-// ListPRComments lists comments for a pull request
+// ReplaceLabelsForIssue replaces all labels for an issue.
+func (c *Client) ReplaceLabelsForIssue(num int, labels []string) error {
+	if _, _, err := c.Client.Issues.ReplaceLabelsForIssue(context.Background(), c.owner, c.repo, num, labels); err != nil {
+		logrus.Errorf("failed to replace labels %v for issue(pr) %d: %v", labels, num, err)
+		return err
+	}
+	logrus.Debugf("succeed in replacing labels %v for issue %d", labels, num)
+	return nil
+}
+
+// ListPRComments lists comments for a pull request.
 func (c *Client) ListPRComments(num int) ([]*github.PullRequestComment, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
@@ -131,7 +141,7 @@ func (c *Client) ListPRComments(num int) ([]*github.PullRequestComment, error) {
 	return prComments, nil
 }
 
-// AddCommentToIssue adds comment to an issue
+// AddCommentToIssue adds comment to an issue.
 func (c *Client) AddCommentToIssue(num int, comment *github.IssueComment) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
@@ -144,7 +154,7 @@ func (c *Client) AddCommentToIssue(num int, comment *github.IssueComment) error 
 	return nil
 }
 
-// AddCommentToPR adds comment to a pull request
+// AddCommentToPR adds comment to a pull request.
 func (c *Client) AddCommentToPR(num int, comment *github.IssueComment) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
@@ -157,7 +167,7 @@ func (c *Client) AddCommentToPR(num int, comment *github.IssueComment) error {
 	return nil
 }
 
-// RemoveCommentForPR removes a comment for a pull request
+// RemoveCommentForPR removes a comment for a pull request.
 func (c *Client) RemoveCommentForPR(num int) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()

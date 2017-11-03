@@ -46,7 +46,7 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 		return err
 	}
 
-	logrus.Infof("received event type [issues] or [issue_comment], action type [%s]", actionType)
+	logrus.Infof("received event type [issues], action type [%s]", actionType)
 
 	issue, err := utils.ExactIssue(data)
 	if err != nil {
@@ -56,11 +56,11 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 
 	switch actionType {
 	case "opened":
-		if err := fIP.ActToIssueOpenOrEdit(&issue); err != nil {
+		if err := fIP.ActToIssueOpened(&issue); err != nil {
 			return err
 		}
 	case "edited":
-		if err := fIP.ActToIssueOpenOrEdit(&issue); err != nil {
+		if err := fIP.ActToIssueEdited(&issue); err != nil {
 			return err
 		}
 	case "labeled":
@@ -75,12 +75,12 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 	return nil
 }
 
-// ActToIssueOpenOrEdit acts to opened issue
+// ActToIssueOpened acts to opened issue
 // This function covers the following part:
 // generate labels;
 // attach comments;
 // assign issue to specific user;
-func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) error {
+func (fIP *TriggeredIssueProcessor) ActToIssueOpened(issue *github.Issue) error {
 	// generate labels
 	labels := open.ParseToGenerateLabels(issue)
 	if len(labels) != 0 {
@@ -89,6 +89,56 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpenOrEdit(issue *github.Issue) er
 			return err
 		}
 		logrus.Infof("succeed in attaching labels %v to issue %d", labels, *(issue.Number))
+	}
+
+	// attach comment
+	newComment := &github.IssueComment{}
+
+	// check if the title is too short or the body empty.
+	if issue.Title == nil || len(*(issue.Title)) < 20 {
+		body := fmt.Sprintf(putils.IssueTitleTooShort, *(issue.User.Login))
+		newComment.Body = &body
+		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
+			return err
+		}
+		logrus.Infof("succeed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
+
+		labels := []string{"status/more-info-needed"}
+		fIP.Client.AddLabelsToIssue(*(issue.Number), labels)
+
+		return nil
+	}
+
+	if issue.Body == nil || len(*(issue.Body)) < 50 {
+		body := fmt.Sprintf(putils.IssueDescriptionTooShort, *(issue.User.Login))
+		newComment.Body = &body
+		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
+			return err
+		}
+		logrus.Infof("secceed in attaching TITLE TOO SHORT comment for issue %d", *(issue.Number))
+
+		labels := []string{"status/more-info-needed"}
+		fIP.Client.AddLabelsToIssue(*(issue.Number), labels)
+
+		return nil
+	}
+
+	return nil
+}
+
+// ActToIssueEdited acts to edited issue
+// This function covers the following part:
+// generate labels;
+// attach comments;
+// assign issue to specific user;
+func (fIP *TriggeredIssueProcessor) ActToIssueEdited(issue *github.Issue) error {
+	// generate labels
+	labels := open.ParseToGenerateLabels(issue)
+	if len(labels) != 0 {
+		// replace the original labels for issue
+		if err := fIP.Client.ReplaceLabelsForIssue(*(issue.Number), labels); err != nil {
+			return err
+		}
 	}
 
 	// attach comment
