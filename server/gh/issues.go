@@ -90,12 +90,13 @@ func (c *Client) ListComments(num int) ([]*github.IssueComment, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	if _, _, err := c.Client.Issues.ListComments(context.Background(), c.owner, c.repo, num, nil); err != nil {
+	comments, _, err := c.Client.Issues.ListComments(context.Background(), c.owner, c.repo, num, nil)
+	if err != nil {
 		logrus.Errorf("failed to list comment in issue(pr) %d: %v", num, err)
 		return nil, err
 	}
 	logrus.Debugf("succeed in listing comments for issue(pr) %d", num)
-	return nil, nil
+	return comments, nil
 }
 
 // AddCommentToIssue adds comment to an issue.
