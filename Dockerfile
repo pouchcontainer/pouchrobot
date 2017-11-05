@@ -30,6 +30,8 @@ ENV GOPATH=/go
 # go binary path is /usr/local/go/bin
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
+EXPOSE 6789
+
 COPY . /go/src/github.com/allencloud/automan
 
 RUN go get github.com/allencloud/automan
