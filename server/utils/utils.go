@@ -1,5 +1,7 @@
 package utils
 
+import "fmt"
+
 // ConflictLabel is a label which means conflict for pull request
 var ConflictLabel = "conflict/needs-rebase"
 
@@ -40,8 +42,8 @@ Seems to be severe enough.
 ping @alibaba/pouch , PTAL. 
 `
 
+// ConflictSubStr is a substring of conflict message.
+var ConflictSubStr = "Conflict happens after merging a previous commit. Please rebase the branch against master and push it back again. Thanks a lot."
+
 // PRConflictComment is a string used to attach comment on conflict PR.
-var PRConflictComment = `
-ping @%s
-Conflict happens after merging a previous commit. Please rebase the branch against master and push it back again. Thanks a lot.
-`
+var PRConflictComment = fmt.Sprintf("ping @%s \n%s", "%s", ConflictSubStr)

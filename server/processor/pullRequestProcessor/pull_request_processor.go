@@ -15,8 +15,6 @@ import (
 )
 
 var (
-	// ConflictLabel means a label
-	ConflictLabel = "conflict/needs-rebase"
 	// SizePrefix means the prefix of a size label
 	SizePrefix = "SIZE/"
 	dcoRegex   = regexp.MustCompile("(?m)(Docker-DCO-1.1-)?Signed-off-by: ([^<]+) <([^<>@]+@[^<>]+)>( \\(github: ([a-zA-Z0-9][a-zA-Z0-9-]+)\\))?")
@@ -46,6 +44,10 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 	switch actionType {
 	case "opened":
 		if err := prp.ActToPROpenOrEdit(&pr); err != nil {
+			return err
+		}
+	case "labeled":
+		if err := prp.ActToPRLabeled(&pr); err != nil {
 			return err
 		}
 	case "review_requested":
@@ -112,14 +114,23 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 	return nil
 }
 
+// ActToPRLabeled acts the event of pull request labeled.
+func (prp *PullRequestProcessor) ActToPRLabeled(pr *github.PullRequest) error {
+	return nil
+}
+
 // ActToPRSynchronized acts to event that a pr is synchronized.
-func (prp *PullRequestProcessor) ActToPRSynchronized(pr *github.PullRequest) error {
+func (prp *PullRequestProcessor) ActToPRSynchronized(syncPR *github.PullRequest) error {
+	pr, err := prp.Client.GetSinglePR(*(syncPR.Number))
+	if err != nil {
+		return nil
+	}
 	// check if this pr is updated to solve the conflict,
 	// if that remove label 'conflict/needs-rebase' and remove the relating comment.
-	if prp.Client.IssueHasLabel(*(pr.Number), ConflictLabel) {
+	if prp.Client.IssueHasLabel(*(pr.Number), utils.ConflictLabel) {
 		if pr.Mergeable != nil && *(pr.Mergeable) == true {
 			// remove conflict label
-			prp.Client.RemoveLabelForIssue(*(pr.Number), ConflictLabel)
+			prp.Client.RemoveLabelForIssue(*(pr.Number), utils.ConflictLabel)
 
 			// remove conflict comment
 			prp.RemoveConflictComment(context.Background(), *(pr.Number))
@@ -149,18 +160,15 @@ func (prp *PullRequestProcessor) ActToPRSynchronized(pr *github.PullRequest) err
 
 // RemoveConflictComment removes a conflict comment for a pull request
 func (prp *PullRequestProcessor) RemoveConflictComment(ctx context.Context, num int) error {
-	prComments, err := prp.Client.ListPRComments(num)
+	prComments, err := prp.Client.ListComments(num)
 	if err != nil {
 		return err
 	}
 	for _, comment := range prComments {
-		commentBody := comment.GetBody()
-		subBody := `
-Conflict happens after merging a previous commit.
-Please rebase the branch against master and push it again.
-Thanks a lot.`
+		commentBody := *(comment.Body)
+		subBody := utils.ConflictSubStr
 		if strings.HasSuffix(commentBody, subBody) {
-			return prp.Client.RemoveCommentForPR(*(comment.ID))
+			return prp.Client.RemoveComment(*(comment.ID))
 		}
 	}
 	return nil

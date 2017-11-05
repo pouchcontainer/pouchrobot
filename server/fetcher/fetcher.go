@@ -59,12 +59,11 @@ func (f *Fetcher) CheckPRsConflict() error {
 			if !hasConflictLabel(f.client, pr) {
 				f.AddConflictLabelToPR(pr)
 			}
-			if !hasConflictComment(f.client, pr) {
-				f.AddConflictCommentToPR(pr)
-			}
+			// if conflict happens, remove all existing conflict comments and add a new one
+			f.AddConflictCommentToPR(pr)
 		} else if pr.Mergeable != nil && *(pr.Mergeable) == true {
 			if hasConflictLabel(f.client, pr) {
-				f.client.RemoveLabelForIssue(*(pr.Number), "conflict/needs-rebase")
+				f.client.RemoveLabelForIssue(*(pr.Number), utils.ConflictLabel)
 			}
 		}
 	}
@@ -90,10 +89,11 @@ func hasConflictComment(c *gh.Client, pr *github.PullRequest) bool {
 	if err != nil {
 		return false
 	}
+	logrus.Infof("There are %d comments in pr %d", len(comments), *(pr.Number))
 
 	for _, comment := range comments {
 		logrus.Infof("pull request %d has comment %s", *(pr.Number), *(comment.Body))
-		if strings.Contains(*(comment.Body), "Conflict happens after merging a previous commit. Please rebase the branch against master and push it back again. Thanks a lot.") {
+		if strings.Contains(*(comment.Body), utils.ConflictSubStr) {
 			return true
 		}
 	}
@@ -102,6 +102,29 @@ func hasConflictComment(c *gh.Client, pr *github.PullRequest) bool {
 
 // AddConflictCommentToPR adds conflict comments to specific pull request.
 func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
+	comments, err := f.client.ListComments(*(pr.Number))
+	if err != nil {
+		return err
+	}
+	if len(comments) == 0 {
+		return nil
+	}
+	latestComment := comments[len(comments)-1]
+	if strings.Contains(*(latestComment.Body), utils.ConflictSubStr) {
+		// do nothing
+		return nil
+	}
+
+	// remove all existing conflict comments
+	for _, comment := range comments {
+		if strings.Contains(*(comment.Body), utils.ConflictSubStr) {
+			if err := f.client.RemoveComment(*(comment.ID)); err != nil {
+				continue
+			}
+		}
+	}
+
+	// add a brand new conflict comment
 	newComment := &github.IssueComment{}
 	if pr.User == nil || pr.User.Login == nil {
 		logrus.Infof("failed to get user from PR %d: empty User", *(pr.Number))
@@ -112,7 +135,7 @@ func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
 	return f.client.AddCommentToIssue(*(pr.Number), newComment)
 }
 
-// AddConflictLabelToPR adds a label of conflict/need-rebase for pull request.
+// AddConflictLabelToPR adds a label of conflict/needs-rebase for pull request.
 func (f *Fetcher) AddConflictLabelToPR(pr *github.PullRequest) error {
 	labels := []string{utils.ConflictLabel}
 	return f.client.AddLabelsToIssue(*(pr.Number), labels)

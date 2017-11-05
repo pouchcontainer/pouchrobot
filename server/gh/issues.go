@@ -111,6 +111,19 @@ func (c *Client) AddCommentToIssue(num int, comment *github.IssueComment) error 
 	return nil
 }
 
+// RemoveComment removes a comment for an issue.
+func (c *Client) RemoveComment(id int) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	if _, err := c.Client.Issues.DeleteComment(context.Background(), c.owner, c.repo, id); err != nil {
+		logrus.Errorf("failed to remove comment %d: %v", id, err)
+		return err
+	}
+	logrus.Debugf("succeed in removing comment %s for pull request", id)
+	return nil
+}
+
 // AssignIssueToUsers assigns users to the specified issue.
 func (c *Client) AssignIssueToUsers(num int, users []string) error {
 	c.Mutex.Lock()
