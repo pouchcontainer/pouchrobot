@@ -57,13 +57,16 @@ func (f *Fetcher) CheckPRsConflict() error {
 			// attach a comment to the pr,
 			// and attach a lable confilct/need-rebase to pr
 			if !hasConflictLabel(f.client, pr) {
+				logrus.Infof("pull request %d has no label conflict/needs-rebase")
 				f.AddConflictLabelToPR(pr)
 			}
 			if !hasConflictComment(f.client, pr) {
+				logrus.Infof("pull request %d has no conflict comment")
 				f.AddConflictCommentToPR(pr)
 			}
 		} else if pr.Mergeable != nil && *(pr.Mergeable) == true {
 			if hasConflictLabel(f.client, pr) {
+				logrus.Infof("pull request %d has label conflict/needs-rebase")
 				f.client.RemoveLabelForIssue(*(pr.Number), "conflict/needs-rebase")
 			}
 		}
@@ -78,7 +81,7 @@ func hasConflictLabel(c *gh.Client, pr *github.PullRequest) bool {
 	}
 
 	for _, label := range labels {
-		if label.GetName() == "conflict/needs-rebase" {
+		if *(label.Name) == "conflict/needs-rebase" {
 			return true
 		}
 	}
