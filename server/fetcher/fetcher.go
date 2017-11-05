@@ -57,16 +57,13 @@ func (f *Fetcher) CheckPRsConflict() error {
 			// attach a comment to the pr,
 			// and attach a lable confilct/need-rebase to pr
 			if !hasConflictLabel(f.client, pr) {
-				logrus.Infof("pull request %d has no label conflict/needs-rebase", *(pr.Number))
 				f.AddConflictLabelToPR(pr)
 			}
 			if !hasConflictComment(f.client, pr) {
-				logrus.Infof("pull request %d has no conflict comment", *(pr.Number))
 				f.AddConflictCommentToPR(pr)
 			}
 		} else if pr.Mergeable != nil && *(pr.Mergeable) == true {
 			if hasConflictLabel(f.client, pr) {
-				logrus.Infof("pull request %d has label conflict/needs-rebase", *(pr.Number))
 				f.client.RemoveLabelForIssue(*(pr.Number), "conflict/needs-rebase")
 			}
 		}
@@ -81,8 +78,7 @@ func hasConflictLabel(c *gh.Client, pr *github.PullRequest) bool {
 	}
 
 	for _, label := range labels {
-		logrus.Infof("pull request %d has label %s", *(pr.Number), *(label.Name))
-		if *(label.Name) == "conflict/needs-rebase" {
+		if *(label.Name) == utils.ConflictLabel {
 			return true
 		}
 	}
@@ -90,7 +86,7 @@ func hasConflictLabel(c *gh.Client, pr *github.PullRequest) bool {
 }
 
 func hasConflictComment(c *gh.Client, pr *github.PullRequest) bool {
-	comments, err := c.ListPRComments(*(pr.Number))
+	comments, err := c.ListComments(*(pr.Number))
 	if err != nil {
 		return false
 	}
@@ -118,6 +114,6 @@ func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
 
 // AddConflictLabelToPR adds a label of conflict/need-rebase for pull request.
 func (f *Fetcher) AddConflictLabelToPR(pr *github.PullRequest) error {
-	labels := []string{"conflict/need-rebase"}
+	labels := []string{utils.ConflictLabel}
 	return f.client.AddLabelsToIssue(*(pr.Number), labels)
 }

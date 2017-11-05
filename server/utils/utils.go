@@ -1,5 +1,8 @@
 package utils
 
+// ConflictLabel is a label which means conflict for pull request
+var ConflictLabel = "conflict/needs-rebase"
+
 // IssueTitleTooShort is a string used to construct the comment
 var IssueTitleTooShort = `
 Thanks for your contribution. 🍻  @%s 
