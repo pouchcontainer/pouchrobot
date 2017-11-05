@@ -7,6 +7,7 @@ import (
 	putils "github.com/allencloud/automan/server/processor/utils"
 	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 )
 
 // PRCommentProcessor is
@@ -31,6 +32,8 @@ func (prcp *PRCommentProcessor) Process(data []byte) error {
 	if err != nil {
 		return err
 	}
+
+	logrus.Debugf("pull request comment : %v", comment)
 
 	switch actionType {
 	case "created":

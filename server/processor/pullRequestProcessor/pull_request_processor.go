@@ -41,6 +41,7 @@ func (prp *PullRequestProcessor) Process(data []byte) error {
 	if err != nil {
 		return err
 	}
+	logrus.Debugf("pull request: %v", pr)
 
 	switch actionType {
 	case "opened":

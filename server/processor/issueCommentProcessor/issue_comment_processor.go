@@ -6,6 +6,7 @@ import (
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 )
 
 // IssueCommentProcessor is
@@ -30,6 +31,8 @@ func (icp *IssueCommentProcessor) Process(data []byte) error {
 	if err != nil {
 		return err
 	}
+
+	logrus.Debugf("issue comment: %v", comment)
 
 	switch actionType {
 	case "created", "edited":

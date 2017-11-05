@@ -52,7 +52,7 @@ func (fIP *TriggeredIssueProcessor) Process(data []byte) error {
 	if err != nil {
 		return err
 	}
-	logrus.Infof("issue: %v", issue)
+	logrus.Debugf("issue: %v", issue)
 
 	switch actionType {
 	case "opened":
