@@ -41,6 +41,6 @@ ping @alibaba/pouch , PTAL.
 var PRConflictComment = `
 ping @%s
 Conflict happens after merging a previous commit.
-Please rebase the branch against master and push it again.
+Please rebase the branch against master and push it back again.
 Thanks a lot.
 `

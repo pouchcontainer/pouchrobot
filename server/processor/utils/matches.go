@@ -17,6 +17,13 @@ var Maintainers = []string{
 // TitleMatches is a map in which key is the label, and value is a slice of string
 // which can be treated as the label.
 var TitleMatches = map[string][]string{
+	"areas/doc": []string{
+		"doc:",
+		"docs:",
+		"doc :",
+		"docs :",
+		"document",
+	},
 	"areas/log": []string{
 		"gelf",
 		"fluentd",
