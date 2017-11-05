@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/allencloud/automan/server/gh"
-	putils "github.com/allencloud/automan/server/processor/utils"
 	"github.com/allencloud/automan/server/utils"
+
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 )
@@ -72,7 +72,7 @@ func hasLGTMFromMaintainer(user string, body string) bool {
 		return false
 	}
 
-	for _, maintainerID := range putils.Maintainers {
+	for _, maintainerID := range utils.Maintainers {
 		if strings.ToLower(user) == strings.ToLower(maintainerID) {
 			return true
 		}

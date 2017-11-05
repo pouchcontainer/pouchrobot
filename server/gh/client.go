@@ -49,20 +49,6 @@ func (c *Client) GetIssues(opt *github.IssueListByRepoOptions) ([]*github.Issue,
 	return issues, nil
 }
 
-// GetPullRequests gets pull request list for a repo.
-func (c *Client) GetPullRequests(opt *github.PullRequestListOptions) ([]*github.PullRequest, error) {
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
-
-	pullRequests, _, err := c.Client.PullRequests.List(context.Background(), c.owner, c.repo, opt)
-	if err != nil {
-		logrus.Errorf("failed to list pull request in repo %s: %v", c.repo, err)
-		return nil, err
-	}
-	logrus.Debugf("succeed in getting pull requests in repo %s", c.repo)
-	return pullRequests, nil
-}
-
 // GetAllLabels gets all labels of a repo, not an issue, nor a pull request
 func (c *Client) GetAllLabels() ([]*github.Label, error) {
 	c.Mutex.Lock()
@@ -127,20 +113,6 @@ func (c *Client) ReplaceLabelsForIssue(num int, labels []string) error {
 	return nil
 }
 
-// ListPRComments lists comments for a pull request.
-func (c *Client) ListPRComments(num int) ([]*github.PullRequestComment, error) {
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
-
-	prComments, _, err := c.Client.PullRequests.ListComments(context.Background(), c.owner, c.repo, num, nil)
-	if err != nil {
-		logrus.Errorf("failed to list comments for pr %d: %v", num, err)
-		return nil, err
-	}
-	logrus.Debugf("succeed in list comments for pr %d:", num)
-	return prComments, nil
-}
-
 // AddCommentToIssue adds comment to an issue.
 func (c *Client) AddCommentToIssue(num int, comment *github.IssueComment) error {
 	c.Mutex.Lock()
@@ -152,43 +124,6 @@ func (c *Client) AddCommentToIssue(num int, comment *github.IssueComment) error 
 	}
 	logrus.Debugf("succeed in adding comment %s for issue %d", *(comment.Body), num)
 	return nil
-}
-
-// AddCommentToPR adds comment to a pull request.
-func (c *Client) AddCommentToPR(num int, comment *github.IssueComment) error {
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
-
-	if _, _, err := c.Client.Issues.CreateComment(context.Background(), c.owner, c.repo, num, comment); err != nil {
-		logrus.Errorf("failed to add comment %s to pr %d: %v", *(comment.Body), num, err)
-		return err
-	}
-	logrus.Debugf("succeed in creating comment %s for pull request %d", *(comment.Body), num)
-	return nil
-}
-
-// RemoveCommentForPR removes a comment for a pull request.
-func (c *Client) RemoveCommentForPR(num int) error {
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
-
-	if _, err := c.Client.PullRequests.DeleteComment(context.Background(), c.owner, c.repo, num); err != nil {
-		logrus.Errorf("failed to remove comment %d: %v", num, err)
-		return err
-	}
-	logrus.Debugf("succeed in removing comment %s for pull request", num)
-	return nil
-}
-
-// ListCommits lists all commits in a pull request.
-func (c *Client) ListCommits(num int) ([]*github.RepositoryCommit, error) {
-	commits, _, err := c.PullRequests.ListCommits(context.Background(), c.owner, c.repo, num, nil)
-	if err != nil {
-		logrus.Errorf("failed to list commits in pull request %d: %v", num, err)
-		return nil, err
-	}
-	logrus.Debugf("succeed in listing commits in pull request %d", num)
-	return commits, nil
 }
 
 // AssignIssueToUsers assigns users to the specified issue.

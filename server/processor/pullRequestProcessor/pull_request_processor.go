@@ -8,8 +8,8 @@ import (
 
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/processor/pullRequestProcessor/open"
-	putils "github.com/allencloud/automan/server/processor/utils"
 	"github.com/allencloud/automan/server/utils"
+
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 )
@@ -79,7 +79,7 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 	newComment := &github.IssueComment{}
 	// check if the title is too short or the body empty.
 	if pr.Title == nil || len(*(pr.Title)) < 20 {
-		body := fmt.Sprintf(putils.PRTitleTooShort, *(pr.User.Login))
+		body := fmt.Sprintf(utils.PRTitleTooShort, *(pr.User.Login))
 		newComment.Body = &body
 		if err := prp.Client.AddCommentToPR(*(pr.Number), newComment); err != nil {
 			return err
@@ -88,7 +88,7 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 	}
 
 	if pr.Body == nil || len(*(pr.Body)) < 50 {
-		body := fmt.Sprintf(putils.PRDescriptionTooShort, *(pr.User.Login))
+		body := fmt.Sprintf(utils.PRDescriptionTooShort, *(pr.User.Login))
 		newComment.Body = &body
 		if err := prp.Client.AddCommentToPR(*(pr.Number), newComment); err != nil {
 			return err

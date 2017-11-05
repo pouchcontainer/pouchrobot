@@ -3,12 +3,10 @@ package open
 import (
 	"strings"
 
-	"github.com/sirupsen/logrus"
-
-	putils "github.com/allencloud/automan/server/processor/utils"
 	"github.com/allencloud/automan/server/utils"
 
 	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 )
 
 // ParseToGenerateLabels parses issue title and issue body to generate a slice
@@ -29,7 +27,7 @@ func ParseTitleToGenerateLabels(issue *github.Issue) []string {
 	}
 	var labels []string
 	title := issue.Title
-	for label, matchedSlice := range putils.TitleMatches {
+	for label, matchedSlice := range utils.TitleMatches {
 		for _, pattern := range matchedSlice {
 			lowerCaseTitle := strings.ToLower(*title)
 			if strings.Contains(lowerCaseTitle, pattern) {
@@ -49,7 +47,7 @@ func ParseBodyToGenerateLabels(issue *github.Issue) []string {
 	}
 	var labels []string
 	content := issue.Body
-	for label, matchedSlice := range putils.BodyMatches {
+	for label, matchedSlice := range utils.BodyMatches {
 		for _, pattern := range matchedSlice {
 			lowerCaseBody := strings.ToLower(*content)
 			if strings.Contains(lowerCaseBody, pattern) {

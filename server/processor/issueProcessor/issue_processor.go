@@ -7,7 +7,6 @@ import (
 
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/processor/issueProcessor/open"
-	putils "github.com/allencloud/automan/server/processor/utils"
 	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
 )
@@ -96,7 +95,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpened(issue *github.Issue) error 
 
 	// check if the title is too short or the body empty.
 	if issue.Title == nil || len(*(issue.Title)) < 20 {
-		body := fmt.Sprintf(putils.IssueTitleTooShort, *(issue.User.Login))
+		body := fmt.Sprintf(utils.IssueTitleTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
 			return err
@@ -110,7 +109,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpened(issue *github.Issue) error 
 	}
 
 	if issue.Body == nil || len(*(issue.Body)) < 50 {
-		body := fmt.Sprintf(putils.IssueDescriptionTooShort, *(issue.User.Login))
+		body := fmt.Sprintf(utils.IssueDescriptionTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
 			return err
@@ -155,7 +154,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueEdited(issue *github.Issue) error 
 
 	// check if the title is too short or the body empty.
 	if issue.Title == nil || len(*(issue.Title)) < 20 {
-		body := fmt.Sprintf(putils.IssueTitleTooShort, *(issue.User.Login))
+		body := fmt.Sprintf(utils.IssueTitleTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
 			return err
@@ -169,7 +168,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueEdited(issue *github.Issue) error 
 	}
 
 	if issue.Body == nil || len(*(issue.Body)) < 50 {
-		body := fmt.Sprintf(putils.IssueDescriptionTooShort, *(issue.User.Login))
+		body := fmt.Sprintf(utils.IssueDescriptionTooShort, *(issue.User.Login))
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
 			return err
@@ -201,7 +200,7 @@ func (fIP *TriggeredIssueProcessor) ActToIssueLabeled(issue *github.Issue) error
 		return nil
 	}
 
-	body := fmt.Sprintf(putils.IssueNeedPOComment, *(issue.User.Login))
+	body := fmt.Sprintf(utils.IssueNeedPOComment, *(issue.User.Login))
 	newComment := &github.IssueComment{
 		Body: &body,
 	}

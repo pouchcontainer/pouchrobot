@@ -40,7 +40,5 @@ ping @alibaba/pouch , PTAL.
 // PRConflictComment is a string used to attach comment on conflict PR.
 var PRConflictComment = `
 ping @%s
-Conflict happens after merging a previous commit.
-Please rebase the branch against master and push it back again.
-Thanks a lot.
+Conflict happens after merging a previous commit. Please rebase the branch against master and push it back again. Thanks a lot.
 `

@@ -3,8 +3,8 @@ package open
 import (
 	"strings"
 
-	putils "github.com/allencloud/automan/server/processor/utils"
 	"github.com/allencloud/automan/server/utils"
+
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 )
@@ -62,7 +62,7 @@ func ParseTitleToGenerateLabels(pr *github.PullRequest) []string {
 	}
 	var labels []string
 	title := pr.Title
-	for label, matchedSlice := range putils.TitleMatches {
+	for label, matchedSlice := range utils.TitleMatches {
 		for _, pattern := range matchedSlice {
 			lowerCaseTitle := strings.ToLower(*title)
 			if strings.Contains(lowerCaseTitle, pattern) {
