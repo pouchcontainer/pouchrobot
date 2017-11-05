@@ -30,9 +30,8 @@ func NewFetcher(client *gh.Client) *Fetcher {
 // Work starts periodical work
 func (f *Fetcher) Work() {
 	for {
-		time.Sleep(FETCHINTERVAL)
-
 		f.CheckPRsConflict()
+		time.Sleep(FETCHINTERVAL)
 	}
 }
 
@@ -53,7 +52,7 @@ func (f *Fetcher) CheckPRsConflict() error {
 			continue
 		}
 		if pr.Mergeable != nil && *(pr.Mergeable) == false {
-			logrus.Infof("found pull request %d conflict", *(pr.Number))
+			logrus.Infof("PR %d: found conflict", *(pr.Number))
 			// attach a comment to the pr,
 			// and attach a lable confilct/need-rebase to pr
 			if !hasConflictLabel(f.client, pr) {
@@ -106,11 +105,14 @@ func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
 	if err != nil {
 		return err
 	}
+	logrus.Infof("PR %d: There are %d comments", *(pr.Number), len(comments))
+
 	if len(comments) == 0 {
 		return nil
 	}
 	latestComment := comments[len(comments)-1]
 	if strings.Contains(*(latestComment.Body), utils.ConflictSubStr) {
+		logrus.Infof("PR %d: latest comment %s \nhas\n %s", *(pr.Number), *(latestComment.Body), utils.ConflictSubStr)
 		// do nothing
 		return nil
 	}
