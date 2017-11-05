@@ -25,3 +25,21 @@ func UniqueElementSlice(data []string) []string {
 	return noDuplicatedSlice
 
 }
+
+// DeltaSlice return a slice which contains element in compare but out of base.
+func DeltaSlice(base, compare []string) []string {
+	var result = []string{}
+	for _, element := range compare {
+		contained := false
+		for _, baseElement := range base {
+			if element == baseElement {
+				contained = true
+				continue
+			}
+		}
+		if !contained {
+			result = append(result, element)
+		}
+	}
+	return result
+}

@@ -133,10 +133,15 @@ func (fIP *TriggeredIssueProcessor) ActToIssueOpened(issue *github.Issue) error 
 // assign issue to specific user;
 func (fIP *TriggeredIssueProcessor) ActToIssueEdited(issue *github.Issue) error {
 	// generate labels
-	labels := open.ParseToGenerateLabels(issue)
+	newLabels := open.ParseToGenerateLabels(issue)
 	if len(labels) != 0 {
 		// replace the original labels for issue
-		if err := fIP.Client.ReplaceLabelsForIssue(*(issue.Number), labels); err != nil {
+		originalLabels, err := fIP.Client.GetLabelsInIssue(*(issue.Number))
+		if err != nil {
+			return err
+		}
+		addedLabels := utils.DeltaSlice(originalLabels, newLabels)
+		if err := fIP.Client.AddLabelsToIssue(*(issue.Number), addedLabels); err != nil {
 			return err
 		}
 	}
