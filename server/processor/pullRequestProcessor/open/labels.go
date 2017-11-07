@@ -13,13 +13,13 @@ var (
 	// XS is
 	XS = 10
 	// S is
-	S = 20
+	S = 40
 	// M is
-	M = 40
+	M = 80
 	// L is
-	L = 80
+	L = 160
 	// XL is
-	XL = 160
+	XL = 640
 )
 
 // ParseToGeneratePRLabels parses
