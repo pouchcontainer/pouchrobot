@@ -86,7 +86,6 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 		if err := prp.Client.AddCommentToPR(*(pr.Number), newComment); err != nil {
 			return err
 		}
-		return nil
 	}
 
 	if pr.Body == nil || len(*(pr.Body)) < 50 {
@@ -95,14 +94,13 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 		if err := prp.Client.AddCommentToPR(*(pr.Number), newComment); err != nil {
 			return err
 		}
-		return nil
 	}
 
+	// check whether commits are following the rules
 	commits, err := prp.Client.ListCommits(*(pr.Number))
 	if err != nil {
 		return err
 	}
-
 	for _, commit := range commits {
 		if commit.Commit != nil && !dcoRegex.MatchString(*commit.Commit.Message) {
 			// pull request is not signed
@@ -110,6 +108,18 @@ func (prp *PullRequestProcessor) ActToPROpenOrEdit(pr *github.PullRequest) error
 			break
 		}
 	}
+
+	// check whether this is the first contributor of the committer
+	/*if pr.AuthorAssociation != nil {
+		authorAssociation := *(pr.AuthorAssociation)
+		if authorAssociation != "owner" {
+			body := fmt.Sprintf(utils.FirstCommitComment, *(pr.User.Login))
+			newComment.Body = &body
+			if err := prp.Client.AddCommentToPR(*(pr.Number), newComment); err != nil {
+				return err
+			}
+		}
+	}*/
 
 	return nil
 }
