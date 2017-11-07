@@ -33,17 +33,16 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 	}
 
 	if pr.Mergeable == nil || *(pr.Mergeable) == true {
-		f.client.RemoveLabelForIssue(*(pr.Number), utils.PRConflictLabel)
+		if f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
+			f.client.RemoveLabelForIssue(*(pr.Number), utils.PRConflictLabel)
+		}
 		f.client.RemoveCommentViaString(*(pr.Number), utils.PRConflictSubStr)
 		return nil
 	}
 
 	logrus.Infof("PR %d: found conflict", *(pr.Number))
 	if f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
-		if _, exist := f.client.IssueHasComment(*(pr.Number), utils.PRConflictSubStr); !exist {
-			return f.AddConflictCommentToPR(pr)
-		}
-		return nil
+		return f.AddConflictCommentToPR(pr)
 	}
 	// attach a comment to the pr,
 	// and attach a lable confilct/need-rebase to pr
