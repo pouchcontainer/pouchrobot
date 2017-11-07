@@ -41,6 +41,10 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 	}
 
 	logrus.Infof("PR %d: found conflict", *(pr.Number))
+	// remove LGTM label if conflict happens
+	if f.client.IssueHasLabel(*(pr.Number), "LGTM") {
+		f.client.RemoveLabelForIssue(*(pr.Number), "LGTM")
+	}
 	if f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
 		return f.AddConflictCommentToPR(pr)
 	}
@@ -62,7 +66,7 @@ func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
 	if err != nil {
 		return err
 	}
-	logrus.Infof("PR %d: There are %d comments", *(pr.Number), len(comments))
+	//logrus.Infof("PR %d: There are %d comments", *(pr.Number), len(comments))
 
 	body := fmt.Sprintf(utils.PRConflictComment, *(pr.User.Login))
 	newComment := &github.IssueComment{
@@ -75,8 +79,15 @@ func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
 
 	latestComment := comments[len(comments)-1]
 	if strings.Contains(*(latestComment.Body), utils.PRConflictSubStr) {
-		logrus.Infof("PR %d: latest comment %s \nhas\n %s", *(pr.Number), *(latestComment.Body), utils.PRConflictSubStr)
-		// do nothing
+		//logrus.Infof("PR %d: latest comment %s \nhas\n %s", *(pr.Number), *(latestComment.Body), utils.PRConflictSubStr)
+		// remove all existing conflict comments
+		for _, comment := range comments[:(len(comments) - 1)] {
+			if strings.Contains(*(comment.Body), utils.PRConflictSubStr) {
+				if err := f.client.RemoveComment(*(comment.ID)); err != nil {
+					continue
+				}
+			}
+		}
 		return nil
 	}
 
