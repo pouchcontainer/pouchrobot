@@ -40,6 +40,9 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 
 	logrus.Infof("PR %d: found conflict", *(pr.Number))
 	if f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
+		if _, exist := f.client.IssueHasComment(*(pr.Number), utils.PRConflictSubStr); !exist {
+			return f.AddConflictCommentToPR(pr)
+		}
 		return nil
 	}
 	// attach a comment to the pr,
@@ -51,15 +54,26 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 
 // AddConflictCommentToPR adds conflict comments to specific pull request.
 func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
+	if pr.User == nil || pr.User.Login == nil {
+		logrus.Infof("failed to get user from PR %d: empty User", *(pr.Number))
+		return nil
+	}
+
 	comments, err := f.client.ListComments(*(pr.Number))
 	if err != nil {
 		return err
 	}
 	logrus.Infof("PR %d: There are %d comments", *(pr.Number), len(comments))
 
-	if len(comments) == 0 {
-		return nil
+	body := fmt.Sprintf(utils.PRConflictComment, *(pr.User.Login))
+	newComment := &github.IssueComment{
+		Body: &body,
 	}
+
+	if len(comments) == 0 {
+		return f.client.AddCommentToIssue(*(pr.Number), newComment)
+	}
+
 	latestComment := comments[len(comments)-1]
 	if strings.Contains(*(latestComment.Body), utils.PRConflictSubStr) {
 		logrus.Infof("PR %d: latest comment %s \nhas\n %s", *(pr.Number), *(latestComment.Body), utils.PRConflictSubStr)
@@ -77,12 +91,5 @@ func (f *Fetcher) AddConflictCommentToPR(pr *github.PullRequest) error {
 	}
 
 	// add a brand new conflict comment
-	newComment := &github.IssueComment{}
-	if pr.User == nil || pr.User.Login == nil {
-		logrus.Infof("failed to get user from PR %d: empty User", *(pr.Number))
-		return nil
-	}
-	body := fmt.Sprintf(utils.PRConflictComment, *(pr.User.Login))
-	newComment.Body = &body
 	return f.client.AddCommentToIssue(*(pr.Number), newComment)
 }
