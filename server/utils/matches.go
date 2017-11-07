@@ -17,6 +17,12 @@ var Maintainers = []string{
 // TitleMatches is a map in which key is the label, and value is a slice of string
 // which can be treated as the label.
 var TitleMatches = map[string][]string{
+	"areas/cli": []string{
+		"cli:",
+		"cli :",
+		"command line",
+		"command-line",
+	},
 	"areas/docs": []string{
 		"doc:",
 		"docs:",
@@ -79,19 +85,10 @@ var TitleMatches = map[string][]string{
 		"error",
 		"failure",
 		"failed to ",
-	},
-	"kind/panic": []string{
-		"invalid memory address or nil pointer",
-		"panic",
-	},
-	"kind/proposal": []string{
-		"proposal",
+		"fix:",
 	},
 	"kind/design": []string{
 		"design",
-	},
-	"kind/performance": []string{
-		"performance",
 	},
 	"kind/feature": []string{
 		"feature",
@@ -101,6 +98,16 @@ var TitleMatches = map[string][]string{
 		"feature-request",
 		"feature_request",
 	},
+	"kind/panic": []string{
+		"invalid memory address or nil pointer",
+		"panic",
+	},
+	"kind/performance": []string{
+		"performance",
+	},
+	"kind/proposal": []string{
+		"proposal",
+	},
 	"kind/question": []string{
 		"can i",
 		"can you",
@@ -109,6 +116,9 @@ var TitleMatches = map[string][]string{
 		"how to",
 		"question",
 		"where to",
+	},
+	"kind/refactor": []string{
+		"refactor",
 	},
 	"os/windows": []string{
 		"windows",

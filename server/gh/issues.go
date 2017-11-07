@@ -3,6 +3,7 @@ package gh
 import (
 	"context"
 
+	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 )
@@ -49,6 +50,20 @@ func (c *Client) GetLabelsInIssue(num int) ([]*github.Label, error) {
 	return labels, nil
 }
 
+// GetStrLabelsInIssue gets string labels attached on a single issue whose id is num.
+func (c *Client) GetStrLabelsInIssue(num int) ([]string, error) {
+	labels, err := c.GetLabelsInIssue(num)
+	if err != nil {
+		return nil, err
+	}
+
+	result := []string{}
+	for _, label := range labels {
+		result = append(result, *(label.Name))
+	}
+	return result, nil
+}
+
 // AddLabelsToIssue adds labels to an issue
 func (c *Client) AddLabelsToIssue(num int, labels []string) error {
 	c.Mutex.Lock()
@@ -85,44 +100,18 @@ func (c *Client) ReplaceLabelsForIssue(num int, labels []string) error {
 	return nil
 }
 
-// ListComments lists all comments in an issue including pull request.
-func (c *Client) ListComments(num int) ([]*github.IssueComment, error) {
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
-
-	comments, _, err := c.Client.Issues.ListComments(context.Background(), c.owner, c.repo, num, nil)
+// IssueContainsLabels return whether issue contains labels
+func (c *Client) IssueContainsLabels(num int, labels []string) bool {
+	rawLabels, err := c.GetLabelsInIssue(num)
 	if err != nil {
-		logrus.Errorf("failed to list comment in issue(pr) %d: %v", num, err)
-		return nil, err
+		return false
 	}
-	logrus.Debugf("succeed in listing comments for issue(pr) %d", num)
-	return comments, nil
-}
-
-// AddCommentToIssue adds comment to an issue.
-func (c *Client) AddCommentToIssue(num int, comment *github.IssueComment) error {
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
-
-	if _, _, err := c.Client.Issues.CreateComment(context.Background(), c.owner, c.repo, num, comment); err != nil {
-		logrus.Errorf("failed to add comment %s to issue(pr) %d: %v", *(comment.Body), num, err)
-		return err
+	labelSlice := []string{}
+	for _, rawLabel := range rawLabels {
+		labelSlice = append(labelSlice, *(rawLabel.Name))
 	}
-	logrus.Debugf("succeed in adding comment %s for issue %d", *(comment.Body), num)
-	return nil
-}
 
-// RemoveComment removes a comment for an issue.
-func (c *Client) RemoveComment(id int) error {
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
-
-	if _, err := c.Client.Issues.DeleteComment(context.Background(), c.owner, c.repo, id); err != nil {
-		logrus.Errorf("failed to remove comment %d: %v", id, err)
-		return err
-	}
-	logrus.Debugf("succeed in removing comment %s for pull request", id)
-	return nil
+	return utils.SliceContainsSlice(labelSlice, labels)
 }
 
 // AssignIssueToUsers assigns users to the specified issue.

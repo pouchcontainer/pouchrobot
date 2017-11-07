@@ -1,13 +1,8 @@
 package prCommentProcessor
 
 import (
-	"strings"
-
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/utils"
-
-	"github.com/google/go-github/github"
-	"github.com/sirupsen/logrus"
 )
 
 // PRCommentProcessor is
@@ -33,67 +28,15 @@ func (prcp *PRCommentProcessor) Process(data []byte) error {
 		return err
 	}
 
-	logrus.Debugf("pull request comment : %v", comment)
-
 	switch actionType {
 	case "created":
-		//logrus.Infof("Got an issue: %v", issue)
 		if err := prcp.ActToPRCommented(&issue, &comment); err != nil {
 			return nil
 		}
 	case "edited":
+		if err := prcp.ActToPRCommentEdited(&issue, &comment); err != nil {
+			return nil
+		}
 	}
 	return nil
-}
-
-// ActToPRCommented acts added comment to the PR
-// Here are the rules:
-// 1. if maintainers attached LGTM and currently no LGTM, add a label "LGTM";
-// 2. if maintainers attached LGTM and already has a LGTM, add a label "APPROVED";
-func (prcp *PRCommentProcessor) ActToPRCommented(issue *github.Issue, comment *github.IssueComment) error {
-	body := *(comment.Body)
-	user := *(comment.User.Login)
-	//logrus.Infof("body: %s, user:%s, issue: %v", body, user, *issue)
-
-	if hasLGTMFromMaintainer(user, body) && noLGTMInLabels(issue) {
-		prcp.Client.AddLabelsToIssue(*(issue.Number), []string{"LGTM"})
-	}
-	// FIXME: one maintainer attached two LGTMs, it will attach an APPROVED
-	if hasLGTMFromMaintainer(user, body) && hasLGTMInLabels(issue) {
-		prcp.Client.AddLabelsToIssue(*(issue.Number), []string{"APPROVED"})
-	}
-	return nil
-}
-
-func hasLGTMFromMaintainer(user string, body string) bool {
-	// FIXME: if a maintainer attached a comment like: LGTM if change request solved,
-	// this rule will still add a lgtm label
-	if !strings.Contains(strings.ToLower(body), "lgtm") {
-		return false
-	}
-
-	for _, maintainerID := range utils.Maintainers {
-		if strings.ToLower(user) == strings.ToLower(maintainerID) {
-			return true
-		}
-	}
-	return false
-}
-
-func noLGTMInLabels(issue *github.Issue) bool {
-	for _, label := range issue.Labels {
-		if label.GetName() == "LGTM" {
-			return false
-		}
-	}
-	return true
-}
-
-func hasLGTMInLabels(issue *github.Issue) bool {
-	for _, label := range issue.Labels {
-		if label.GetName() == "LGTM" {
-			return true
-		}
-	}
-	return false
 }

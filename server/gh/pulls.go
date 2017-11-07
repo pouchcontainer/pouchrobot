@@ -71,16 +71,3 @@ func (c *Client) ListCommits(num int) ([]*github.RepositoryCommit, error) {
 	logrus.Debugf("succeed in listing commits in pull request %d", num)
 	return commits, nil
 }
-
-// RemoveCommentForPR removes a comment for a pull request.
-func (c *Client) RemoveCommentForPR(num int) error {
-	c.Mutex.Lock()
-	defer c.Mutex.Unlock()
-
-	if _, err := c.Client.PullRequests.DeleteComment(context.Background(), c.owner, c.repo, num); err != nil {
-		logrus.Errorf("failed to remove comment %d: %v", num, err)
-		return err
-	}
-	logrus.Debugf("succeed in removing comment %s for pull request", num)
-	return nil
-}

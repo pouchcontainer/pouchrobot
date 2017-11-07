@@ -21,7 +21,7 @@ type processor interface {
 
 // Processor contains several specific processors
 type Processor struct {
-	IssueProcessor        *issueProcessor.TriggeredIssueProcessor
+	IssueProcessor        *issueProcessor.IssueProcessor
 	PullRequestProcessor  *pullRequestProcessor.PullRequestProcessor
 	IssueCommentProcessor *issueCommentProcessor.IssueCommentProcessor
 	PRCommentProcessor    *prCommentProcessor.PRCommentProcessor
@@ -30,7 +30,7 @@ type Processor struct {
 // NewProcessor creates
 func NewProcessor(client *gh.Client) *Processor {
 	return &Processor{
-		IssueProcessor: &issueProcessor.TriggeredIssueProcessor{
+		IssueProcessor: &issueProcessor.IssueProcessor{
 			Client: client,
 		},
 		PullRequestProcessor: &pullRequestProcessor.PullRequestProcessor{

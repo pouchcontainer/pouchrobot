@@ -26,7 +26,7 @@ func UniqueElementSlice(data []string) []string {
 
 }
 
-// DeltaSlice return a slice which contains element in compare but out of base.
+// DeltaSlice returns a slice which contains element in compare but out of base.
 func DeltaSlice(base, compare []string) []string {
 	var result = []string{}
 	for _, element := range compare {
@@ -42,4 +42,20 @@ func DeltaSlice(base, compare []string) []string {
 		}
 	}
 	return result
+}
+
+// SliceContainsSlice returns true if a slice contains another one
+func SliceContainsSlice(old, new []string) bool {
+	for _, newElement := range new {
+		in := false
+		for _, oldElement := range old {
+			if newElement == oldElement {
+				in = true
+			}
+		}
+		if !in {
+			return false
+		}
+	}
+	return true
 }
