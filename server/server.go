@@ -111,7 +111,7 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	type TravisCI struct {
 		id     int
 		number string
-		cfg    config
+		//cfg    config
 	}
 
 	var st TravisCI
@@ -123,9 +123,9 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	logrus.Infof("id: %s", st.id)
 
-	logrus.Infof("pull request title: %s", st.cfg.pull_request_title)
+	//logrus.Infof("pull request title: %s", st.cfg.pull_request_title)
 
-	logrus.Infof("pull request number: %d", st.cfg.pull_request_number)
+	//logrus.Infof("pull request number: %d", st.cfg.pull_request_number)
 
 	w.WriteHeader(http.StatusOK)
 	return
