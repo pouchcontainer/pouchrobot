@@ -49,7 +49,12 @@ func (s *Server) Run() error {
 
 	// register ping api
 	r.HandleFunc("/_ping", pingHandler).Methods("GET")
+
+	// github webhook API
 	r.HandleFunc("/events", s.eventHandler).Methods("POST")
+
+	// travisCI webhook API
+	r.HandleFunc("/ci_notifications", s.ciNotificationHandler).Methods("POST")
 	return http.ListenAndServe(listenAddress, r)
 }
 
@@ -76,6 +81,20 @@ func (s *Server) eventHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusOK)
+	return
+}
+
+//
+func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
+	logrus.Debug("/ci_notifications events reveived")
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logrus.Infof("get data from travisCI webhook: %s", string(data))
 
 	w.WriteHeader(http.StatusOK)
 	return
