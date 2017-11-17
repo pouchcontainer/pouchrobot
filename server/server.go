@@ -95,7 +95,6 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logrus.Infof("r.PostForm: %v", r.PostForm)
 	logrus.Infof("r.Form: %v", r.Form)
 
 	str := r.PostForm.Get("payload")
@@ -107,7 +106,7 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	type config struct {
 		pull_request_number int
-		pull_request_title  *string
+		pull_request_title  string
 	}
 	type TravisCI struct {
 		id     int
@@ -122,7 +121,9 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logrus.Infof("pull request title: %s", *(st.cfg.pull_request_title))
+	logrus.Infof("id: %s", st.id)
+
+	logrus.Infof("pull request title: %s", st.cfg.pull_request_title)
 
 	logrus.Infof("pull request number: %d", st.cfg.pull_request_number)
 
