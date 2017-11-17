@@ -106,7 +106,7 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	data := []byte(str)
 
 	type config struct {
-		pull_request_number *int
+		pull_request_number int
 		pull_request_title  *string
 	}
 	type TravisCI struct {
@@ -122,10 +122,9 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logrus.Infof("pull request number: %d, pull request title: %s",
-		*(st.cfg.pull_request_number),
-		*(st.cfg.pull_request_title),
-	)
+	logrus.Infof("pull request title: %s", *(st.cfg.pull_request_title))
+
+	logrus.Infof("pull request number: %d", st.cfg.pull_request_number)
 
 	w.WriteHeader(http.StatusOK)
 	return
