@@ -123,8 +123,8 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logrus.Infof("pull request number: %d, pull request title: %s",
-		st.cfg.pull_request_number,
-		st.cfg.pull_request_title,
+		*(st.cfg.pull_request_number),
+		*(st.cfg.pull_request_title),
 	)
 
 	w.WriteHeader(http.StatusOK)
