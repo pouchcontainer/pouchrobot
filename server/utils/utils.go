@@ -17,7 +17,8 @@ Please edit issue title instead of opening a new one.
 More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`
 
 // IssueTitleTooShort is a string used to construct the comment.
-var IssueTitleTooShort = fmt.Sprintf("Thanks for your contribution. 🍻 @%s \n%s",
+var IssueTitleTooShort = fmt.Sprintf(
+	"Thanks for your contribution. 🍻 @%s \n%s",
 	"%s",
 	IssueTitleTooShortSubStr,
 )
@@ -29,7 +30,8 @@ Please edit this issue description instead of opening a new one.
 More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`
 
 // IssueDescriptionTooShort is a string used to construct the comment.
-var IssueDescriptionTooShort = fmt.Sprintf("Thanks for your contribution. 🍻 @%s \n%s",
+var IssueDescriptionTooShort = fmt.Sprintf(
+	"Thanks for your contribution. 🍻 @%s \n%s",
 	"%s",
 	IssueDescriptionTooShortSubStr,
 )
@@ -40,7 +42,8 @@ Please edit this PR title instead of opening a new one.
 More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`
 
 // PRTitleTooShort is a string used to construct the comment.
-var PRTitleTooShort = fmt.Sprintf("Thanks for your contribution. 🍻  @%s \n%s",
+var PRTitleTooShort = fmt.Sprintf(
+	"Thanks for your contribution. 🍻  @%s \n%s",
 	"%s",
 	PRTitleTooShortSubStr,
 )
@@ -51,7 +54,8 @@ Please edit this PR title instead of opening a new one.
 More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`
 
 // PRDescriptionTooShort is a string used to construct the comment.
-var PRDescriptionTooShort = fmt.Sprintf("Thanks for your contribution. 🍻  @%s \n%s",
+var PRDescriptionTooShort = fmt.Sprintf(
+	"Thanks for your contribution. 🍻  @%s \n%s",
 	"%s",
 	PRDescriptionTooShortSubStr,
 )
@@ -69,21 +73,33 @@ ping @alibaba/pouch , PTAL.
 `
 
 // IssueNeedPOComment is a string used to attach comment on P0 issue.
-var IssueNeedPOComment = fmt.Sprintf("Thanks for your report, @%s \n%s",
+var IssueNeedPOComment = fmt.Sprintf(
+	"Thanks for your report, @%s \n%s",
 	"%s",
 	IssueNeedPOCommentSubStr,
 )
 
-// FirstCommitComment is a comment used to thank a user's first contribution.
-var FirstCommitComment = `
-Thanks for your first contribution, @%s
+// FirstCommitCommentSubStr is a string which is substring of FirstCommitComment
+var FirstCommitCommentSubStr = `👏  We really appreciate it.
+Just remind that you have read the contribution guide: https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md
+If you didn't, you should do that first. If done, welcome again and please enjoy hacking! 🍻 
 `
 
+// FirstCommitComment is a comment used to thank a user's first contribution.
+var FirstCommitComment = fmt.Sprintf(
+	"We found this is your first time to contribute to Pouch, @%s \n%s",
+	"%s",
+	FirstCommitCommentSubStr,
+)
+
 // PRConflictSubStr is a substring of conflict message.
-var PRConflictSubStr = "Conflict happens after merging a previous commit. Please rebase the branch against master and push it back again. Thanks a lot."
+var PRConflictSubStr = `Conflict happens after merging a previous commit. 
+Please rebase the branch against master and push it back again. Thanks a lot.
+`
 
 // PRConflictComment is a string used to attach comment on conflict PR.
-var PRConflictComment = fmt.Sprintf("ping @%s \n%s",
+var PRConflictComment = fmt.Sprintf(
+	"ping @%s \n%s",
 	"%s",
 	PRConflictSubStr,
 )

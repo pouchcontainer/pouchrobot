@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/allencloud/automan/server/utils"
+
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
 )
@@ -45,6 +46,7 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 	if f.client.IssueHasLabel(*(pr.Number), "LGTM") {
 		f.client.RemoveLabelForIssue(*(pr.Number), "LGTM")
 	}
+
 	if f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
 		return f.AddConflictCommentToPR(pr)
 	}

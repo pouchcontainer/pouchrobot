@@ -88,6 +88,8 @@ func (prp *PullRequestProcessor) addSignoffComments(pr *github.PullRequest) erro
 	return prp.Client.AddCommentToPR(*(pr.Number), newComment)
 }
 
+// attachFirstContributionComments attaches a first contributor comments when
+// it is the first time for author to contribute.
 func (prp *PullRequestProcessor) attachFirstContributionComments(pr *github.PullRequest) error {
 	// check whether this is the first contributor of the committer
 	if pr.AuthorAssociation == nil {
@@ -98,6 +100,7 @@ func (prp *PullRequestProcessor) attachFirstContributionComments(pr *github.Pull
 		return nil
 	}
 
+	// generate PR comment body
 	body := fmt.Sprintf(utils.FirstCommitComment, *(pr.User.Login))
 	newComment := &github.IssueComment{
 		Body: &body,
@@ -105,7 +108,7 @@ func (prp *PullRequestProcessor) attachFirstContributionComments(pr *github.Pull
 	return prp.Client.AddCommentToPR(*(pr.Number), newComment)
 }
 
+// isFirstContribution returns true if the author_assiciate field is FIRST_TIME_CONTRIBUTOR.
 func isFirstContribution(str string) bool {
-	// TODO: add how to check
-	return false
+	return str == "FIRST_TIME_CONTRIBUTOR"
 }
