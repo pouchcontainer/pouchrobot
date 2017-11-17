@@ -59,7 +59,7 @@ func (s *Server) Run() error {
 }
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
-	logrus.Info("/_ping request received")
+	logrus.Debug("/_ping request received")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte{'O', 'K'})
 	return
@@ -88,7 +88,7 @@ func (s *Server) eventHandler(w http.ResponseWriter, r *http.Request) {
 
 //
 func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
-	logrus.Debug("/ci_notifications events reveived")
+	logrus.Info("/ci_notifications events reveived")
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
