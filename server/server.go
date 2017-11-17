@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
@@ -97,16 +98,34 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Infof("r.PostForm: %v", r.PostForm)
 	logrus.Infof("r.Form: %v", r.Form)
 
-	if r.PostForm.Get("payload") != "" {
+	str := r.PostForm.Get("payload")
+	if str != "" {
 		logrus.Infof("r.PostForm[payload]: %v", r.PostForm.Get("payload"))
 	}
 
-	data, err := ioutil.ReadAll(r.Body)
-	if err != nil {
+	data := []byte(str)
+
+	type config struct {
+		pull_request_number *int
+		pull_request_title  *string
+	}
+	type TravisCI struct {
+		id     int
+		number string
+		cfg    config
+	}
+
+	var st TravisCI
+
+	if err := json.Unmarshal(data, &st); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	logrus.Infof("get data from travisCI webhook: %s", string(data))
+
+	logrus.Infof("pull request number: %d, pull request title: %s",
+		st.cfg.pull_request_number,
+		st.cfg.pull_request_title,
+	)
 
 	w.WriteHeader(http.StatusOK)
 	return
