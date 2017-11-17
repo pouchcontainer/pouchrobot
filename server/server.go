@@ -89,6 +89,18 @@ func (s *Server) eventHandler(w http.ResponseWriter, r *http.Request) {
 //
 func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Info("/ci_notifications events reveived")
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logrus.Infof("r.PostForm: %v", r.PostForm)
+	logrus.Infof("r.Form: %v", r.Form)
+
+	if r.PostForm.Get("payload") != "" {
+		logrus.Infof("r.PostForm[payload]: %v", r.PostForm.Get("payload"))
+	}
+
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
