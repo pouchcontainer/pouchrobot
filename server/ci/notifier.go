@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/utils"
 
@@ -26,6 +28,7 @@ func New(client *gh.Client) *Notifier {
 
 // Process gets the json string and acts to these messages from CI system, such as travisCI.
 func (n *Notifier) Process(input string) error {
+	logrus.Info(input)
 	var wh Webhook
 	if err := json.Unmarshal([]byte(input), &wh); err != nil {
 		return err
@@ -33,7 +36,7 @@ func (n *Notifier) Process(input string) error {
 
 	prNum := wh.PullRequestNumber
 	if prNum <= 0 {
-		return fmt.Errorf("invalid pull request number unmarshalled")
+		return fmt.Errorf("invalid pull request number %d unmarshalled", prNum)
 	}
 
 	pr, err := n.client.GetSinglePR(prNum)
