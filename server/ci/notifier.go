@@ -28,6 +28,7 @@ func New(client *gh.Client) *Notifier {
 
 // Process gets the json string and acts to these messages from CI system, such as travisCI.
 func (n *Notifier) Process(input string) error {
+	input = strings.Replace(input, `\"`, `"`, -1)
 	logrus.Info(input)
 	var wh Webhook
 	if err := json.Unmarshal([]byte(input), &wh); err != nil {
