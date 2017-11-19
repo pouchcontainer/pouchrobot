@@ -25,12 +25,18 @@ func (prp *PullRequestProcessor) attachLabels(pr *github.PullRequest) error {
 }
 
 func (prp *PullRequestProcessor) attachComments(pr *github.PullRequest) error {
+	// check pull request whether title is sufficient
 	prp.attachTitleComments(pr)
+
+	// check pull request whether description is sufficient
 	prp.attachBodyComments(pr)
-	if err := prp.addSignoffComments(pr); err != nil {
-		return err
-	}
+
+	// check whether this pull request is signed off
+	prp.addSignoffComments(pr)
+
+	// check whether this contributor is the first time contributor
 	prp.attachFirstContributionComments(pr)
+
 	return nil
 }
 
