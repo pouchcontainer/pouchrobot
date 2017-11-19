@@ -9,13 +9,13 @@ import (
 // FETCHINTERVAL refers the interval of fetch action
 const FETCHINTERVAL = 1 * time.Minute
 
-// Fetcher is a worker to periodically get elements from github
+// Fetcher is a worker to periodically get elements from github.
 type Fetcher struct {
 	client *gh.Client
 }
 
-// NewFetcher creates
-func NewFetcher(client *gh.Client) *Fetcher {
+// New initializes a brand new fetch.
+func New(client *gh.Client) *Fetcher {
 	return &Fetcher{
 		client: client,
 	}

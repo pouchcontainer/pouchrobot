@@ -3,15 +3,14 @@ package processor
 import (
 	"fmt"
 
-	"github.com/allencloud/automan/server/gh"
-	"github.com/sirupsen/logrus"
-
 	"github.com/allencloud/automan/server/processor/issueCommentProcessor"
 	"github.com/allencloud/automan/server/processor/issueProcessor"
 	"github.com/allencloud/automan/server/processor/prCommentProcessor"
 	"github.com/allencloud/automan/server/processor/pullRequestProcessor"
-
 	"github.com/allencloud/automan/server/utils"
+
+	"github.com/allencloud/automan/server/gh"
+	"github.com/sirupsen/logrus"
 )
 
 type processor interface {
@@ -27,8 +26,8 @@ type Processor struct {
 	PRCommentProcessor    *prCommentProcessor.PRCommentProcessor
 }
 
-// NewProcessor creates
-func NewProcessor(client *gh.Client) *Processor {
+// New initializes a brand new processor.
+func New(client *gh.Client) *Processor {
 	return &Processor{
 		IssueProcessor: &issueProcessor.IssueProcessor{
 			Client: client,

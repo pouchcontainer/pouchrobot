@@ -1,10 +1,11 @@
 package server
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
+	"github.com/allencloud/automan/server/ci"
 	"github.com/allencloud/automan/server/config"
 	"github.com/allencloud/automan/server/fetcher"
 	"github.com/allencloud/automan/server/gh"
@@ -22,6 +23,7 @@ type Server struct {
 	listenAddress   string
 	processor       *processor.Processor
 	fetcher         *fetcher.Fetcher
+	ciNotifier      *ci.Notifier
 	maintainersTeam string
 }
 
@@ -29,9 +31,10 @@ type Server struct {
 func NewServer(config config.Config) *Server {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	return &Server{
-		processor:     processor.NewProcessor(ghClient),
+		processor:     processor.New(ghClient),
 		listenAddress: config.HTTPListen,
-		fetcher:       fetcher.NewFetcher(ghClient),
+		fetcher:       fetcher.New(ghClient),
+		ciNotifier:    ci.New(ghClient),
 	}
 }
 
@@ -95,37 +98,15 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logrus.Infof("r.Form: %v", r.Form)
+	rawStr := r.PostForm.Get("payload")
 
-	str := r.PostForm.Get("payload")
-	if str != "" {
-		logrus.Infof("r.PostForm[payload]: %v", r.PostForm.Get("payload"))
-	}
+	logrus.Debugf("r.PostForm[payload]: %v", rawStr)
 
-	data := []byte(str)
-
-	type config struct {
-		pull_request_number int
-		pull_request_title  string
-	}
-	type TravisCI struct {
-		id     int
-		number string
-		//cfg    config
-	}
-
-	var st TravisCI
-
-	if err := json.Unmarshal(data, &st); err != nil {
+	jsonStr := strings.Replace(rawStr, `\"`, `"`, -1)
+	if err := s.ciNotifier.Process(jsonStr); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	logrus.Infof("id: %s", st.id)
-
-	//logrus.Infof("pull request title: %s", st.cfg.pull_request_title)
-
-	//logrus.Infof("pull request number: %d", st.cfg.pull_request_number)
 
 	w.WriteHeader(http.StatusOK)
 	return

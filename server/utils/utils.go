@@ -103,3 +103,17 @@ var PRConflictComment = fmt.Sprintf(
 	"%s",
 	PRConflictSubStr,
 )
+
+// CIFailsCommentSubStr is a substring of CI failing comments
+var CIFailsCommentSubStr = `
+CI fails according integration system. 
+Please refer to the CI failure Details button to corresponding test, and update your PR to pass CI.
+If this is flaky test, welcome to track this with profiling an issue.
+`
+
+// CIFailsComment is a string used to attach comment to CI failed PRs.
+var CIFailsComment = fmt.Sprintf(
+	"ping @%s\n, %s",
+	"%s",
+	CIFailsCommentSubStr,
+)
