@@ -108,12 +108,13 @@ var PRConflictComment = fmt.Sprintf(
 var CIFailsCommentSubStr = `
 CI fails according integration system. 
 Please refer to the CI failure Details button to corresponding test, and update your PR to pass CI.
-If this is flaky test, welcome to track this with profiling an issue.
+
+If this is flaky test, welcome to track this with [profiling an issue](https://github.com/alibaba/pouch/issues/new).
 `
 
 // CIFailsComment is a string used to attach comment to CI failed PRs.
 var CIFailsComment = fmt.Sprintf(
-	"ping @%s\n, %s",
+	"ping @%s \n%s",
 	"%s",
 	CIFailsCommentSubStr,
 )

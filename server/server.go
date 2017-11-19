@@ -104,6 +104,7 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 
 	jsonStr := strings.Replace(rawStr, `\"`, `"`, -1)
 	if err := s.ciNotifier.Process(jsonStr); err != nil {
+		logrus.Errorf("failed to process ci notification: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

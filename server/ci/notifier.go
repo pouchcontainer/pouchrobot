@@ -41,9 +41,7 @@ func (n *Notifier) Process(input string) error {
 		return err
 	}
 
-	n.addCIFaiureComments(pr, wh)
-
-	return nil
+	return n.addCIFaiureComments(pr, wh)
 }
 
 func (n *Notifier) addCIFaiureComments(pr *github.PullRequest, wh Webhook) error {

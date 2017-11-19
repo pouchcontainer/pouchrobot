@@ -7,7 +7,7 @@ import (
 )
 
 // FETCHINTERVAL refers the interval of fetch action
-const FETCHINTERVAL = 1 * time.Minute
+const FETCHINTERVAL = 3 * time.Minute
 
 // Fetcher is a worker to periodically get elements from github.
 type Fetcher struct {

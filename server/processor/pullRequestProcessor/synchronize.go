@@ -83,7 +83,8 @@ func (prp *PullRequestProcessor) RemoveConflictComment(ctx context.Context, num 
 		commentBody := *(comment.Body)
 		subBody := utils.PRConflictSubStr
 		if strings.HasSuffix(commentBody, subBody) {
-			return prp.Client.RemoveComment(*(comment.ID))
+			// remove all if there are more than one
+			prp.Client.RemoveComment(*(comment.ID))
 		}
 	}
 	return nil

@@ -33,7 +33,10 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 		return nil
 	}
 
+	// if PR can be merged to specified branch
 	if pr.Mergeable == nil || *(pr.Mergeable) == true {
+		// just remove conflict label if there is one
+		// and remove conflict comments if there are some
 		if f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
 			f.client.RemoveLabelForIssue(*(pr.Number), utils.PRConflictLabel)
 		}
@@ -47,14 +50,15 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 		f.client.RemoveLabelForIssue(*(pr.Number), "LGTM")
 	}
 
-	if f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
-		return f.AddConflictCommentToPR(pr)
+	// attach a label and add comments
+	if !f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
+		f.client.AddLabelsToIssue(*(pr.Number), []string{utils.PRConflictLabel})
 	}
 	// attach a comment to the pr,
 	// and attach a lable confilct/need-rebase to pr
-	f.client.AddLabelsToIssue(*(pr.Number), []string{utils.PRConflictLabel})
-	f.AddConflictCommentToPR(pr)
-	return nil
+
+	return f.AddConflictCommentToPR(pr)
+
 }
 
 // AddConflictCommentToPR adds conflict comments to specific pull request.
