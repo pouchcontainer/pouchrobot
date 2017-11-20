@@ -2,6 +2,9 @@ package utils
 
 import "fmt"
 
+// CIFailureLable is a label which means ci failure.
+var CIFailureLable = "CI-failure"
+
 // PRConflictLabel is a label which means conflict for pull request.
 var PRConflictLabel = "conflict/needs-rebase"
 

@@ -45,6 +45,11 @@ func (n *Notifier) Process(input string) error {
 		return err
 	}
 
+	if pr.State != nil && *(pr.State) != "open" {
+		// we only consider pr which are open
+		return nil
+	}
+
 	return n.addCIFaiureComments(pr, wh)
 }
 
