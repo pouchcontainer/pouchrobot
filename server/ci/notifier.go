@@ -40,6 +40,8 @@ func (n *Notifier) Process(input string) error {
 		return fmt.Errorf("invalid pull request number %d unmarshalled", prNum)
 	}
 
+	logrus.Infof("CI notification from PR %d received, state: %s", prNum, wh.State)
+
 	// if the status is passed, we need to remove failure comment
 	if wh.State == "passed" {
 		return n.client.RemoveCommentViaString(prNum, utils.CIFailsCommentSubStr)
