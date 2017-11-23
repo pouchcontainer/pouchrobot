@@ -35,27 +35,37 @@ func (n *Notifier) Process(input string) error {
 		return err
 	}
 
-	// if the status is not
-	if wh.State != "failed" {
-		return nil
-	}
-
 	prNum := wh.PullRequestNumber
 	if prNum <= 0 {
 		return fmt.Errorf("invalid pull request number %d unmarshalled", prNum)
 	}
 
-	pr, err := n.client.GetSinglePR(prNum)
-	if err != nil {
-		return err
+	// if the status is passed, we need to remove failure comment
+	if wh.State == "passed" {
+		return n.client.RemoveCommentViaString(prNum, utils.CIFailsCommentSubStr)
 	}
 
-	if pr.State != nil && *(pr.State) != "open" {
-		// we only consider pr which are open
-		return nil
+	// if the status is failure, we need to do steps by:
+	// 1. remove failure comments if there are any;
+	// 2. add new failure comments to show failure state.
+	if wh.State == "failed" {
+		// first remove failure comments if there are any.
+		n.client.RemoveCommentViaString(prNum, utils.CIFailsCommentSubStr)
+
+		pr, err := n.client.GetSinglePR(prNum)
+		if err != nil {
+			return err
+		}
+
+		if pr.State != nil && *(pr.State) != "open" {
+			// we only consider pr which are open
+			return nil
+		}
+		// add new failure comments
+		return n.addCIFaiureComments(pr, wh)
 	}
 
-	return n.addCIFaiureComments(pr, wh)
+	return nil
 }
 
 func (n *Notifier) addCIFaiureComments(pr *github.PullRequest, wh Webhook) error {

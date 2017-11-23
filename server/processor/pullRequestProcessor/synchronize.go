@@ -2,6 +2,7 @@ package pullRequestProcessor
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/allencloud/automan/server/processor/pullRequestProcessor/open"
@@ -14,6 +15,7 @@ import (
 func (prp *PullRequestProcessor) ActToPRSynchronized(syncPR *github.PullRequest) error {
 	prp.removeConflictLabel(syncPR)
 	prp.changeSizeLabel(syncPR)
+	prp.changeSignCommitComment(syncPR)
 	return nil
 }
 
@@ -88,4 +90,34 @@ func (prp *PullRequestProcessor) RemoveConflictComment(ctx context.Context, num 
 		}
 	}
 	return nil
+}
+
+// changeSignCommitComment changes comments of being signed off.
+func (prp *PullRequestProcessor) changeSignCommitComment(pr *github.PullRequest) error {
+	commits, err := prp.Client.ListCommits(*(pr.Number))
+	if err != nil {
+		return err
+	}
+
+	needSignoff := false
+	for _, commit := range commits {
+		if commit.Commit != nil && !dcoRegex.MatchString(*commit.Commit.Message) {
+			needSignoff = true
+			break
+		}
+	}
+
+	// try to remove sign off commits if there are any.
+	prp.Client.RemoveCommentViaString(*(pr.Number), utils.PRNeedsSignOffStr)
+
+	if !needSignoff {
+		return nil
+	}
+
+	body := fmt.Sprintf(utils.PRNeedsSignOff, *(pr.User.Login))
+	newComment := &github.IssueComment{
+		Body: &body,
+	}
+
+	return prp.Client.AddCommentToPR(*(pr.Number), newComment)
 }

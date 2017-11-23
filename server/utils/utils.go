@@ -63,11 +63,16 @@ var PRDescriptionTooShort = fmt.Sprintf(
 	PRDescriptionTooShortSubStr,
 )
 
+// PRNeedsSignOffStr is a string used to remind user to sign off.
+var PRNeedsSignOffStr = ` Thanks for your contribution. 🍻 
+Please sign off in each of your commits.`
+
 // PRNeedsSignOff is a string used to remind user to sign off.
-var PRNeedsSignOff = `
-Thanks for your contribution. 🍻  @%s
-Please sign off in each of your commits.
-`
+var PRNeedsSignOff = fmt.Sprintf(
+	"@%s %s",
+	"%s",
+	PRNeedsSignOffStr,
+)
 
 // IssueNeedPOCommentSubStr is a string used to attach comment on P0 issue.
 var IssueNeedPOCommentSubStr = `😱 This is a **priority/P0** issue.
