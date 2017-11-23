@@ -3,6 +3,8 @@ package pullRequestProcessor
 import (
 	"fmt"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/allencloud/automan/server/processor/pullRequestProcessor/open"
 	"github.com/allencloud/automan/server/utils"
 
@@ -103,6 +105,7 @@ func (prp *PullRequestProcessor) attachFirstContributionComments(pr *github.Pull
 		return nil
 	}
 
+	logrus.Infof("Author in pr %d is %s", *(pr.Number), *(pr.AuthorAssociation))
 	if !isFirstContribution(*(pr.AuthorAssociation)) {
 		return nil
 	}
