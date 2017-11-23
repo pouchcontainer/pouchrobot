@@ -99,7 +99,13 @@ func (prp *PullRequestProcessor) addSignoffComments(pr *github.PullRequest) erro
 
 // attachFirstContributionComments attaches a first contributor comments when
 // it is the first time for author to contribute.
-func (prp *PullRequestProcessor) attachFirstContributionComments(pr *github.PullRequest) error {
+func (prp *PullRequestProcessor) attachFirstContributionComments(pullRequest *github.PullRequest) error {
+	// since webhook pull requests are different from raw pull request from GET api,
+	// we need to get a brand new pull request from GitHub.
+	pr, err := prp.Client.GetSinglePR(*(pullRequest.Number))
+	if err != nil {
+		return err
+	}
 	// check whether this is the first contributor of the committer
 	if pr.AuthorAssociation == nil {
 		return nil

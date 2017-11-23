@@ -35,6 +35,11 @@ func (n *Notifier) Process(input string) error {
 		return err
 	}
 
+	// if the status is not
+	if wh.State != "failed" {
+		return nil
+	}
+
 	prNum := wh.PullRequestNumber
 	if prNum <= 0 {
 		return fmt.Errorf("invalid pull request number %d unmarshalled", prNum)
