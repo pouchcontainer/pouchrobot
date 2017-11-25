@@ -40,7 +40,7 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 		if f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
 			f.client.RemoveLabelForIssue(*(pr.Number), utils.PRConflictLabel)
 		}
-		f.client.RemoveCommentViaString(*(pr.Number), utils.PRConflictSubStr)
+		f.client.RmCommentsViaStr(*(pr.Number), utils.PRConflictSubStr)
 		return nil
 	}
 

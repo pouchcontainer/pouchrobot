@@ -108,7 +108,7 @@ func (prp *PullRequestProcessor) changeSignCommitComment(pr *github.PullRequest)
 	}
 
 	// try to remove sign off commits if there are any.
-	prp.Client.RemoveCommentViaString(*(pr.Number), utils.PRNeedsSignOffStr)
+	prp.Client.RmCommentsViaStr(*(pr.Number), utils.PRNeedsSignOffStr)
 
 	if !needSignoff {
 		return nil

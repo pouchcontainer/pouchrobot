@@ -44,7 +44,7 @@ func (n *Notifier) Process(input string) error {
 
 	// if the status is passed, we need to remove failure comment
 	if wh.State == "passed" {
-		return n.client.RemoveCommentViaString(prNum, utils.CIFailsCommentSubStr)
+		return n.client.RmCommentsViaStr(prNum, utils.CIFailsCommentSubStr)
 	}
 
 	// if the status is failure, we need to do steps by:
@@ -52,7 +52,7 @@ func (n *Notifier) Process(input string) error {
 	// 2. add new failure comments to show failure state.
 	if wh.State == "failed" {
 		// first remove failure comments if there are any.
-		n.client.RemoveCommentViaString(prNum, utils.CIFailsCommentSubStr)
+		n.client.RmCommentsViaStr(prNum, utils.CIFailsCommentSubStr)
 
 		pr, err := n.client.GetSinglePR(prNum)
 		if err != nil {
@@ -71,32 +71,10 @@ func (n *Notifier) Process(input string) error {
 }
 
 func (n *Notifier) addCIFaiureComments(pr *github.PullRequest, wh Webhook) error {
-	// Remove all the existing CI failure comments
-	comments, err := n.client.ListComments(*(pr.Number))
-	if err != nil {
-		return err
-	}
-
-	// remove all the existing CI failure comments
-	for _, comment := range comments {
-		if comment.Body == nil {
-			continue
-		}
-
-		if !strings.Contains(*(comment.Body), utils.CIFailsCommentSubStr) {
-			continue
-		}
-
-		n.client.RemoveComment(*(comment.ID))
-	}
-
 	// add a brand new one CI failure comments
 	body := fmt.Sprintf(utils.CIFailsComment, *(pr.User.Login))
 	detailsStr := fmt.Sprintf("build url: %s\nbuild duration: %ds\n", wh.BuildURL, wh.Duration)
 	body = body + "\n" + detailsStr
-	newComment := &github.IssueComment{
-		Body: &body,
-	}
 
-	return n.client.AddCommentToPR(*(pr.Number), newComment)
+	return n.client.RmCommentsViaStrAndAttach(*(pr.Number), utils.CIFailsCommentSubStr, body)
 }

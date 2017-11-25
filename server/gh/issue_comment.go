@@ -48,8 +48,8 @@ func (c *Client) RemoveComment(id int) error {
 	return nil
 }
 
-// RemoveCommentViaString removes a comment in an issue via given string
-func (c *Client) RemoveCommentViaString(num int, str string) error {
+// RmCommentsViaStr removes a comment in an issue via given string
+func (c *Client) RmCommentsViaStr(num int, str string) error {
 	comments, err := c.ListComments(num)
 	if err != nil {
 		return err
@@ -61,6 +61,35 @@ func (c *Client) RemoveCommentViaString(num int, str string) error {
 		}
 	}
 	return nil
+}
+
+// RmCommentsViaStrAndAttach removes all comments contains the string str and
+// attaches a brand new commnet constructed by body.
+// In automan, many cases needs this actions to fresh the comments.
+func (c *Client) RmCommentsViaStrAndAttach(num int, str string, body string) error {
+	comments, err := c.ListComments(num)
+	if err != nil {
+		return err
+	}
+
+	// remove all the existing CI failure comments
+	for _, comment := range comments {
+		if comment.Body == nil {
+			continue
+		}
+
+		if !strings.Contains(*(comment.Body), str) {
+			continue
+		}
+
+		c.RemoveComment(*(comment.ID))
+	}
+
+	newComment := &github.IssueComment{
+		Body: &body,
+	}
+
+	return c.AddCommentToPR(num, newComment)
 }
 
 // IssueHasComment returns true if the issue contains a commnet who has substring of 'elment'
