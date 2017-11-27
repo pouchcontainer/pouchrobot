@@ -19,7 +19,7 @@ func (icp *IssueCommentProcessor) ActToIssueCommentCreated(issue *github.Issue, 
 
 	users := []string{commentUser}
 
-	if !strings.Contains(strings.ToLower(commentBody), "#dibs") {
+	if !strings.HasPrefix(strings.ToLower(commentBody), "#dibs") {
 		return nil
 	}
 
