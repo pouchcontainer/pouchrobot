@@ -22,6 +22,21 @@ func (c *Client) GetIssues(opt *github.IssueListByRepoOptions) ([]*github.Issue,
 	return issues, nil
 }
 
+// CreateIssue creates a brand new issue in repo's issue list.
+func (c *Client) CreateIssue(title, body string) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	issueRequest := &github.IssueRequest{
+		Title: &title,
+		Body:  &body,
+	}
+	if _, _, err := c.Issues.Create(context.Background(), c.owner, c.repo, issueRequest); err != nil {
+		logrus.Errorf("failed to create issue in repo %s: %v", c.repo, err)
+		return err
+	}
+	return nil
+}
+
 // GetAllLabels gets all labels of a repo, not an issue, nor a pull request
 func (c *Client) GetAllLabels() ([]*github.Label, error) {
 	c.Mutex.Lock()
