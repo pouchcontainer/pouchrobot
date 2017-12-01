@@ -20,6 +20,7 @@ var TitleMatches = map[string][]string{
 	"areas/cli": []string{
 		"cli:",
 		"cli :",
+		"command",
 		"command line",
 		"command-line",
 	},
