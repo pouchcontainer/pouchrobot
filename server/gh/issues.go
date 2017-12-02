@@ -168,3 +168,15 @@ func (c *Client) IssueHasLabel(num int, inputLabel string) bool {
 	}
 	return false
 }
+
+// SearchIssues searches issues.
+func (c *Client) SearchIssues(query string, opt *github.SearchOptions) (*github.IssuesSearchResult, error) {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	issueSearchResult, _, err := c.Search.Issues(context.Background(), query, opt)
+	if err != nil {
+		logrus.Errorf("failed to search issues by query %s", query)
+		return nil, err
+	}
+	return issueSearchResult, nil
+}
