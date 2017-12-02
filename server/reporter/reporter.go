@@ -17,7 +17,6 @@ func New(client *gh.Client) *Reporter {
 }
 
 // Run starts to work on reporting things for repo.
-func (r *Reporter) Run() error {
-
-	return nil
+func (r *Reporter) Run() {
+	r.weeklyReport()
 }

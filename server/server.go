@@ -10,6 +10,7 @@ import (
 	"github.com/allencloud/automan/server/fetcher"
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/processor"
+	"github.com/allencloud/automan/server/reporter"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -18,30 +19,37 @@ import (
 // DefaultAddress is the default address daemon will listen to.
 var DefaultAddress = ":6789"
 
-// Server refers to a
+// Server refers to a daemon server interating with github repos.
 type Server struct {
-	listenAddress   string
-	processor       *processor.Processor
-	fetcher         *fetcher.Fetcher
-	ciNotifier      *ci.Notifier
-	maintainersTeam string
+	// listenAddress is the address which is used to accepting requests.
+	listenAddress string
+	// processor processes webhook event from GitHub.
+	processor *processor.Processor
+	// fetcher does periodical work to check repo's status on GitHub.
+	fetcher *fetcher.Fetcher
+	// ciNotifier handles ci system webhook.
+	ciNotifier *ci.Notifier
+	// reporter reports weekly update of repository.
+	reporter *reporter.Reporter
 }
 
 // NewServer constructs a brand new automan server
 func NewServer(config config.Config) *Server {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	return &Server{
-		processor:     processor.New(ghClient),
 		listenAddress: config.HTTPListen,
+		processor:     processor.New(ghClient),
 		fetcher:       fetcher.New(ghClient),
 		ciNotifier:    ci.New(ghClient),
+		reporter:      reporter.New(ghClient),
 	}
 }
 
 // Run runs the server.
 func (s *Server) Run() error {
-	// start fetcher in a goroutine
-	go s.fetcher.Work()
+	// start fetcher and reporter in goroutines
+	go s.fetcher.Run()
+	go s.reporter.Run()
 
 	// start webserver
 	listenAddress := s.listenAddress
@@ -55,13 +63,14 @@ func (s *Server) Run() error {
 	r.HandleFunc("/_ping", pingHandler).Methods("GET")
 
 	// github webhook API
-	r.HandleFunc("/events", s.eventHandler).Methods("POST")
+	r.HandleFunc("/events", s.gitHubEventHandler).Methods("POST")
 
 	// travisCI webhook API
 	r.HandleFunc("/ci_notifications", s.ciNotificationHandler).Methods("POST")
 	return http.ListenAndServe(listenAddress, r)
 }
 
+// pingHandler handles ping request to return health of server.
 func pingHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Debug("/_ping request received")
 	w.WriteHeader(http.StatusOK)
@@ -69,7 +78,8 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (s *Server) eventHandler(w http.ResponseWriter, r *http.Request) {
+// gitHubEventHandler handles webhook events from github.
+func (s *Server) gitHubEventHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Debug("/events request received")
 	eventType := r.Header.Get("X-Github-Event")
 
@@ -90,7 +100,7 @@ func (s *Server) eventHandler(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-//
+// ciNotificationHandler handles webhook events from CI system.
 func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Info("/ci_notifications events reveived")
 	if err := r.ParseForm(); err != nil {

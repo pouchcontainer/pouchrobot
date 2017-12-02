@@ -21,8 +21,8 @@ func New(client *gh.Client) *Fetcher {
 	}
 }
 
-// Work starts periodical work
-func (f *Fetcher) Work() {
+// Run starts periodical work
+func (f *Fetcher) Run() {
 	for {
 		f.CheckPRsConflict()
 		time.Sleep(FETCHINTERVAL)
