@@ -3,6 +3,8 @@ package fetcher
 import (
 	"time"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/allencloud/automan/server/gh"
 )
 
@@ -23,6 +25,7 @@ func New(client *gh.Client) *Fetcher {
 
 // Run starts periodical work
 func (f *Fetcher) Run() {
+	logrus.Info("start to run fetcher")
 	for {
 		f.CheckPRsConflict()
 		time.Sleep(FETCHINTERVAL)

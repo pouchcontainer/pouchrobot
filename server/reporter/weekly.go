@@ -54,7 +54,7 @@ func (r *Reporter) construcWeekReport() (WeekReport, error) {
 	wr.Fork = *(repo.ForksCount)
 
 	// get merged pull request details
-	query := "is:merged type:pr repo:moby/moby merged:>=2017-11-23"
+	query := "is:merged type:pr repo:alibaba/pouch merged:>=2017-11-23"
 	issueSearchResult, err := r.client.SearchIssues(query, nil)
 	if err != nil {
 		return wr, err
@@ -70,6 +70,7 @@ func (r *Reporter) construcWeekReport() (WeekReport, error) {
 
 func (wr *WeekReport) setContributorAndCommits(prs []github.Issue) {
 	wr.CountOfPR = len(prs)
+	wr.MergedPR = map[string][]*SimplePR{}
 	for _, pr := range prs {
 		if pr.Body != nil && strings.HasSuffix(*pr.Body, utils.FirstCommitCommentSubStr) {
 			wr.NewContributors = append(wr.NewContributors, *pr.User.Login)
@@ -82,31 +83,31 @@ func (wr *WeekReport) setContributorAndCommits(prs []github.Issue) {
 		}
 
 		if strings.HasPrefix(*pr.Title, "feature:") || strings.HasPrefix(*pr.Title, "feat:") {
-			if wr.MergedPR["feature"] == nil {
+			if _, ok := wr.MergedPR["feature"]; !ok {
 				wr.MergedPR["feature"] = []*SimplePR{newSimplePR}
 			} else {
 				wr.MergedPR["feature"] = append(wr.MergedPR["feature"], newSimplePR)
 			}
 		} else if strings.HasPrefix(*pr.Title, "bugfix:") || strings.HasPrefix(*pr.Title, "fix:") {
-			if wr.MergedPR["bugfix"] == nil {
+			if _, ok := wr.MergedPR["bugfix"]; !ok {
 				wr.MergedPR["bugfix"] = []*SimplePR{newSimplePR}
 			} else {
 				wr.MergedPR["bugfix"] = append(wr.MergedPR["bugfix"], newSimplePR)
 			}
 		} else if strings.HasPrefix(*pr.Title, "doc:") || strings.HasPrefix(*pr.Title, "docs:") {
-			if wr.MergedPR["doc"] == nil {
+			if _, ok := wr.MergedPR["doc"]; !ok {
 				wr.MergedPR["doc"] = []*SimplePR{newSimplePR}
 			} else {
 				wr.MergedPR["doc"] = append(wr.MergedPR["doc"], newSimplePR)
 			}
 		} else if strings.HasPrefix(*pr.Title, "test:") || strings.HasPrefix(*pr.Title, "tests:") {
-			if wr.MergedPR["test"] == nil {
+			if _, ok := wr.MergedPR["test"]; !ok {
 				wr.MergedPR["test"] = []*SimplePR{newSimplePR}
 			} else {
 				wr.MergedPR["test"] = append(wr.MergedPR["test"], newSimplePR)
 			}
 		} else {
-			if wr.MergedPR["others"] == nil {
+			if _, ok := wr.MergedPR["others"]; !ok {
 				wr.MergedPR["others"] = []*SimplePR{newSimplePR}
 			} else {
 				wr.MergedPR["others"] = append(wr.MergedPR["others"], newSimplePR)
