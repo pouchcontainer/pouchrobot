@@ -1,6 +1,8 @@
 package reporter
 
 import (
+	"time"
+
 	"github.com/allencloud/automan/server/gh"
 	"github.com/sirupsen/logrus"
 )
@@ -10,7 +12,7 @@ type Reporter struct {
 	client *gh.Client
 }
 
-// New initializes a brand new reporter
+// New initializes a brand new reporter.
 func New(client *gh.Client) *Reporter {
 	return &Reporter{
 		client: client,
@@ -20,5 +22,19 @@ func New(client *gh.Client) *Reporter {
 // Run starts to work on reporting things for repo.
 func (r *Reporter) Run() {
 	logrus.Infof("start to run reporter")
-	r.weeklyReport()
+	// Wait time goes to Monday.
+	for {
+		if time.Now().Weekday().String() == "Monday" {
+			break
+		}
+		time.Sleep(4 * time.Hour)
+	}
+
+	for {
+		if time.Now().Weekday().String() == "Monday" {
+			go r.weeklyReport()
+		}
+		// report one issue every week.
+		time.Sleep(7 * 24 * time.Hour)
+	}
 }
