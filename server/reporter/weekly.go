@@ -3,6 +3,9 @@ package reporter
 import (
 	"fmt"
 	"strings"
+	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
@@ -23,9 +26,9 @@ type WeekReport struct {
 
 // SimplePR represents
 type SimplePR struct {
-	Num   int
-	Title string
-	URL   string
+	Num     int
+	Title   string
+	HTMLURL string
 }
 
 func (r *Reporter) weeklyReport() error {
@@ -34,7 +37,7 @@ func (r *Reporter) weeklyReport() error {
 		return err
 	}
 
-	issueTitle := fmt.Sprintf("Weekly Report in Pouch %s - %s", wr.StartDate, wr.EndDate)
+	issueTitle := fmt.Sprintf("Weekly Report of Pouch from %s to %s", wr.StartDate, wr.EndDate)
 	issueBody := wr.String()
 
 	return r.client.CreateIssue(issueTitle, issueBody)
@@ -42,6 +45,17 @@ func (r *Reporter) weeklyReport() error {
 
 func (r *Reporter) construcWeekReport() (WeekReport, error) {
 	var wr WeekReport
+
+	now := time.Now()
+	data := strings.Split(now.String(), " ")
+	today := data[0]
+
+	lastWeek := now.Add(-7 * 24 * time.Hour)
+	data = strings.Split(lastWeek.String(), " ")
+	dayBeforeAWeek := data[0]
+
+	wr.EndDate = today
+	wr.StartDate = dayBeforeAWeek
 
 	// get repository details
 	repo, err := r.client.GetRepository()
@@ -54,7 +68,9 @@ func (r *Reporter) construcWeekReport() (WeekReport, error) {
 	wr.Fork = *(repo.ForksCount)
 
 	// get merged pull request details
-	query := "is:merged type:pr repo:alibaba/pouch merged:>=2017-11-23"
+
+	logrus.Infof("Start: %s, End: %s", wr.StartDate, wr.EndDate)
+	query := fmt.Sprintf("is:merged type:pr repo:%s/%s merged:>=%s", r.client.Owner(), r.client.Repo(), wr.StartDate)
 	issueSearchResult, err := r.client.SearchIssues(query, nil)
 	if err != nil {
 		return wr, err
@@ -77,9 +93,9 @@ func (wr *WeekReport) setContributorAndCommits(prs []github.Issue) {
 		}
 
 		newSimplePR := &SimplePR{
-			Title: *pr.Title,
-			URL:   *pr.URL,
-			Num:   *pr.Number,
+			Title:   *pr.Title,
+			HTMLURL: *pr.HTMLURL,
+			Num:     *pr.Number,
 		}
 
 		if strings.HasPrefix(*pr.Title, "feature:") || strings.HasPrefix(*pr.Title, "feat:") {
@@ -106,14 +122,16 @@ func (wr *WeekReport) setContributorAndCommits(prs []github.Issue) {
 			} else {
 				wr.MergedPR["test"] = append(wr.MergedPR["test"], newSimplePR)
 			}
+		} else if _, ok := wr.MergedPR["others"]; !ok {
+			wr.MergedPR["others"] = []*SimplePR{newSimplePR}
 		} else {
-			if _, ok := wr.MergedPR["others"]; !ok {
-				wr.MergedPR["others"] = []*SimplePR{newSimplePR}
-			} else {
-				wr.MergedPR["others"] = append(wr.MergedPR["others"], newSimplePR)
-			}
+			wr.MergedPR["others"] = append(wr.MergedPR["others"], newSimplePR)
 		}
 	}
+
+	// make contributor name unique in weekly report.
+	wr.NewContributors = utils.UniqueElementSlice(wr.NewContributors)
+
 	return
 }
 
@@ -122,7 +140,8 @@ func (wr *WeekReport) String() string {
 	totalStr := fmt.Sprintf(`
 # Weekly Report in Pouch
 
-%s - %s
+This is a weekly report of Pouch. It summarizes what have changed in Pouch in the passed week, including pr merged, new contributors, and more things in the future. 
+It is all done by @pouchrobot which is an AI robot.
 
 ## Repo Update 
 
@@ -132,29 +151,64 @@ func (wr *WeekReport) String() string {
 | Star      |   %d |  
 | Fork      |   %d | 
 `,
-		wr.StartDate,
-		wr.EndDate,
 		wr.Watch,
 		wr.Star,
 		wr.Fork,
 	)
 
-	prUpdateSubStr := fmt.Sprintf("## PR Update\n\nLast week, we merged %d pull requests in the Pouch repositories.\n\n", wr.CountOfPR)
+	prUpdateSubStr := fmt.Sprintf(`
+## PR Update
+
+Thanks to contributions from community, we merged %d pull requests in the Pouch repositories last week. We divided all these pull requests into **feature**, **bugfix**, **doc**, **test** and **others**:
+
+`,
+		wr.CountOfPR,
+	)
 	for _, typeStr := range []string{"feature", "bugfix", "doc", "test", "others"} {
-		prUpdateSubStr = prUpdateSubStr + fmt.Sprintf("### %s\n\n", typeStr)
+		if len(wr.MergedPR[typeStr]) == 0 {
+			// if no this type pr merged, no related thing output.
+			continue
+		}
+
+		var appendStr string
+		if typeStr == "feature" {
+			appendStr = fmt.Sprintf("### %s 🆕 🔫 \n\n", typeStr)
+		} else if typeStr == "bugfix" {
+			appendStr = fmt.Sprintf("### %s 🐛 🔪 \n\n", typeStr)
+		} else if typeStr == "doc" {
+			appendStr = fmt.Sprintf("### %s 📜 📝 \n\n", typeStr)
+		} else if typeStr == "test" {
+			appendStr = fmt.Sprintf("### %s ✅ ☑️ \n\n", typeStr)
+		} else {
+			appendStr = fmt.Sprintf("### %s\n\n", typeStr)
+		}
+		prUpdateSubStr = prUpdateSubStr + appendStr
 		for _, pr := range wr.MergedPR[typeStr] {
-			prUpdateSubStr = prUpdateSubStr + fmt.Sprintf("* [%s](%s)\n", pr.Title, pr.URL)
+			prUpdateSubStr = prUpdateSubStr + fmt.Sprintf("* %s ([#%d](%s))\n", pr.Title, pr.Num, pr.HTMLURL)
 		}
 		prUpdateSubStr = prUpdateSubStr + "\n"
 	}
 	totalStr = totalStr + prUpdateSubStr
 
 	// calculate new contributors of this week.
-	newContribSubstr := "## New Contributors\n\n"
-	for _, contributor := range wr.NewContributors {
-		newContribSubstr = newContribSubstr + fmt.Sprintf("@%s\n", contributor)
+	newContribSubstr := "## New Contributors 🎖 🎖 🎖 \n\n"
+	if len(wr.NewContributors) != 0 {
+		newContribSubstr = newContribSubstr + `It is pouch team's great honor to have new contributors in Pouch's community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share Pouch with more people if you could. If you hopes to be contributors as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺 
+
+Here is the list of new contributors:
+
+`
+		for _, contributor := range wr.NewContributors {
+			newContribSubstr = newContribSubstr + fmt.Sprintf("@%s\n", contributor)
+		}
+	} else {
+		newContribSubstr = newContribSubstr + `We have no new contributors in Pouch project this week.
+Pouch team encourages everythings about contribution from community.
+For more details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🍻 
+`
 	}
-	newContribSubstr = newContribSubstr + fmt.Sprintf("\n")
+
+	newContribSubstr = newContribSubstr + fmt.Sprintf("\n\n Thank all of you!")
 	totalStr = totalStr + newContribSubstr
 
 	return totalStr

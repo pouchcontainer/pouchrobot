@@ -32,3 +32,17 @@ func NewClient(owner, repo, token string) *Client {
 		repo:   repo,
 	}
 }
+
+// Owner returns owner of client.
+func (c *Client) Owner() string {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	return c.owner
+}
+
+// Repo returns repo name of client.
+func (c *Client) Repo() string {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	return c.repo
+}
