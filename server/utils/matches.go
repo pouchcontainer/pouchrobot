@@ -1,6 +1,7 @@
 package utils
 
-// Maintainers is a list of the maintainers
+// Maintainers is a list of the maintainers,
+// TODO: this part will be auto-generated according to MAINTAINERS file in repo.
 var Maintainers = []string{
 	"allencloud",
 	"yyb196",
@@ -12,6 +13,7 @@ var Maintainers = []string{
 	"skyline09",
 	"rudyfly",
 	"houqianming",
+	"Letty5411",
 }
 
 // TitleMatches is a map in which key is the label, and value is a slice of string
@@ -42,6 +44,7 @@ var TitleMatches = map[string][]string{
 	"areas/images": []string{
 		"docker image",
 		"image-spec",
+		"pouch pull",
 	},
 	"areas/monitoring": []string{
 		"monitoring",
@@ -76,6 +79,9 @@ var TitleMatches = map[string][]string{
 	"areas/test": []string{
 		"ci",
 		"test",
+	},
+	"areas/typo": []string{
+		"typo",
 	},
 	"kind/bug": []string{
 		"bug",
@@ -149,13 +155,16 @@ var TitleMatches = map[string][]string{
 		"panic",
 		"invalid memory address or nil pointer",
 	},
-	"areas/typo": []string{
-		"typo",
-	},
 	"DO-NOT-MERGE": []string{
 		"do not merge",
 		"do-not-merge",
 		"don't merge",
+	},
+	"WeeklyReport": []string{
+		"weekly report",
+		"weeklyreport",
+		"weekreport",
+		"week report",
 	},
 }
 
