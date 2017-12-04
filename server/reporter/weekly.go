@@ -79,17 +79,25 @@ func (r *Reporter) construcWeekReport() (WeekReport, error) {
 	// SearchIssues returns a list of issue, and we can treat them as pull request as well.
 	prs := issueSearchResult.Issues
 
-	wr.setContributorAndCommits(prs)
+	r.setContributorAndCommits(&wr, prs)
 
 	return wr, nil
 }
 
-func (wr *WeekReport) setContributorAndCommits(prs []github.Issue) {
+func (r *Reporter) setContributorAndCommits(wr *WeekReport, prs []github.Issue) {
 	wr.CountOfPR = len(prs)
 	wr.MergedPR = map[string][]*SimplePR{}
 	for _, pr := range prs {
-		if pr.Body != nil && strings.HasSuffix(*pr.Body, utils.FirstCommitCommentSubStr) {
-			wr.NewContributors = append(wr.NewContributors, *pr.User.Login)
+		comments, err := r.client.ListComments(*pr.Number)
+		if err != nil {
+			continue
+		}
+		// determine whether this is a new contributor via pull request comments.
+		for _, comment := range comments {
+			if comment.Body != nil && strings.HasSuffix(*comment.Body, utils.FirstCommitCommentSubStr) {
+				wr.NewContributors = append(wr.NewContributors, *pr.User.Login)
+				break
+			}
 		}
 
 		newSimplePR := &SimplePR{
@@ -138,7 +146,7 @@ func (wr *WeekReport) setContributorAndCommits(prs []github.Issue) {
 // String returns a string of Week Report
 func (wr *WeekReport) String() string {
 	totalStr := fmt.Sprintf(`
-# Weekly Report in Pouch
+# Weekly Report of Pouch
 
 This is a weekly report of Pouch. It summarizes what have changed in Pouch in the passed week, including pr merged, new contributors, and more things in the future. 
 It is all done by @pouchrobot which is an AI robot.
