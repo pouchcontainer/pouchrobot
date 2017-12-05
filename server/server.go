@@ -7,6 +7,7 @@ import (
 
 	"github.com/allencloud/automan/server/ci"
 	"github.com/allencloud/automan/server/config"
+	"github.com/allencloud/automan/server/doc"
 	"github.com/allencloud/automan/server/fetcher"
 	"github.com/allencloud/automan/server/gh"
 	"github.com/allencloud/automan/server/processor"
@@ -31,6 +32,8 @@ type Server struct {
 	ciNotifier *ci.Notifier
 	// reporter reports weekly update of repository.
 	reporter *reporter.Reporter
+	// docGenerator auto generates docs for repo.
+	docGenerator *doc.Generator
 }
 
 // NewServer constructs a brand new automan server
@@ -42,14 +45,16 @@ func NewServer(config config.Config) *Server {
 		fetcher:       fetcher.New(ghClient),
 		ciNotifier:    ci.New(ghClient),
 		reporter:      reporter.New(ghClient),
+		docGenerator:  doc.New(ghClient),
 	}
 }
 
 // Run runs the server.
 func (s *Server) Run() error {
-	// start fetcher and reporter in goroutines
+	// start fetcher, reporter and doc generator in goroutines
 	go s.fetcher.Run()
 	go s.reporter.Run()
+	go s.docGenerator.Run()
 
 	// start webserver
 	listenAddress := s.listenAddress
