@@ -25,6 +25,7 @@ func (c *Client) GetPullRequests(opt *github.PullRequestListOptions) ([]*github.
 func (c *Client) GetSinglePR(num int) (*github.PullRequest, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
+
 	pullRequest, _, err := c.Client.PullRequests.Get(context.Background(), c.owner, c.repo, num)
 	if err != nil {
 		logrus.Errorf("failed to get single pull request %d in repo %s: %v", num, c.repo, err)
@@ -63,6 +64,9 @@ func (c *Client) AddCommentToPR(num int, comment *github.IssueComment) error {
 
 // ListCommits lists all commits in a pull request.
 func (c *Client) ListCommits(num int) ([]*github.RepositoryCommit, error) {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
 	commits, _, err := c.PullRequests.ListCommits(context.Background(), c.owner, c.repo, num, nil)
 	if err != nil {
 		logrus.Errorf("failed to list commits in pull request %d: %v", num, err)
@@ -70,4 +74,18 @@ func (c *Client) ListCommits(num int) ([]*github.RepositoryCommit, error) {
 	}
 	logrus.Debugf("succeed in listing commits in pull request %d", num)
 	return commits, nil
+}
+
+// CreatePR creates a brand new pull request in repo.
+func (c *Client) CreatePR(newPR *github.NewPullRequest) (*github.PullRequest, error) {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	pullRequest, _, err := c.PullRequests.Create(context.Background(), c.owner, c.repo, newPR)
+	if err != nil {
+		logrus.Errorf("failed to create pull request: %v", err)
+		return nil, err
+	}
+	logrus.Debug("succeed in creating pull request")
+	return pullRequest, nil
 }
