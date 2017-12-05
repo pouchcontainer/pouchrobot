@@ -13,7 +13,7 @@ RUN apt-get update \
     && apt-get clean
 
 # set go version this image use
-ENV GO_VERSION=1.8.3
+ENV GO_VERSION=1.9.1
 ENV ARCH=amd64
 
 # install golang which version is GO_VERSION
@@ -35,3 +35,11 @@ EXPOSE 6789
 COPY . /go/src/github.com/allencloud/automan
 
 RUN go get github.com/allencloud/automan
+
+RUN mkdir -p /go/src/github.com/alibaba \
+    && cd /go/src/github.com/alibaba \
+    && git clone git@github.com:pouchrobot/pouch.git \
+    && cd pouch \
+    && git remote add upstream https://github.com/alibaba/pouch.git \
+    && git config user.name "Pouch AI Robot" \ 
+    && git config user.email "pouch-dev@alibaba-inc.com" 
