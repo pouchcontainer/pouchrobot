@@ -17,33 +17,35 @@ import (
 // Third, use github to create a new pull request.
 func (g *Generator) generateCliDoc() error {
 	newBranch := generateNewBranch()
+	logrus.Infof("generate a new branch name %s", newBranch)
+
 	// sync latest master branch and checkout new branch
 	cmd := exec.Command("git", "checkout", "master")
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to checkout master: %v", err)
 	}
 	cmd = exec.Command("git", "fetch", "upstream", "master")
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to git fetch upstreanm master: %v", err)
 	}
 	cmd = exec.Command("git", "rebase", "upstream/master")
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to git rebase upstreanm/master: %v", err)
 	}
 	cmd = exec.Command("git", "push", "-f", "origin", "master")
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to git push -f origin master: %v", err)
 	}
 	// create a new branch
 	cmd = exec.Command("git", "checkout", "-b", newBranch)
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to git checkout -b %s: %v", newBranch, err)
 	}
 
 	// auto generate cli docs
 	cmd = exec.Command("./pouch", "gen-doc")
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to gen doc via cobra: %v", err)
 	}
 
 	// commit and push branch
@@ -62,7 +64,7 @@ func gitCommitAndPush(newBranch string) error {
 	// git add all updated files.
 	cmd := exec.Command("git", "add", ",")
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to git add .: %v", err)
 	}
 
 	// check whether nothing changed.
@@ -80,19 +82,19 @@ func gitCommitAndPush(newBranch string) error {
 	// git commit all the staged files.
 	cmd = exec.Command("git", "commit", "-s", "-m", "docs: auto generate pouch cli docs via code")
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to git commit -s -m : %v", err)
 	}
 
 	// git push forcely to origin repo.
 	cmd = exec.Command("git", "push", "-f", "origin", newBranch)
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to git push -f origin %s: %v", newBranch, err)
 	}
 
 	// git branch -D to delete branch to free resources.
 	cmd = exec.Command("git", "branch", "-D", newBranch)
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to git push branch -D %s: %v", newBranch, err)
 	}
 
 	return nil

@@ -23,18 +23,10 @@ func New(client *gh.Client) *Generator {
 // currently generator generates doc every day.
 func (g *Generator) Run() error {
 	logrus.Infof("start to run doc generator")
-	// Wait time goes to Monday.
 	for {
-		if time.Now().Weekday().String() == "Monday" {
-			break
-		}
-		time.Sleep(4 * time.Hour)
-	}
 
-	for {
-		if time.Now().Weekday().String() == "Monday" {
-			go g.generateDoc()
-		}
+		go g.generateDoc()
+
 		// report one issue every two days.
 		time.Sleep(2 * 24 * time.Hour)
 	}
