@@ -115,19 +115,24 @@ func (g *Generator) sumbitPR(branch string) error {
 	title := "docs: auto generate pouch cli docs via code"
 	head := fmt.Sprintf("pouchrobot:%s", branch)
 	base := "master"
-	body := `**1.Describe what this PR did**
+	body := `Signed-off-by: pouchrobot <pouch-dev@alibaba-inc.com>
+
+**1.Describe what this PR did**
+This PR is automatically done by AI-based collaborating robot.
+Pouchrobot will auto-generate command line document via https://github.com/spf13/cobra/tree/master/doc every day.
 	
-	**2.Does this pull request fix one issue?** 
-	None
-	
-	**3.Describe how you did it**
-	None
-	
-	**4.Describe how to verify it**
-	None
-	
-	**5.Special notes for reviews**
-	None`
+**2.Does this pull request fix one issue?** 
+None
+
+**3.Describe how you did it**
+First, execute command "make client" to build new pouch cli;
+Second, execute command "./pouch gen-doc" to generate new cli docs. 
+
+**4.Describe how to verify it**
+None
+
+**5.Special notes for reviews**
+The cli doc must be automatically generated.`
 
 	newPR := &github.NewPullRequest{
 		Title: &title,
@@ -135,9 +140,11 @@ func (g *Generator) sumbitPR(branch string) error {
 		Base:  &base,
 		Body:  &body,
 	}
+
 	if _, err := g.client.CreatePR(newPR); err != nil {
 		return err
 	}
+
 	return nil
 }
 

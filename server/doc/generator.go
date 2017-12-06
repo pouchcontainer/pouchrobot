@@ -24,11 +24,17 @@ func New(client *gh.Client) *Generator {
 func (g *Generator) Run() error {
 	logrus.Infof("start to run doc generator")
 	for {
+		// break the loop if the time passes one clock
+		if hour, _, _ := time.Now().Clock(); hour == 1 {
+			break
+		}
+		time.Sleep(30 * time.Minute)
+	}
 
+	for {
 		go g.generateDoc()
-
-		// report one issue every two days.
-		time.Sleep(2 * 24 * time.Hour)
+		// report one issue every day.
+		time.Sleep(24 * time.Hour)
 	}
 }
 

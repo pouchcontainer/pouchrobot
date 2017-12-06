@@ -46,7 +46,7 @@ RUN mkdir -p /go/src/github.com/alibaba \
     && git remote remove origin \
     && git remote add origin git@github.com:pouchrobot/pouch.git \
     && git remote add upstream https://github.com/alibaba/pouch.git \
-    && git config user.name "Pouch AI Robot" \ 
+    && git config user.name "pouchrobot" \ 
     && git config user.email "pouch-dev@alibaba-inc.com"
 
 WORKDIR /go/src/github.com/alibaba/pouch
