@@ -67,7 +67,7 @@ func (g *Generator) generateCliDoc() error {
 
 func gitCommitAndPush(newBranch string) error {
 	// git add all updated files.
-	cmd := exec.Command("git", "add", ",")
+	cmd := exec.Command("git", "add", ".")
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to git add .: %v", err)
 	}
