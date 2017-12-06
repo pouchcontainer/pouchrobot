@@ -97,6 +97,12 @@ func gitCommitAndPush(newBranch string) error {
 	}
 
 	// git branch -D to delete branch to free resources.
+	cmd = exec.Command("git", "checkout", "master")
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to git checkout master before deleting branch %s: %v", newBranch, err)
+	}
+
+	// git branch -D to delete branch to free resources.
 	cmd = exec.Command("git", "branch", "-D", newBranch)
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to git push branch -D %s: %v", newBranch, err)
