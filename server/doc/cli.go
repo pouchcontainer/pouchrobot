@@ -42,6 +42,11 @@ func (g *Generator) generateCliDoc() error {
 		return fmt.Errorf("failed to git checkout -b %s: %v", newBranch, err)
 	}
 
+	cmd = exec.Command("make", "client")
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to make client: %v", err)
+	}
+
 	// auto generate cli docs
 	cmd = exec.Command("./pouch", "gen-doc")
 	if err := cmd.Run(); err != nil {
