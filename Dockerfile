@@ -10,7 +10,15 @@ RUN apt-get update \
     gcc \
     vim \
     tree \
+    software-properties-common && \
+    add-apt-repository ppa:webupd8team/java -y && \
+    apt-get update && \
+    echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-get install -y oracle-java8-installer && \
     && apt-get clean
+
+# install swagger2markup
+RUN wget -O /root/swagger2markup-cli-1.3.1.jar http://central.maven.org/maven2/io/github/swagger2markup/swagger2markup-cli/1.3.1/swagger2markup-cli-1.3.1.jar
 
 # set go version this image use
 ENV GO_VERSION=1.9.1
@@ -39,6 +47,9 @@ RUN go get github.com/allencloud/automan
 # try to skip StrictHostKeyChecking when executing git
 RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 
+# add essentail library to support docker's running
+COPY libltdl.so.7 /usr/lib/x86_64-linux-gnu/libltdl.so.7
+
 RUN mkdir -p /go/src/github.com/alibaba \
     && cd /go/src/github.com/alibaba \
     && git clone https://github.com/pouchrobot/pouch.git \
@@ -47,6 +58,6 @@ RUN mkdir -p /go/src/github.com/alibaba \
     && git remote add origin git@github.com:pouchrobot/pouch.git \
     && git remote add upstream https://github.com/alibaba/pouch.git \
     && git config user.name "pouchrobot" \ 
-    && git config user.email "pouch-dev@alibaba-inc.com"
+    && git config user.email "pouch-dev@list.alibaba-inc.com"
 
 WORKDIR /go/src/github.com/alibaba/pouch
