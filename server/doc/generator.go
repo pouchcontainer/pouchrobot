@@ -183,7 +183,7 @@ None
 First, execute command "make client" to build new pouch cli;
 Second, execute command "./pouch gen-doc" to generate new cli docs. 
 
-For API part, we use a tool swagger2marup to make it.
+For API part, we use a tool swagger2markup to make it.
 
 **4.Describe how to verify it**
 None
