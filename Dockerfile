@@ -40,9 +40,6 @@ RUN go get github.com/allencloud/automan
 # try to skip StrictHostKeyChecking when executing git
 RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 
-# add essentail library to support docker's running
-COPY libltdl.so.7 /usr/lib/x86_64-linux-gnu/libltdl.so.7
-
 RUN mkdir -p /go/src/github.com/alibaba \
     && cd /go/src/github.com/alibaba \
     && git clone https://github.com/pouchrobot/pouch.git \
