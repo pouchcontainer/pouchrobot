@@ -6,7 +6,7 @@ import (
 )
 
 // generateAPIDoc will generate api doc via Swagger2Markup.
-// First, execute command `java -jar swagger2markup-cli-{release-version}.jar convert -i`
+// First, execute command `java -jar swagger2markup-cli-{release-version}.jar convert -i...`
 
 // Swagger2MarkupReleaseVersion represents version of swagger2markup.
 var swagger2markupReleaseVersion = "1.3.1"
