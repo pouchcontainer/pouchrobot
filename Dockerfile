@@ -8,17 +8,17 @@ RUN apt-get update && \
     apt-get update && \
     echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
     apt-get install -y oracle-java8-installer && \
-     apt-get clean
+    apt-get clean
 
 # install swagger2markup
-RUN wget -O /root/swagger2markup-cli-1.3.1.jar http://central.maven.org/maven2/io/github/swagger2markup/swagger2markup-cli/1.3.1/swagger2markup-cli-1.3.1.jar
+RUN wget --quiet -O /root/swagger2markup-cli-1.3.1.jar http://central.maven.org/maven2/io/github/swagger2markup/swagger2markup-cli/1.3.1/swagger2markup-cli-1.3.1.jar
 
 # set go version this image use
 ENV GO_VERSION=1.9.1
 ENV ARCH=amd64
 
 # install golang which version is GO_VERSION
-RUN wget https://storage.googleapis.com/golang/go${GO_VERSION}.linux-${ARCH}.tar.gz \
+RUN wget --quiet https://storage.googleapis.com/golang/go${GO_VERSION}.linux-${ARCH}.tar.gz \
     && tar -C /usr/local -xzf go${GO_VERSION}.linux-${ARCH}.tar.gz \
     && rm go${GO_VERSION}.linux-${ARCH}.tar.gz
 
