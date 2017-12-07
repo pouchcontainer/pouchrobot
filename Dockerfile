@@ -2,20 +2,13 @@ FROM ubuntu:16.04
 
 # install wget to download golang source code
 # install git
-RUN apt-get update \
-    && apt-get install -y \
-    wget \ 
-    git \
-    make \
-    gcc \
-    vim \
-    tree \
-    software-properties-common && \
+RUN apt-get update && \
+    apt-get install -y wget git make gcc vim tree software-properties-common && \
     add-apt-repository ppa:webupd8team/java -y && \
     apt-get update && \
     echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
     apt-get install -y oracle-java8-installer && \
-    && apt-get clean
+     apt-get clean
 
 # install swagger2markup
 RUN wget -O /root/swagger2markup-cli-1.3.1.jar http://central.maven.org/maven2/io/github/swagger2markup/swagger2markup-cli/1.3.1/swagger2markup-cli-1.3.1.jar
