@@ -30,7 +30,7 @@ func New(client *gh.Client) *Generator {
 // currently generator generates doc every day.
 func (g *Generator) Run() error {
 	logrus.Infof("start to run doc generator")
-	for {
+	/*for {
 		// Break the loop if the time passes one clock
 		// Since time zone container maybe has a delta 8 hours from Beijing Time,
 		// It is about 9 o'clock in Beijing Time.
@@ -38,7 +38,7 @@ func (g *Generator) Run() error {
 			break
 		}
 		time.Sleep(30 * time.Minute)
-	}
+	}*/
 
 	for {
 		go g.generateDoc()
