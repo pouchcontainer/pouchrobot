@@ -27,13 +27,13 @@ func (r *Reporter) Run() {
 		if time.Now().Weekday().String() == "Monday" {
 			break
 		}
-		time.Sleep(4 * time.Hour)
+		time.Sleep(1 * time.Hour)
 	}
 
 	for {
-		if time.Now().Weekday().String() == "Monday" {
-			go r.weeklyReport()
-		}
+		// only Monday, code will enter this for loop block.
+		go r.weeklyReport()
+
 		// report one issue every week.
 		time.Sleep(7 * 24 * time.Hour)
 	}
