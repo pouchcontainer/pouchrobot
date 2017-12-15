@@ -24,7 +24,7 @@ func (r *Reporter) Run() {
 	logrus.Infof("start to run reporter")
 	// Wait time goes to Monday.
 	for {
-		if time.Now().Weekday().String() == "Monday" {
+		if time.Now().Weekday().String() == "Friday" {
 			break
 		}
 		time.Sleep(1 * time.Hour)
