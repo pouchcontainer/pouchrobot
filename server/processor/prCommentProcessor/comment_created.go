@@ -25,7 +25,7 @@ func (prcp *PRCommentProcessor) updateLabels(issue *github.Issue, comment *githu
 	body := *(comment.Body)
 	user := *(comment.User.Login)
 
-	if !strings.HasPrefix(strings.ToLower(body), "lgtm") || !strings.HasSuffix(strings.ToLower(body), "lgtm") {
+	if !strings.HasPrefix(strings.ToLower(body), "lgtm") && !strings.HasSuffix(strings.ToLower(body), "lgtm") {
 		return nil
 	}
 
