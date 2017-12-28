@@ -25,7 +25,9 @@ func (r *Reporter) Run() {
 	// Wait time goes to Monday.
 	for {
 		if time.Now().Weekday().String() == "Friday" {
-			break
+			if hour, _, _ := time.Now().Clock(); hour == 7 {
+				break
+			}
 		}
 		time.Sleep(1 * time.Hour)
 	}
