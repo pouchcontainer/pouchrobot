@@ -68,6 +68,11 @@ func (g *Generator) generateDoc() error {
 		logrus.Errorf("failed to generate cli doc: %v", err)
 	}
 
+	// auto generate file CONTRIBUTORS on local filesystem.
+	if err := g.generateContributors(); err != nil{
+		logrus.Errorf("failed to generate CONTRIBUTORS: %v", err)
+	}
+
 	// commit and push branch
 	if err := gitCommitAndPush(newBranch); err != nil {
 		if err == ErrNothingChanged {
