@@ -15,7 +15,7 @@ var swagger2markupPath = fmt.Sprintf("/root/%s", swagger2markupJar)
 
 var swaggerYML = "/go/src/github.com/alibaba/pouch/apis/swagger.yml"
 var swagger2markupConfig = "/go/src/github.com/allencloud/automan/config.properties"
-var targetAPIFile = "/go/src/github.com/alibaba/pouch/docs/api/api"
+var targetAPIFile = "/go/src/github.com/alibaba/pouch/docs/api/HTTP_API"
 
 func (g *Generator) generateAPIDoc() error {
 	args := []string{"-jar", swagger2markupPath, "convert", "-i", swaggerYML, "-f", targetAPIFile, "-c", swagger2markupConfig}
