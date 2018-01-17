@@ -13,7 +13,7 @@ func (g *Generator) generateContributors() error {
 	// auto generate cli docs
 	cmd := exec.Command("/bin/bash", "hack/generate-conrtibutors.sh")
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to gen doc via cobra: %v", err)
+		return fmt.Errorf("failed to generate contributors: %v", err)
 	}
 
 	return nil
