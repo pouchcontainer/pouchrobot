@@ -11,7 +11,7 @@ import (
 // Third, use github to create a new pull request.
 func (g *Generator) generateContributors() error {
 	// auto generate cli docs
-	cmd := exec.Command("/bin/bash", "-c", "/go/src/github.com/alibaba/pouch/hack/generate-conrtibutors.sh")
+	cmd := exec.Command("/bin/bash", "-c", "/go/src/github.com/alibaba/pouch/hack/generate-contributors.sh")
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to generate contributors: %v", err)
 	}
