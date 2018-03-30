@@ -7,8 +7,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 )
 
 // WeekReport contains details about elements to construct a report.

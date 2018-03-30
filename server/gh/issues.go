@@ -3,8 +3,8 @@ package gh
 import (
 	"context"
 
-	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 	"github.com/sirupsen/logrus"
 )
 

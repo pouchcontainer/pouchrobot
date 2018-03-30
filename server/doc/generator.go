@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/allencloud/automan/server/gh"
 	"github.com/google/go-github/github"
+	"github.com/pouchcontainer/pouchrobot/server/gh"
 	"github.com/sirupsen/logrus"
 )
 
@@ -69,7 +69,7 @@ func (g *Generator) generateDoc() error {
 	}
 
 	// auto generate file CONTRIBUTORS on local filesystem.
-	if err := g.generateContributors(); err != nil{
+	if err := g.generateContributors(); err != nil {
 		logrus.Errorf("failed to generate CONTRIBUTORS: %v", err)
 	}
 

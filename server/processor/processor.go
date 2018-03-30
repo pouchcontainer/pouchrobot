@@ -3,13 +3,13 @@ package processor
 import (
 	"fmt"
 
-	"github.com/allencloud/automan/server/processor/issueCommentProcessor"
-	"github.com/allencloud/automan/server/processor/issueProcessor"
-	"github.com/allencloud/automan/server/processor/prCommentProcessor"
-	"github.com/allencloud/automan/server/processor/pullRequestProcessor"
-	"github.com/allencloud/automan/server/utils"
+	"github.com/pouchcontainer/pouchrobot/server/processor/issueCommentProcessor"
+	"github.com/pouchcontainer/pouchrobot/server/processor/issueProcessor"
+	"github.com/pouchcontainer/pouchrobot/server/processor/prCommentProcessor"
+	"github.com/pouchcontainer/pouchrobot/server/processor/pullRequestProcessor"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 
-	"github.com/allencloud/automan/server/gh"
+	"github.com/pouchcontainer/pouchrobot/server/gh"
 	"github.com/sirupsen/logrus"
 )
 

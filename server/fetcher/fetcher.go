@@ -5,7 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/allencloud/automan/server/gh"
+	"github.com/pouchcontainer/pouchrobot/server/gh"
 )
 
 // FETCHINTERVAL refers the interval of fetch action

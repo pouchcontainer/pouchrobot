@@ -3,8 +3,8 @@ package prCommentProcessor
 import (
 	"strings"
 
-	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 )
 
 // ActToPRCommented acts added comment to the PR

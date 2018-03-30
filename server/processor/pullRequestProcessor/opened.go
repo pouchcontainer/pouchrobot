@@ -5,8 +5,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/allencloud/automan/server/processor/pullRequestProcessor/open"
-	"github.com/allencloud/automan/server/utils"
+	"github.com/pouchcontainer/pouchrobot/server/processor/pullRequestProcessor/open"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 
 	"github.com/google/go-github/github"
 )

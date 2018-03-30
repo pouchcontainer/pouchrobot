@@ -3,9 +3,9 @@ package issueProcessor
 import (
 	"fmt"
 
-	"github.com/allencloud/automan/server/processor/issueProcessor/open"
-	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
+	"github.com/pouchcontainer/pouchrobot/server/processor/issueProcessor/open"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 )
 
 // ActToIssueOpened acts to opened issue
