@@ -3,8 +3,8 @@ package issueProcessor
 import (
 	"fmt"
 
-	"github.com/allencloud/automan/server/utils"
 	"github.com/google/go-github/github"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 )
 
 // ActToIssueLabeled acts to issue labeled events

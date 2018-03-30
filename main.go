@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/allencloud/automan/server"
-	"github.com/allencloud/automan/server/config"
+	"github.com/pouchcontainer/pouchrobot/server"
+	"github.com/pouchcontainer/pouchrobot/server/config"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

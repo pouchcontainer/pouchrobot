@@ -7,8 +7,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/allencloud/automan/server/gh"
-	"github.com/allencloud/automan/server/utils"
+	"github.com/pouchcontainer/pouchrobot/server/gh"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 
 	"github.com/google/go-github/github"
 )

@@ -3,7 +3,7 @@ package reporter
 import (
 	"time"
 
-	"github.com/allencloud/automan/server/gh"
+	"github.com/pouchcontainer/pouchrobot/server/gh"
 	"github.com/sirupsen/logrus"
 )
 

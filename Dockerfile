@@ -33,9 +33,9 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 EXPOSE 6789
 
-COPY . /go/src/github.com/allencloud/automan
+COPY . /go/src/github.com/pouchcontainer/pouchrobot
 
-RUN go get github.com/allencloud/automan
+RUN go get github.com/pouchcontainer/pouchrobot
 
 # try to skip StrictHostKeyChecking when executing git
 RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config

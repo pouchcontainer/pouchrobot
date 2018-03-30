@@ -3,7 +3,7 @@ package open
 import (
 	"strings"
 
-	"github.com/allencloud/automan/server/utils"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"

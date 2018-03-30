@@ -1,8 +1,8 @@
 package issueCommentProcessor
 
 import (
-	"github.com/allencloud/automan/server/gh"
-	"github.com/allencloud/automan/server/utils"
+	"github.com/pouchcontainer/pouchrobot/server/gh"
+	"github.com/pouchcontainer/pouchrobot/server/utils"
 )
 
 // IssueCommentProcessor is
