@@ -63,7 +63,7 @@ func (r *Reporter) construcWeekReport() (WeekReport, error) {
 		return wr, err
 	}
 
-	wr.Watch = *(repo.WatchersCount)
+	wr.Watch = *(repo.SubscribersCount)
 	wr.Star = *(repo.StargazersCount)
 	wr.Fork = *(repo.ForksCount)
 
