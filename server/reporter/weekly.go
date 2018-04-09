@@ -148,7 +148,7 @@ func (wr *WeekReport) String() string {
 	totalStr := fmt.Sprintf(`
 # Weekly Report of Pouch
 
-This is a weekly report of Pouch. It summarizes what have changed in Pouch in the passed week, including pr merged, new contributors, and more things in the future. 
+This is a weekly report of Pouch. It summarizes what have changed in Pouch in the past week, including pull requests which are merged, new contributors, and more things in the future. 
 It is all done by @pouchrobot which is an AI robot.
 
 ## Repo Update 
@@ -157,7 +157,7 @@ It is all done by @pouchrobot which is an AI robot.
 | :-------- | --------:| 
 | Watch     |   %d |  
 | Star      |   %d |  
-| Fork      |   %d | 
+| Fork      |   %d |
 `,
 		wr.Watch,
 		wr.Star,
@@ -167,7 +167,7 @@ It is all done by @pouchrobot which is an AI robot.
 	prUpdateSubStr := fmt.Sprintf(`
 ## PR Update
 
-Thanks to contributions from community, we merged %d pull requests in the Pouch repositories last week. We divided all these pull requests into **feature**, **bugfix**, **doc**, **test** and **others**:
+Thanks to contributions from community, Pouch team merged %d pull requests in the Pouch repositories last week. All these pull requests could be divided into **feature**, **bugfix**, **doc**, **test** and **others**:
 
 `,
 		wr.CountOfPR,
@@ -201,7 +201,7 @@ Thanks to contributions from community, we merged %d pull requests in the Pouch 
 	// calculate new contributors of this week.
 	newContribSubstr := "## New Contributors 🎖 🎖 🎖 \n\n"
 	if len(wr.NewContributors) != 0 {
-		newContribSubstr = newContribSubstr + `It is pouch team's great honor to have new contributors in Pouch's community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share Pouch with more people if you could. If you hopes to be contributors as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺 
+		newContribSubstr = newContribSubstr + `It is Pouch team's great honor to have new contributors in Pouch's community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share Pouch with more people if you could. If you hope to be a contributor as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺 
 
 Here is the list of new contributors:
 
@@ -211,7 +211,7 @@ Here is the list of new contributors:
 		}
 	} else {
 		newContribSubstr = newContribSubstr + `We have no new contributors in Pouch project this week.
-Pouch team encourages everythings about contribution from community.
+Pouch team encourages everything about contribution from community.
 For more details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🍻 
 `
 	}
