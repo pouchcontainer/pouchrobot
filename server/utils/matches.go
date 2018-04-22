@@ -152,7 +152,7 @@ var TitleMatches = map[string][]string{
 	"os/freebsd": []string{
 		"freebsd",
 	},
-	"priority/P0": []string{
+	"priority/P1": []string{
 		"panic",
 		"invalid memory address or nil pointer",
 	},
