@@ -8,8 +8,8 @@ var CIFailureLable = "CI-failure"
 // PRConflictLabel is a label which means conflict for pull request.
 var PRConflictLabel = "conflict/needs-rebase"
 
-// PriorityP0Label is a lable which represent P0 priority
-var PriorityP0Label = "priority/P0"
+// PriorityP1Label is a lable which represent P1 priority which is highest.
+var PriorityP1Label = "priority/P1"
 
 // SizeLabelPrefix presents the prefix of size label name.
 var SizeLabelPrefix = "size/"
@@ -74,17 +74,17 @@ var PRNeedsSignOff = fmt.Sprintf(
 	PRNeedsSignOffStr,
 )
 
-// IssueNeedPOCommentSubStr is a string used to attach comment on P0 issue.
-var IssueNeedPOCommentSubStr = `😱 This is a **priority/P0** issue.
+// IssueNeedP1CommentSubStr is a string used to attach comment on P1 issue.
+var IssueNeedP1CommentSubStr = `😱 This is a **priority/P1** issue which is highest.
 Seems to be severe enough. 
 ping @alibaba/pouch , PTAL. 
 `
 
-// IssueNeedPOComment is a string used to attach comment on P0 issue.
-var IssueNeedPOComment = fmt.Sprintf(
+// IssueNeedP1Comment is a string used to attach comment on P1 issue.
+var IssueNeedP1Comment = fmt.Sprintf(
 	"Thanks for your report, @%s \n%s",
 	"%s",
-	IssueNeedPOCommentSubStr,
+	IssueNeedP1CommentSubStr,
 )
 
 // FirstCommitCommentSubStr is a string which is substring of FirstCommitComment
