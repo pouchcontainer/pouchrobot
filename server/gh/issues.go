@@ -170,13 +170,42 @@ func (c *Client) IssueHasLabel(num int, inputLabel string) bool {
 }
 
 // SearchIssues searches issues.
-func (c *Client) SearchIssues(query string, opt *github.SearchOptions) (*github.IssuesSearchResult, error) {
+// search result's wrapper is never be nil.
+func (c *Client) SearchIssues(query string, opt *github.SearchOptions, all bool) (*github.IssuesSearchResult, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
-	issueSearchResult, _, err := c.Search.Issues(context.Background(), query, opt)
-	if err != nil {
-		logrus.Errorf("failed to search issues by query %s", query)
-		return nil, err
+
+	if all && opt == nil {
+		opt = new(github.SearchOptions)
+		opt.Page = 1 // first page.
+		opt.PerPage = 30
 	}
+
+	total := 0
+	issueSearchResult := &github.IssuesSearchResult{Total: &total}
+
+	for {
+		result, resp, err := c.Search.Issues(context.Background(), query, opt)
+		if err != nil {
+			logrus.Errorf("failed to search issues by query %s", query)
+			return nil, err
+		}
+		if result.Total == nil {
+			break
+		}
+		total += *result.Total
+		issueSearchResult.Issues = append(issueSearchResult.Issues, result.Issues...)
+
+		// just retrieve a page.
+		if !all {
+			break
+		}
+
+		if resp.NextPage == 0 {
+			break
+		}
+		opt.Page = resp.NextPage
+	}
+
 	return issueSearchResult, nil
 }
