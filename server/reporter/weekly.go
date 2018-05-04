@@ -32,7 +32,7 @@ type SimplePR struct {
 }
 
 func (r *Reporter) weeklyReport() error {
-	wr, err := r.construcWeekReport()
+	wr, err := r.constructWeekReport()
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (r *Reporter) weeklyReport() error {
 	return r.client.CreateIssue(issueTitle, issueBody)
 }
 
-func (r *Reporter) construcWeekReport() (WeekReport, error) {
+func (r *Reporter) constructWeekReport() (WeekReport, error) {
 	var wr WeekReport
 
 	now := time.Now()
@@ -71,23 +71,22 @@ func (r *Reporter) construcWeekReport() (WeekReport, error) {
 
 	logrus.Infof("Start: %s, End: %s", wr.StartDate, wr.EndDate)
 	query := fmt.Sprintf("is:merged type:pr repo:%s/%s merged:>=%s", r.client.Owner(), r.client.Repo(), wr.StartDate)
-	issueSearchResult, err := r.client.SearchIssues(query, nil)
+	issueSearchResult, err := r.client.SearchIssues(query, nil, true)
 	if err != nil {
 		return wr, err
 	}
 
-	// SearchIssues returns a list of issue, and we can treat them as pull request as well.
-	prs := issueSearchResult.Issues
-
-	r.setContributorAndCommits(&wr, prs)
+	r.setContributorAndPRSummary(&wr, issueSearchResult)
 
 	return wr, nil
 }
 
-func (r *Reporter) setContributorAndCommits(wr *WeekReport, prs []github.Issue) {
-	wr.CountOfPR = len(prs)
+func (r *Reporter) setContributorAndPRSummary(wr *WeekReport, issueSearchResult *github.IssuesSearchResult) {
+	wr.CountOfPR = issueSearchResult.GetTotal()
 	wr.MergedPR = map[string][]*SimplePR{}
-	for _, pr := range prs {
+
+	// SearchIssues returns a list of issue, and we can treat them as pull request as well.
+	for _, pr := range issueSearchResult.Issues {
 		comments, err := r.client.ListComments(*pr.Number)
 		if err != nil {
 			continue
