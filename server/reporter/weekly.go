@@ -1,3 +1,17 @@
+// Copyright 2018 The Pouch Robot Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package reporter
 
 import (
@@ -148,15 +162,15 @@ func (wr *WeekReport) String() string {
 	totalStr := fmt.Sprintf(`
 # Weekly Report of Pouch
 
-This is a weekly report of Pouch. It summarizes what have changed in Pouch in the past week, including pull requests which are merged, new contributors, and more things in the future. 
+This is a weekly report of Pouch. It summarizes what have changed in Pouch in the past week, including pull requests which are merged, new contributors, and more things in the future.
 It is all done by @pouchrobot which is an AI robot.
 
-## Repo Update 
+## Repo Update
 
 | Type      |    Count |
-| :-------- | --------:| 
-| Watch     |   %d |  
-| Star      |   %d |  
+| :-------- | --------:|
+| Watch     |   %d |
+| Star      |   %d |
 | Fork      |   %d |
 `,
 		wr.Watch,
@@ -201,7 +215,7 @@ Thanks to contributions from community, Pouch team merged %d pull requests in th
 	// calculate new contributors of this week.
 	newContribSubstr := "## New Contributors 🎖 🎖 🎖 \n\n"
 	if len(wr.NewContributors) != 0 {
-		newContribSubstr = newContribSubstr + `It is Pouch team's great honor to have new contributors in Pouch's community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share Pouch with more people if you could. If you hope to be a contributor as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺 
+		newContribSubstr = newContribSubstr + `It is Pouch team's great honor to have new contributors in Pouch's community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share Pouch with more people if you could. If you hope to be a contributor as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺
 
 Here is the list of new contributors:
 
@@ -212,7 +226,7 @@ Here is the list of new contributors:
 	} else {
 		newContribSubstr = newContribSubstr + `We have no new contributors in Pouch project this week.
 Pouch team encourages everything about contribution from community.
-For more details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🍻 
+For more details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🍻
 `
 	}
 
