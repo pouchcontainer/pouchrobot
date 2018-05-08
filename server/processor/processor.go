@@ -77,7 +77,8 @@ func (p *Processor) HandleEvent(eventType string, data []byte) error {
 			p.PRCommentProcessor.Process(data)
 			return nil
 		}
-		return nil
+	case "ping":
+		logrus.Debug("Got ping from GitHub")
 	default:
 		return fmt.Errorf("unknown event type %s", eventType)
 	}
