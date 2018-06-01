@@ -29,6 +29,7 @@ var Maintainers = []string{
 	"houqianming",
 	"Letty5411",
 	"HusterWan",
+	"shaloulcy",
 }
 
 // TitleMatches is a map in which key is the label, and value is a slice of string
