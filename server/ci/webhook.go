@@ -14,8 +14,8 @@
 
 package ci
 
-// Webhook represents a struct in payload
-type Webhook struct {
+// TravisWebhook represents a struct in TravisCI payload
+type TravisWebhook struct {
 	ID                int    `json:"id"`
 	Number            string `json:"number"`
 	PullRequestNumber int    `json:"pull_request_number"`
@@ -26,4 +26,21 @@ type Webhook struct {
 	Type              string `json:"type"`
 	State             string `json:"state"`
 	BuildURL          string `json:"build_url"`
+}
+
+type pullRequests struct {
+	HeadSha string `json:"head_sha"`
+	Url     string `json:"url"`
+}
+
+// CircleCIWebhook represents a struct in CircleCI payload
+type CircleCIWebhook struct {
+	PullRequests    pullRequests `json:"pull_requests"`
+	Status          string       `json:"status"`
+	Subject         string       `json:"subject"`
+	AuthorName      string       `json:"author_name"`
+	AuthorEmail     string       `json:"author_email"`
+	BuildNum        int          `json:"build_num"`
+	BuildURL        string       `json:"build_url"`
+	BuildTimeMillis int          `json:"build_time_millis"`
 }

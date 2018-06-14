@@ -17,14 +17,14 @@ package ci
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
-
-	"github.com/sirupsen/logrus"
 
 	"github.com/pouchcontainer/pouchrobot/server/gh"
 	"github.com/pouchcontainer/pouchrobot/server/utils"
 
 	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 )
 
 // Notifier is a processor that receives notification from CI system
@@ -40,31 +40,31 @@ func New(client *gh.Client) *Notifier {
 	}
 }
 
-// Process gets the json string and acts to these messages from CI system, such as travisCI.
-func (n *Notifier) Process(input string) error {
+// TravisCIProcess gets the json string and acts to these messages from travisCI.
+func (n *Notifier) TravisCIProcess(input string) error {
 	input = strings.Replace(input, `\"`, `"`, -1)
 	logrus.Info(input)
-	var wh Webhook
-	if err := json.Unmarshal([]byte(input), &wh); err != nil {
+	var tw TravisWebhook
+	if err := json.Unmarshal([]byte(input), &tw); err != nil {
 		return err
 	}
 
-	prNum := wh.PullRequestNumber
+	prNum := tw.PullRequestNumber
 	if prNum <= 0 {
 		return fmt.Errorf("invalid pull request number %d unmarshalled", prNum)
 	}
 
-	logrus.Infof("CI notification from PR %d received, state: %s", prNum, wh.State)
+	logrus.Infof("TravisCI notification from PR %d received, state: %s", prNum, tw.State)
 
 	// if the status is passed, we need to remove failure comment
-	if wh.State == "passed" {
+	if tw.State == "passed" {
 		return n.client.RmCommentsViaStr(prNum, utils.CIFailsCommentSubStr)
 	}
 
 	// if the status is failure, we need to do steps by:
 	// 1. remove failure comments if there are any;
 	// 2. add new failure comments to show failure state.
-	if wh.State == "failed" {
+	if tw.State == "failed" {
 		// first remove failure comments if there are any.
 		n.client.RmCommentsViaStr(prNum, utils.CIFailsCommentSubStr)
 
@@ -78,17 +78,74 @@ func (n *Notifier) Process(input string) error {
 			return nil
 		}
 		// add new failure comments
-		return n.addCIFaiureComments(pr, wh)
+		return n.addCIFaiureComments(pr, tw)
 	}
 
 	return nil
 }
 
-func (n *Notifier) addCIFaiureComments(pr *github.PullRequest, wh Webhook) error {
+// CircleCIProcess gets the json string and acts to these messages from CircleCI.
+func (n *Notifier) CircleCIProcess(input string) error {
+	input = strings.Replace(input, `\"`, `"`, -1)
+	logrus.Info(input)
+	var cw CircleCIWebhook
+	if err := json.Unmarshal([]byte(input), &cw); err != nil {
+		return err
+	}
+
+	// url in format of "url" : "https://github.com/alibaba/pouch/pull/3"
+	url := cw.PullRequests.Url
+	data := strings.Split(url, "/")
+	prNum, err := strconv.Atoi(data[6])
+	if err != nil {
+		return fmt.Errorf("failed to get pull request number %v", err)
+	}
+
+	if prNum <= 0 {
+		return fmt.Errorf("invalid pull request number %d unmarshalled", prNum)
+	}
+
+	logrus.Infof("CirleCI notification from PR %d received, state: %s", prNum, cw.Status)
+
+	// if the status is success, we need to remove failure comment
+	if cw.Status == "success" {
+		return n.client.RmCommentsViaStr(prNum, utils.CIFailsCommentSubStr)
+	}
+
+	if cw.Status == "failed" {
+		// first remove failure comments if there are any.
+		n.client.RmCommentsViaStr(prNum, utils.CIFailsCommentSubStr)
+
+		pr, err := n.client.GetSinglePR(prNum)
+		if err != nil {
+			return err
+		}
+
+		if pr.State != nil && *(pr.State) != "open" {
+			// we only consider pr which are open
+			return nil
+		}
+		// add new failure comments
+		return n.addCIFaiureComments(pr, cw)
+	}
+
+	return nil
+}
+
+func (n *Notifier) addCIFaiureComments(pr *github.PullRequest, wh interface{}) error {
 	// add a brand new one CI failure comments
 	body := fmt.Sprintf(utils.CIFailsComment, *(pr.User.Login))
-	detailsStr := fmt.Sprintf("build url: %s\nbuild duration: %ds\n", wh.BuildURL, wh.Duration)
-	body = body + "\n" + detailsStr
+	switch wh.(type) {
+	case TravisWebhook:
+		tw, _ := wh.(TravisWebhook)
+		detailsStr := fmt.Sprintf("build url: %s\nbuild duration: %ds\n", tw.BuildURL, tw.Duration)
+		body = body + "\n" + detailsStr
+	case CircleCIWebhook:
+		cw, _ := wh.(CircleCIWebhook)
+		detailsStr := fmt.Sprintf("build url: %s\nbuild duration: %ds\n", cw.BuildURL, cw.BuildTimeMillis)
+		body = body + "\n" + detailsStr
+
+	}
 
 	return n.client.RmCommentsViaStrAndAttach(*(pr.Number), utils.CIFailsCommentSubStr, body)
 }
