@@ -17,8 +17,9 @@ package prCommentProcessor
 import (
 	"strings"
 
+	"github.com/pouchcontainer/pouchrobot/server/utils/maintainer"
+
 	"github.com/google/go-github/github"
-	"github.com/pouchcontainer/pouchrobot/server/utils"
 )
 
 // ActToPRCommented acts added comment to the PR
@@ -43,7 +44,7 @@ func (prcp *PRCommentProcessor) updateLabels(issue *github.Issue, comment *githu
 		return nil
 	}
 
-	if !isMaintainer(user) {
+	if !maintainer.Check(user) {
 		return nil
 	}
 
@@ -66,15 +67,6 @@ func (prcp *PRCommentProcessor) retriggerCI(issue *github.Issue, comment *github
 	}
 	// TODO: call CI system to retest
 	return nil
-}
-
-func isMaintainer(user string) bool {
-	for _, maintainerID := range utils.Maintainers {
-		if strings.ToLower(user) == strings.ToLower(maintainerID) {
-			return true
-		}
-	}
-	return false
 }
 
 func hasLGTMInLabels(issue *github.Issue) bool {

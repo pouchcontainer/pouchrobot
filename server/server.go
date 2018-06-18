@@ -26,6 +26,7 @@ import (
 	"github.com/pouchcontainer/pouchrobot/server/gh"
 	"github.com/pouchcontainer/pouchrobot/server/processor"
 	"github.com/pouchcontainer/pouchrobot/server/reporter"
+	"github.com/pouchcontainer/pouchrobot/server/utils/maintainer"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -69,6 +70,9 @@ func (s *Server) Run() error {
 	go s.fetcher.Run()
 	go s.reporter.Run()
 	go s.docGenerator.Run()
+
+	// sync maintainer list periodically.
+	go maintainer.Sync()
 
 	// start webserver
 	listenAddress := s.listenAddress
