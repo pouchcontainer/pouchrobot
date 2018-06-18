@@ -86,6 +86,7 @@ func (n *Notifier) TravisCIProcess(input string) error {
 
 // CircleCIProcess gets the json string and acts to these messages from CircleCI.
 func (n *Notifier) CircleCIProcess(input string) error {
+	logrus.Infof("here is input :%v", input)
 	input = strings.Replace(input, `\"`, `"`, -1)
 	logrus.Info(input)
 	var cw CircleCIWebhook

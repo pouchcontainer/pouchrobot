@@ -32,7 +32,7 @@ import (
 )
 
 // DefaultAddress is the default address daemon will listen to.
-var DefaultAddress = ":6788"
+var DefaultAddress = ":6789"
 
 // Server refers to a daemon server interating with github repos.
 type Server struct {
@@ -75,6 +75,7 @@ func (s *Server) Run() error {
 	if listenAddress == "" {
 		listenAddress = DefaultAddress
 	}
+	logrus.Infof("listen to %v", listenAddress)
 
 	r := mux.NewRouter()
 
@@ -133,9 +134,10 @@ func (s *Server) travisCINotificationHandler(w http.ResponseWriter, r *http.Requ
 
 	rawStr := r.PostForm.Get("payload")
 
-	logrus.Debugf("r.PostForm[payload]: %v", rawStr)
+	logrus.Infof("r.PostForm[payload]: %v", rawStr)
 
 	jsonStr := strings.Replace(rawStr, `\"`, `"`, -1)
+	logrus.Infof("r.PostForm[payload]: %v", jsonStr)
 	if err := s.ciNotifier.TravisCIProcess(jsonStr); err != nil {
 		logrus.Errorf("failed to process ci notification: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -156,8 +158,10 @@ func (s *Server) circleCINotificationHandler(w http.ResponseWriter, r *http.Requ
 
 	rawStr := r.PostForm.Get("payload")
 
-	logrus.Debugf("r.PostForm[payload]: %v", rawStr)
+	logrus.Infof("r.PostForm[payload]: %v", rawStr)
+
 	jsonStr := strings.Replace(rawStr, `\"`, `"`, -1)
+	logrus.Infof("r.PostForm[payload]: %v", jsonStr)
 	if err := s.ciNotifier.CircleCIProcess(jsonStr); err != nil {
 		logrus.Errorf("failed to process ci notification: %v", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

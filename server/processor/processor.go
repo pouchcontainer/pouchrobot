@@ -60,6 +60,7 @@ func New(client *gh.Client) *Processor {
 
 // HandleEvent processes an event received from github
 func (p *Processor) HandleEvent(eventType string, data []byte) error {
+	logrus.Infof("eventType is %v", eventType)
 	switch eventType {
 	case "issues":
 		p.IssueProcessor.Process(data)
