@@ -46,7 +46,7 @@ func (n *Notifier) TravisCIProcess(input string) error {
 	logrus.Info(input)
 	var tw TravisWebhook
 	if err := json.Unmarshal([]byte(input), &tw); err != nil {
-		return err
+		return fmt.Errorf("unmarsal error: %v", err)
 	}
 
 	prNum := tw.PullRequestNumber
@@ -86,6 +86,7 @@ func (n *Notifier) TravisCIProcess(input string) error {
 
 // CircleCIProcess gets the json string and acts to these messages from CircleCI.
 func (n *Notifier) CircleCIProcess(input string) error {
+	logrus.Infof("here is input :%v", input)
 	input = strings.Replace(input, `\"`, `"`, -1)
 	logrus.Info(input)
 	var cw CircleCIWebhook
@@ -93,9 +94,10 @@ func (n *Notifier) CircleCIProcess(input string) error {
 		return err
 	}
 
-	// branch in format of "branch" : "pull/1526"
-	branch := cw.Branch
-	prNum, err := strconv.Atoi(branch[5:])
+	// url in format of "url" : "https://github.com/alibaba/pouch/pull/3"
+	url := cw.PullRequests.Url
+	data := strings.Split(url, "/")
+	prNum, err := strconv.Atoi(data[6])
 	if err != nil {
 		return fmt.Errorf("failed to get pull request number %v", err)
 	}
@@ -137,11 +139,11 @@ func (n *Notifier) addCIFaiureComments(pr *github.PullRequest, wh interface{}) e
 	switch wh.(type) {
 	case TravisWebhook:
 		tw, _ := wh.(TravisWebhook)
-		detailsStr := fmt.Sprintf("build url: %s\nbuild duration: %ds\n", tw.BuildURL, tw.Duration)
+		detailsStr := fmt.Sprintf("TravisCI build url: %s\nbuild duration: %ds\n", tw.BuildURL, tw.Duration)
 		body = body + "\n" + detailsStr
 	case CircleCIWebhook:
 		cw, _ := wh.(CircleCIWebhook)
-		detailsStr := fmt.Sprintf("build url: %s\nbuild duration: %ds\n", cw.BuildURL, cw.BuildTimeMillis)
+		detailsStr := fmt.Sprintf("CircleCI build url: %s\nbuild duration: %ds\n", cw.BuildURL, cw.BuildTimeMillis)
 		body = body + "\n" + detailsStr
 
 	}

@@ -128,7 +128,7 @@ var PRConflictComment = fmt.Sprintf(
 
 // CIFailsCommentSubStr is a substring of CI failing comments
 var CIFailsCommentSubStr = `
-CI fails according integration system.
+CI fails according to integration system.
 Please refer to the CI failure Details button to corresponding test, and update your PR to pass CI.
 
 If this is flaky test, welcome to track this with [profiling an issue](https://github.com/alibaba/pouch/issues/new).

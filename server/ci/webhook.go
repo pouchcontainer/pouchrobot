@@ -28,14 +28,19 @@ type TravisWebhook struct {
 	BuildURL          string `json:"build_url"`
 }
 
+type pullRequests struct {
+	HeadSha string `json:"head_sha"`
+	Url     string `json:"url"`
+}
+
 // CircleCIWebhook represents a struct in CircleCI payload
 type CircleCIWebhook struct {
-	Branch          string `json:"branch"`
-	Status          string `json:"status"`
-	Subject         string `json:"subject"`
-	AuthorName      string `json:"author_name"`
-	AuthorEmail     string `json:"author_email"`
-	BuildNum        int    `json:"build_num"`
-	BuildURL        string `json:"build_url"`
-	BuildTimeMillis int    `json:"build_time_millis"`
+	PullRequests    pullRequests `json:"pull_requests"`
+	Status          string       `json:"status"`
+	Subject         string       `json:"subject"`
+	AuthorName      string       `json:"author_name"`
+	AuthorEmail     string       `json:"author_email"`
+	BuildNum        int          `json:"build_num"`
+	BuildURL        string       `json:"build_url"`
+	BuildTimeMillis int          `json:"build_time_millis"`
 }
