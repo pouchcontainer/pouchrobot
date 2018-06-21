@@ -195,8 +195,7 @@ func (c *Client) SearchIssues(query string, opt *github.SearchOptions, all bool)
 		opt.PerPage = 30
 	}
 
-	total := 0
-	issueSearchResult := &github.IssuesSearchResult{Total: &total}
+	issueSearchResult := &github.IssuesSearchResult{}
 
 	for {
 		result, resp, err := c.Search.Issues(context.Background(), query, opt)
@@ -207,7 +206,7 @@ func (c *Client) SearchIssues(query string, opt *github.SearchOptions, all bool)
 		if result.Total == nil {
 			break
 		}
-		total += *result.Total
+		issueSearchResult.Total = result.Total
 		issueSearchResult.Issues = append(issueSearchResult.Issues, result.Issues...)
 
 		// just retrieve a page.

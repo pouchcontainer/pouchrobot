@@ -16,6 +16,7 @@ package gh
 
 import (
 	"context"
+	"net/http"
 	"sync"
 
 	"github.com/google/go-github/github"
@@ -32,13 +33,16 @@ type Client struct {
 
 // NewClient constructs a new instance of Client.
 func NewClient(owner, repo, token string) *Client {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{
-			AccessToken: token,
-		},
-	)
-	tc := oauth2.NewClient(ctx, ts)
+	var tc *http.Client
+	if token != "" {
+		ctx := context.Background()
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{
+				AccessToken: token,
+			},
+		)
+		tc = oauth2.NewClient(ctx, ts)
+	}
 
 	return &Client{
 		Client: github.NewClient(tc),
