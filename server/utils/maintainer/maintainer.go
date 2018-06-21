@@ -72,9 +72,6 @@ func doSync() {
 		return
 	}
 
-	mutex.Lock()
-	defer mutex.Unlock()
-
 	var newestMaintainers []string
 	doc.Find("tr").Each(func(i int, s *goquery.Selection) {
 		// First column in table's body.
@@ -84,7 +81,9 @@ func doSync() {
 		}
 	})
 
+	mutex.Lock()
 	maintainers = newestMaintainers
+	mutex.Unlock()
 
 	logrus.Infof("maintainers were successfully updated to %v", maintainers)
 }
