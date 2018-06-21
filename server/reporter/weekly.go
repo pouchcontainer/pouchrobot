@@ -27,15 +27,36 @@ import (
 
 // WeekReport contains details about elements to construct a report.
 type WeekReport struct {
-	StartDate         string
-	EndDate           string
-	Watch             int
-	Star              int
-	Fork              int
+	// time of this weekly report's start time.
+	StartDate string
+
+	// time of this weekly report's end time.
+	EndDate string
+
+	// Watch defines currently how many github users are watching this repo.
+	Watch int
+
+	// Star defines currently how many github users are staring this repo.
+	Star int
+
+	// Fork defines currently how many github users have forked this repo.
+	Fork int
+
+	// ContributorsCount defines the number of contributors.
 	ContributorsCount int
-	MergedPR          map[string][]*SimplePR
-	CountOfPR         int
-	NewContributors   []string
+
+	// MergedPR defines how many pull requests have beem merge between time StartDate and EndDate.
+	MergedPR map[string][]*SimplePR
+
+	// CountOfPR defines the number of merged pull request.
+	CountOfPR int
+
+	// NewContributors defines new contributors between time StartDate and EndDate.
+	NewContributors []string
+
+	// PRReviewsByUser defines that all pull request reviews submitted between time StartDate and EndDate.
+	// PRReviewsByUser has a type map, the key is User, Value is the number of pull reuqest reviews of single User.
+	PRReviewsByUser map[string]int
 }
 
 // SimplePR represents
@@ -51,7 +72,7 @@ func (r *Reporter) weeklyReport() error {
 		return err
 	}
 
-	issueTitle := fmt.Sprintf("Weekly Report of Pouch from %s to %s", wr.StartDate, wr.EndDate)
+	issueTitle := fmt.Sprintf("Weekly Report of PouchContainer from %s to %s", wr.StartDate, wr.EndDate)
 	issueBody := wr.String()
 
 	return r.client.CreateIssue(issueTitle, issueBody)
@@ -91,6 +112,8 @@ func (r *Reporter) constructWeekReport() (WeekReport, error) {
 	}
 
 	r.setContributorAndPRSummary(&wr, issueSearchResult)
+
+	r.CalculateReviews(&wr)
 
 	return wr, nil
 }
@@ -159,9 +182,9 @@ func (r *Reporter) setContributorAndPRSummary(wr *WeekReport, issueSearchResult 
 // String returns a string of Week Report
 func (wr *WeekReport) String() string {
 	totalStr := fmt.Sprintf(`
-# Weekly Report of Pouch
+# Weekly Report of PouchContainer
 
-This is a weekly report of Pouch. It summarizes what have changed in Pouch in the past week, including pull requests which are merged, new contributors, and more things in the future.
+This is a weekly report of PouchContainer. It summarizes what have changed in PouchContainer in the passed week, including pr merged, new contributors, and more things in the future. 
 It is all done by @pouchrobot which is an AI robot.
 
 ## Repo Update
@@ -180,7 +203,7 @@ It is all done by @pouchrobot which is an AI robot.
 	prUpdateSubStr := fmt.Sprintf(`
 ## PR Update
 
-Thanks to contributions from community, Pouch team merged %d pull requests in the Pouch repositories last week. All these pull requests could be divided into **feature**, **bugfix**, **doc**, **test** and **others**:
+Thanks to contributions from community, PouchContainer team merged %d pull requests in the PouchContainer repositories last week. All these pull requests could be divided into **feature**, **bugfix**, **doc**, **test** and **others**:
 
 `,
 		wr.CountOfPR,
@@ -211,10 +234,14 @@ Thanks to contributions from community, Pouch team merged %d pull requests in th
 	}
 	totalStr = totalStr + prUpdateSubStr
 
+	// construct code review details of the past week
+	prReviewContent := wr.getPRReviewContent()
+	totalStr += prReviewContent
+
 	// calculate new contributors of this week.
 	newContribSubstr := "## New Contributors 🎖 🎖 🎖 \n\n"
 	if len(wr.NewContributors) != 0 {
-		newContribSubstr = newContribSubstr + `It is Pouch team's great honor to have new contributors in Pouch's community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share Pouch with more people if you could. If you hope to be a contributor as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺
+		newContribSubstr = newContribSubstr + `It is PouchContainer team's great honor to have new contributors in Pouch's community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share PouchContainer with more people if you could. If you hope to be a contributor as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺
 
 Here is the list of new contributors:
 
@@ -223,8 +250,8 @@ Here is the list of new contributors:
 			newContribSubstr = newContribSubstr + fmt.Sprintf("@%s\n", contributor)
 		}
 	} else {
-		newContribSubstr = newContribSubstr + `We have no new contributors in Pouch project this week.
-Pouch team encourages everything about contribution from community.
+		newContribSubstr = newContribSubstr + `We have no new contributors in PouchContainer project this week.
+PouchContainer team encourages everything about contribution from community.
 For more details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🍻
 `
 	}
@@ -233,4 +260,44 @@ For more details, please refer to https://github.com/alibaba/pouch/blob/master/C
 	totalStr = totalStr + newContribSubstr
 
 	return totalStr
+}
+
+func (wr *WeekReport) getPRReviewContent() string {
+	header := "## Code Review Statistics 🐞 🐞 🐞 \n"
+
+	foreword := "PouchContainer encourages everyone to participant in code review, in order to improve software quality. Everyweek @pouchrobot would automatically help to count pull request reviews of single github user as the following. So, try to help review code in this project.\n\n"
+
+	tableHeader := `| Contributor ID | Pull Request Reviews |
+|:--------: | :--------:|
+`
+
+	tableContent := ""
+
+	// sort the users
+	length := len(wr.PRReviewsByUser)
+	users := make([]string, 0, length)
+	reviewNums := make([]int, 0, length)
+	for user, num := range wr.PRReviewsByUser {
+		users = append(users, user)
+		reviewNums = append(reviewNums, num)
+	}
+	for i := 0; i < length-1; i++ {
+		for j := i + 1; j < length; j++ {
+			if reviewNums[i] < reviewNums[j] {
+				reviewNums[i], reviewNums[j] = reviewNums[j], reviewNums[i]
+				users[i], users[j] = users[j], users[i]
+			}
+		}
+	}
+
+	// after sorting, construct table content via sorted data
+	for i := 0; i < length; i++ {
+		tableRow := fmt.Sprintf("|@%s|%d|\n", users[i], reviewNums[i])
+		tableContent += tableRow
+	}
+
+	tableContent += "\n\n"
+
+	wholeContent := header + foreword + tableHeader + tableContent
+	return wholeContent
 }
