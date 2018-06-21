@@ -90,6 +90,20 @@ func (c *Client) ListCommits(num int) ([]*github.RepositoryCommit, error) {
 	return commits, nil
 }
 
+// ListPRReviews lists all reviews on a pull request.
+func (c *Client) ListPRReviews(num int) ([]*github.PullRequestReview, error) {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	reviews, _, err := c.PullRequests.ListReviews(context.Background(), c.owner, c.repo, num, nil)
+	if err != nil {
+		logrus.Errorf("failed to list reviews in pull request %d: %v", num, err)
+		return nil, err
+	}
+	logrus.Debugf("succeed in listing reviews in pull request %d", num)
+	return reviews, nil
+}
+
 // CreatePR creates a brand new pull request in repo.
 func (c *Client) CreatePR(newPR *github.NewPullRequest) (*github.PullRequest, error) {
 	c.Mutex.Lock()
