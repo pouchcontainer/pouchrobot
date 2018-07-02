@@ -22,6 +22,9 @@ var CIFailureLable = "CI-failure"
 // PRConflictLabel is a label which means conflict for pull request.
 var PRConflictLabel = "conflict/needs-rebase"
 
+//PRGapLabel is a label which means gap for pull request.
+var PRGapLabel = "gap/needs-rebase"
+
 // PriorityP1Label is a lable which represent P1 priority which is highest.
 var PriorityP1Label = "priority/P1"
 
@@ -124,6 +127,18 @@ var PRConflictComment = fmt.Sprintf(
 	"ping @%s \n%s",
 	"%s",
 	PRConflictSubStr,
+)
+
+// PRGapSubStr is a substring of gap message.
+var PRGapSubStr = `We found that this PR is over 10 commits behind master.
+Please rebase the branch against master and push it back again. Thanks a lot.
+`
+
+// PRGapComment is a string used to attach comment on gap PR.
+var PRGapComment = fmt.Sprintf(
+	"ping @%s \n%s",
+	"%s",
+	PRGapSubStr,
 )
 
 // CIFailsCommentSubStr is a substring of CI failing comments
