@@ -36,7 +36,7 @@ func New(client *gh.Client) *Reporter {
 // Run starts to work on reporting things for repo.
 func (r *Reporter) Run() {
 	logrus.Infof("start to run reporter")
-	// Wait time goes to Monday.
+	// Wait time goes to Thursday.
 	for {
 		if time.Now().Weekday().String() == "Thursday" {
 			if hour, _, _ := time.Now().Clock(); hour == 8 {
