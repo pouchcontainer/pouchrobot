@@ -40,8 +40,10 @@ func New(client *gh.Client) *Fetcher {
 // Run starts periodical work
 func (f *Fetcher) Run() {
 	logrus.Info("start to run fetcher")
+
 	for {
 		f.CheckPRsConflict()
+		f.CheckPRsGap()
 		time.Sleep(FETCHINTERVAL)
 	}
 }
