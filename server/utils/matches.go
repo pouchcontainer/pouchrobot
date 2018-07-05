@@ -14,24 +14,6 @@
 
 package utils
 
-// Maintainers is a list of the maintainers,
-// TODO: this part will be auto-generated according to MAINTAINERS file in repo.
-var Maintainers = []string{
-	"allencloud",
-	"yyb196",
-	"Ace-Tang",
-	"skoo87",
-	"sunyuan3",
-	"furykerry",
-	"WIZARD-CXY",
-	"skyline09",
-	"rudyfly",
-	"houqianming",
-	"Letty5411",
-	"HusterWan",
-	"shaloulcy",
-}
-
 // TitleMatches is a map in which key is the label, and value is a slice of string
 // which can be treated as the label.
 var TitleMatches = map[string][]string{
