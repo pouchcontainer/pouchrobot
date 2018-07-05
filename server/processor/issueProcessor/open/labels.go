@@ -30,7 +30,15 @@ func ParseToGenerateLabels(issue *github.Issue) []string {
 	labels = append(labels, ParseTitleToGenerateLabels(issue)...)
 	labels = append(labels, ParseBodyToGenerateLabels(issue)...)
 
-	return utils.UniqueElementSlice(labels)
+	labels = utils.UniqueElementSlice(labels)
+
+	for _, label := range labels {
+		if specificLabels, ok := utils.SpecialIssueMatches[label]; ok {
+			return specificLabels
+		}
+	}
+
+	return labels
 }
 
 // ParseTitleToGenerateLabels parses issue title to generate a slice.

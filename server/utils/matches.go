@@ -192,3 +192,11 @@ var BodyMatches = map[string][]string{
 		"invalid memory address or nil pointer",
 	},
 }
+
+// SpecialIssueMatches is a map in which key is the label, and value is a slice of labels
+// which will be specifically attached to those issues which contain this key.
+var SpecialIssueMatches = map[string][]string{
+	"WeeklyReport": []string{
+		"WeeklyReport",
+	},
+}
