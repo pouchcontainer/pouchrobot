@@ -15,8 +15,7 @@
 package main
 
 import (
-	"github.com/pouchcontainer/pouchrobot/server"
-	"github.com/pouchcontainer/pouchrobot/server/config"
+	"github.com/pouchcontainer/pouchrobot/config"
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -28,7 +27,7 @@ func main() {
 		Use:  "",
 		Args: cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			s := server.NewServer(cfg)
+			s := NewServer(cfg)
 			logrus.Fatal(s.Run())
 		},
 	}
