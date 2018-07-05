@@ -40,7 +40,11 @@ func (f *Fetcher) CheckPRsGap() error {
 
 	for _, pr := range prs {
 		logrus.Info("start to check prs")
-		f.checkPRGap(pr)
+		go func(pr *github.PullRequest) {
+			if err := f.checkPRGap(pr); err != nil {
+				logrus.Errorf("failed to check pull request %d gap: %v", *pr.Number, err)
+			}
+		}(pr)
 	}
 	return nil
 }
