@@ -67,8 +67,6 @@ func NewServer(config config.Config) *Server {
 func (s *Server) Run() error {
 	// start fetcher, reporter and doc generator in goroutines
 	go s.fetcher.Run()
-	go s.reporter.Run()
-	go s.docGenerator.Run()
 
 	// start webserver
 	listenAddress := s.listenAddress
