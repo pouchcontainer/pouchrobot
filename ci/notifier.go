@@ -78,13 +78,13 @@ func (n *Notifier) Process(input string) error {
 			return nil
 		}
 		// add new failure comments
-		return n.addCIFaiureComments(pr, wh)
+		return n.addCIFailureComments(pr, wh)
 	}
 
 	return nil
 }
 
-func (n *Notifier) addCIFaiureComments(pr *github.PullRequest, wh Webhook) error {
+func (n *Notifier) addCIFailureComments(pr *github.PullRequest, wh Webhook) error {
 	// add a brand new one CI failure comments
 	body := fmt.Sprintf(utils.CIFailsComment, *(pr.User.Login))
 	detailsStr := fmt.Sprintf("build url: %s\nbuild duration: %ds\n", wh.BuildURL, wh.Duration)
