@@ -52,6 +52,20 @@ func (c *Client) CreateIssue(title, body string) error {
 	return nil
 }
 
+// EditIssue modify a specific issue's property in repo's issue list
+func (c *Client) EditIssue(opt *github.IssueRequest, order int) (*github.Issue, error) {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	issue, _, err := c.Client.Issues.Edit(context.Background(), c.owner, c.repo, order ,opt)
+	if err != nil {
+		logrus.Error("failed to edit issue:%v in repo %s: %v", order, c.repo, err)
+		return nil, err
+	}
+	logrus.Debugf("succeed in edit issue:%v in repo %s", order, c.repo)
+	return issue, nil
+}
+
 // GetAllLabels gets all labels of a repo, not an issue, nor a pull request
 func (c *Client) GetAllLabels() ([]*github.Label, error) {
 	c.Mutex.Lock()
