@@ -28,7 +28,7 @@ func main() {
 		Args: cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			s := NewServer(cfg)
-			logrus.Fatal(s.Run())
+			logrus.Fatal(s.Run(cfg))
 		},
 	}
 

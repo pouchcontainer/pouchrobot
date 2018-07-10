@@ -20,6 +20,7 @@ import (
 	"github.com/pouchcontainer/pouchrobot/gh"
 
 	"github.com/sirupsen/logrus"
+	"github.com/pouchcontainer/pouchrobot/config"
 )
 
 // FETCHINTERVAL refers the interval of fetch action
@@ -38,13 +39,13 @@ func New(client *gh.Client) *Fetcher {
 }
 
 // Run starts periodical work
-func (f *Fetcher) Run() {
+func (f *Fetcher) Run(config config.Config) {
 	logrus.Info("start to run fetcher")
 
 	for {
 		f.CheckPRsConflict()
 		f.CheckPRsGap()
-		f.CheckExpireIssue()
+		f.CheckExpireIssue(config)
 		time.Sleep(FETCHINTERVAL)
 	}
 }

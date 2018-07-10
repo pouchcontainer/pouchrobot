@@ -64,9 +64,9 @@ func NewServer(config config.Config) *Server {
 }
 
 // Run runs the server.
-func (s *Server) Run() error {
+func (s *Server) Run(config config.Config) error {
 	// start fetcher, reporter and doc generator in goroutines
-	go s.fetcher.Run()
+	go s.fetcher.Run(config)
 	go s.reporter.Run()
 	go s.docGenerator.Run()
 
