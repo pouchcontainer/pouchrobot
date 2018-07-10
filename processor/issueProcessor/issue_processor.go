@@ -79,6 +79,10 @@ func (ip *IssueProcessor) Process(data []byte) error {
 		if err := ip.ActToIssueLabeled(&issue); err != nil {
 			return nil
 		}
+	case "expired":
+		if err := ip.ActToIssueExpired(&issue); err != nil {
+			return nil
+		}
 	case "reopened":
 	default:
 		return fmt.Errorf("unknown action type %s in issue: ", actionType)

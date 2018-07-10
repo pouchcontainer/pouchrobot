@@ -17,6 +17,7 @@ package gh
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
@@ -118,4 +119,28 @@ func (c *Client) IssueHasComment(num int, element string) (int, bool) {
 		}
 	}
 	return -1, false
+}
+
+// CloseExpiredIssues returns true if expired thus closed
+func (c *Client) CloseExpiredIssue(num int) bool {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	ret := 0
+	comments, err := c.ListComments(num)
+	if err != nil {
+		return -1, false
+	}
+
+	now := time.Now()
+
+	d, _ := time.ParseDuration("-24h")
+	d30 := now.add(30 * d)
+
+	for _, comment := range comments {
+		if comment.UpdatedAt != nil && subres = d30.Sub(comment.UpdatedAt) && subres.Duration > 0 {
+			c.Client.Issues.CloseIssue(num)	/// FIXME: CloseComment not implemented
+		}
+	}
+	return ret
 }
