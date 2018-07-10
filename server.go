@@ -26,6 +26,7 @@ import (
 	"github.com/pouchcontainer/pouchrobot/gh"
 	"github.com/pouchcontainer/pouchrobot/processor"
 	"github.com/pouchcontainer/pouchrobot/reporter"
+	"github.com/pouchcontainer/pouchrobot/scheduler"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -48,6 +49,8 @@ type Server struct {
 	reporter *reporter.Reporter
 	// docGenerator auto generates docs for repo.
 	docGenerator *docgenerator.Generator
+	// scheduler to run some task such as close out-of-day issue
+	scheduler *scheduler.Scheduler
 }
 
 // NewServer constructs a brand new automan server
@@ -60,6 +63,7 @@ func NewServer(config config.Config) *Server {
 		ciNotifier:    ci.New(ghClient),
 		reporter:      reporter.New(ghClient),
 		docGenerator:  docgenerator.New(ghClient),
+		scheduler:     scheduler.New(ghClient, config),
 	}
 }
 
@@ -69,6 +73,7 @@ func (s *Server) Run() error {
 	go s.fetcher.Run()
 	go s.reporter.Run()
 	go s.docGenerator.Run()
+	go s.scheduler.Run()
 
 	// start webserver
 	listenAddress := s.listenAddress
