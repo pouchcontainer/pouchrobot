@@ -20,6 +20,8 @@ type Config struct {
 	Repo        string
 	HTTPListen  string
 	AccessToken string
+	Timeunit	string
+	Time        int
 }
 
 // NewConfig creates a
@@ -28,5 +30,7 @@ func NewConfig() Config {
 		Owner:      "",
 		Repo:       "",
 		HTTPListen: "",
+		Timeunit: 	"s",
+		Time:		1,
 	}
 }

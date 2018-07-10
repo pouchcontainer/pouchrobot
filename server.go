@@ -19,16 +19,16 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/pouchcontainer/pouchrobot/ci"
-	"github.com/pouchcontainer/pouchrobot/config"
-	"github.com/pouchcontainer/pouchrobot/docgenerator"
-	"github.com/pouchcontainer/pouchrobot/fetcher"
-	"github.com/pouchcontainer/pouchrobot/gh"
-	"github.com/pouchcontainer/pouchrobot/processor"
-	"github.com/pouchcontainer/pouchrobot/reporter"
-
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+
+	"github.com/pouchcontainer/pouchrobot/fetcher"
+	"github.com/pouchcontainer/pouchrobot/ci"
+	"github.com/pouchcontainer/pouchrobot/reporter"
+	"github.com/pouchcontainer/pouchrobot/docgenerator"
+	"github.com/pouchcontainer/pouchrobot/gh"
+	"github.com/pouchcontainer/pouchrobot/processor"
+	"github.com/pouchcontainer/pouchrobot/config"
 )
 
 // DefaultAddress is the default address daemon will listen to.
@@ -52,7 +52,7 @@ type Server struct {
 
 // NewServer constructs a brand new automan server
 func NewServer(config config.Config) *Server {
-	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
+	ghClient := gh.NewClient(config.Owner, config.Repo, config.Timeunit, config.Time, config.AccessToken)
 	return &Server{
 		listenAddress: config.HTTPListen,
 		processor:     processor.New(ghClient),

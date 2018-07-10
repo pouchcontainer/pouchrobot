@@ -44,6 +44,7 @@ func (f *Fetcher) Run() {
 	for {
 		f.CheckPRsConflict()
 		f.CheckPRsGap()
+		f.CheckIssue()
 		time.Sleep(FETCHINTERVAL)
 	}
 }
