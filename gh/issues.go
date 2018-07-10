@@ -16,7 +16,6 @@ package gh
 
 import (
 	"context"
-
 	"github.com/pouchcontainer/pouchrobot/utils"
 
 	"github.com/google/go-github/github"
@@ -51,7 +50,21 @@ func (c *Client) CreateIssue(title, body string) error {
 	}
 	return nil
 }
+// Remove issue
+func (c *Client) LockIssue(num int) error {
 
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	_, resp, error :=c.Authorizations.Check(context.Background(),"cb7de59bf75b5edf903f","aec551e22249dd32550585bafce3b65146e1d880")
+	if error != nil {
+		logrus.Errorf("auth faild %v", error)
+	}
+	logrus.Info("res: %v", resp)
+	if _, err := c.Issues.Lock(context.Background(), "paul-yml", "testrobot", num); err != nil {
+		logrus.Errorf("failed to create issue in repo %s: %v", num, err)
+	}
+	return nil
+}
 // GetAllLabels gets all labels of a repo, not an issue, nor a pull request
 func (c *Client) GetAllLabels() ([]*github.Label, error) {
 	c.Mutex.Lock()

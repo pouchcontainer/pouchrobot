@@ -15,10 +15,9 @@
 package main
 
 import (
-	"github.com/pouchcontainer/pouchrobot/config"
-
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/sirupsen/logrus"
+	"github.com/pouchcontainer/pouchrobot/config"
 )
 
 func main() {
@@ -33,10 +32,10 @@ func main() {
 	}
 
 	flagSet := cmdServe.Flags()
-	flagSet.StringVarP(&cfg.Owner, "owner", "o", "", "github ID to which connect in GitHub")
-	flagSet.StringVarP(&cfg.Repo, "repo", "r", "", "github repo to which connect in GitHub")
+	flagSet.StringVarP(&cfg.Owner, "owner", "o", "paul-yml", "github ID to which connect in GitHub")
+	flagSet.StringVarP(&cfg.Repo, "repo", "r", "testrobot", "github repo to which connect in GitHub")
 	flagSet.StringVarP(&cfg.HTTPListen, "listen", "l", "", "where does automan listened on")
-	flagSet.StringVarP(&cfg.AccessToken, "token", "t", "", "access token to have some control on resources")
+	flagSet.StringVarP(&cfg.AccessToken, "token", "t", "afdc4a6aef1d2bcdbdca3b3d69ac301a1095444a", "access token to have some control on resources")
 
 	cmdServe.Execute()
 }
