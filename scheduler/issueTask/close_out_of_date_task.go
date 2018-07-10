@@ -15,6 +15,8 @@
 package issueTask
 
 import (
+	"time"
+
 	"github.com/google/go-github/github"
 
 	"github.com/sirupsen/logrus"
@@ -70,6 +72,6 @@ func (it *IssueTask) CloseOutOfDateIssues(leftRetryTime int) error {
 // isOutOfDay if updateAt - createAt more than config.MaxDayOfNoActionIssue day then
 // the issue is out of day
 func (it *IssueTask) isOutOfDay(issue *github.Issue) bool {
-	timeSpan := issue.UpdatedAt.Sub(*(issue.CreatedAt))
+	timeSpan := issue.UpdatedAt.Sub(time.Now())
 	return int(timeSpan.Hours()) <= 24*it.MaxDayOfNoActionIssue
 }
