@@ -24,6 +24,7 @@ func (f *Fetcher) CheckOrphanIssue() error {
 		return err
 	}
 
+	logrus.Debugf("%v",isues)
 	// stop if all have comments
 	if len(isues) == 0 || *(isues[0].Comments) > 0{
 		logrus.Info("no orphan issue found...")
@@ -42,6 +43,12 @@ func (f *Fetcher) CheckOrphanIssue() error {
 func (f *Fetcher) closeOrphanIssue(isue *github.Issue) error {
 	// check comments
 	if *(isue.Comments) == 0 {
-		f.client.
+		s := "closed"
+		parm := &github.IssueRequest{
+			State: &s,
+		}
+		_, err := f.client.EditIssue(parm, *(isue.Number))
+		return err
 	}
+	return nil
 }
