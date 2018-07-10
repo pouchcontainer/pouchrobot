@@ -55,7 +55,7 @@ func (c *Client) LockIssue(num int) error {
 
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
-	_, resp, error :=c.Authorizations.Check(context.Background(),"cb7de59bf75b5edf903f","aec551e22249dd32550585bafce3b65146e1d880")
+	_, resp, error :=c.Authorizations.Check(context.Background(),"paul-yml","a52bd035bb0210bd173db996e96d91b7453b42da")
 	if error != nil {
 		logrus.Errorf("auth faild %v", error)
 	}

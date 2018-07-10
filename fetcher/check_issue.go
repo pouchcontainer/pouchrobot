@@ -41,37 +41,23 @@ func (f *Fetcher) CheckIssue() error {
 
 func (f *Fetcher) checkIssue(p *github.Issue) error {
 
-	// if PR can be merged to specified branch
 	now := time.Now()
-	dur, _ := time.ParseDuration("-1s")
-	checkLine := now.Add(dur)
+
+	dur, _ := time.ParseDuration("-1" + f.client.TimeUnit())
+
+	checkLine := now.Add(time.Duration(int64(f.client.Time()) * dur.Nanoseconds()))
 	close := "close"
 	if p != nil && p.GetUpdatedAt().Before(checkLine){
-		// just remove conflict label if there is one
-		// and remove conflict comments if there are some
-		logrus.Infof("No #%d issue is closed!!", *p.Number)
+		logrus.Infof("No #%d issue is closed!! time %v %s", *p.Number,f.client.Time(), f.client.TimeUnit())
 		issue := github.IssueRequest{
 			State : &close,
 		}
-		_, _, error := f.client.Issues.Edit(context.Background(), "paul-yml", "testrobot", *p.Number, &issue)
+		_, _, error := f.client.Issues.Edit(context.Background(), f.client.Owner(), f.client.Repo(), *p.Number, &issue)
 		if error != nil {
 			logrus.Error("lock error %v", error)
 		}
 		return nil
 	}
-
-	//logrus.Infof("PR %d: found conflict", *(pr.Number))
-	//// remove LGTM label if conflict happens
-	//if f.client.IssueHasLabel(*(pr.Number), "LGTM") {
-	//	f.client.RemoveLabelForIssue(*(pr.Number), "LGTM")
-	//}
-	//
-	//// attach a label and add comments
-	//if !f.client.IssueHasLabel(*(pr.Number), utils.PRConflictLabel) {
-	//	f.client.AddLabelsToIssue(*(pr.Number), []string{utils.PRConflictLabel})
-	//}
-	// attach a comment to the pr,
-	// and attach a lable confilct/need-rebase to pr
 
 	return nil
 

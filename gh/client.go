@@ -29,10 +29,12 @@ type Client struct {
 	*github.Client
 	owner string
 	repo  string
+	timeUnit string
+	time int
 }
 
 // NewClient constructs a new instance of Client.
-func NewClient(owner, repo, token string) *Client {
+func NewClient(owner, repo, timeUnit string, time int, token string) *Client {
 	var tc *http.Client
 	if token != "" {
 		ctx := context.Background()
@@ -48,6 +50,8 @@ func NewClient(owner, repo, token string) *Client {
 		Client: github.NewClient(tc),
 		owner:  owner,
 		repo:   repo,
+		timeUnit: timeUnit,
+		time: time,
 	}
 }
 
@@ -63,4 +67,18 @@ func (c *Client) Repo() string {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 	return c.repo
+}
+
+// Repo returns repo name of client.
+func (c *Client) TimeUnit() string {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	return c.timeUnit
+}
+
+// Repo returns repo name of client.
+func (c *Client) Time() int {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	return c.time
 }

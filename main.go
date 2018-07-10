@@ -35,7 +35,8 @@ func main() {
 	flagSet.StringVarP(&cfg.Owner, "owner", "o", "paul-yml", "github ID to which connect in GitHub")
 	flagSet.StringVarP(&cfg.Repo, "repo", "r", "testrobot", "github repo to which connect in GitHub")
 	flagSet.StringVarP(&cfg.HTTPListen, "listen", "l", "", "where does automan listened on")
-	flagSet.StringVarP(&cfg.AccessToken, "token", "t", "afdc4a6aef1d2bcdbdca3b3d69ac301a1095444a", "access token to have some control on resources")
-
+	flagSet.StringVarP(&cfg.AccessToken, "token", "t", "0a3417b3958a91349625ba0b5d4f4d224ff34d86", "access token to have some control on resources")
+	flagSet.StringVarP(&cfg.Timeunit, "timeunit", "u","s", "m for minute, d for day, s for second")
+	flagSet.IntVarP(&cfg.Time, "time", "n",1, "use with u, -u d -n 5 means closed issues with out update in 5 days")
 	cmdServe.Execute()
 }
