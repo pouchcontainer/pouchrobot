@@ -59,7 +59,7 @@ func (c *Client) EditIssue(opt *github.IssueRequest, order int) (*github.Issue, 
 
 	issue, _, err := c.Client.Issues.Edit(context.Background(), c.owner, c.repo, order ,opt)
 	if err != nil {
-		logrus.Error("failed to edit issue:%v in repo %s: %v", order, c.repo, err)
+		logrus.Errorf("failed to edit issue:%v in repo %s: %v", order, c.repo, err)
 		return nil, err
 	}
 	logrus.Debugf("succeed in edit issue:%v in repo %s", order, c.repo)

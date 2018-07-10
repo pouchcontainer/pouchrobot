@@ -10,14 +10,10 @@ import (
 func (f *Fetcher) CheckOrphanIssue() error {
 	logrus.Info("start to check orphan issues...")
 
-	now :=time.Now()
-	// TODO: configurable
-	var thirtyDayAgo = now.AddDate(0,0,-30)
 	opt := &github.IssueListByRepoOptions{
 		State: "open",
 		Sort: "comments",
 		Direction:"asc",
-		Since: thirtyDayAgo,
 	}
 	isues,err := f.client.GetIssues(opt)
 	if err != nil {
@@ -41,8 +37,10 @@ func (f *Fetcher) CheckOrphanIssue() error {
 
 // close specific Issue
 func (f *Fetcher) closeOrphanIssue(isue *github.Issue) error {
-	// check comments
-	if *(isue.Comments) == 0 {
+	// check condition
+	now :=time.Now()
+	var thirtyDayAgo = now.AddDate(0,0,-30)
+	if *(isue.Comments) == 0  && (*isue.CreatedAt).After(thirtyDayAgo) {
 		s := "closed"
 		parm := &github.IssueRequest{
 			State: &s,
