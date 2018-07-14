@@ -57,12 +57,12 @@ func (c *Client) EditIssue(opt *github.IssueRequest, order int) (*github.Issue, 
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	issue, _, err := c.Client.Issues.Edit(context.Background(), c.owner, c.repo, order ,opt)
+	issue, _, err := c.Client.Issues.Edit(context.Background(), c.owner, c.repo, order, opt)
 	if err != nil {
-		logrus.Errorf("failed to edit issue:%v in repo %s: %v", order, c.repo, err)
+		logrus.Errorf("failed to edit issue:%v in repo %s: %v", order, c, err)
 		return nil, err
 	}
-	logrus.Debugf("succeed in edit issue:%v in repo %s", order, c.repo)
+	logrus.Infof("succeed in edit issue:%v in repo %s", order, c.repo)
 	return issue, nil
 }
 

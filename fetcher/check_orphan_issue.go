@@ -1,8 +1,8 @@
 package fetcher
 
 import (
-	"github.com/sirupsen/logrus"
 	"github.com/google/go-github/github"
+	"github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -10,22 +10,18 @@ import (
 func (f *Fetcher) CheckOrphanIssue() error {
 	logrus.Info("start to check orphan issues...")
 
-	now :=time.Now()
-	// TODO: configurable
-	var thirtyDayAgo = now.AddDate(0,0,-30)
 	opt := &github.IssueListByRepoOptions{
-		State: "open",
-		Sort: "comments",
-		Direction:"asc",
-		Since: thirtyDayAgo,
+		State:     "open",
+		Sort:      "comments",
+		Direction: "asc",
 	}
-	isues,err := f.client.GetIssues(opt)
+	isues, err := f.client.GetIssues(opt)
 	if err != nil {
 		return err
 	}
 
 	// stop if all have comments
-	if len(isues) == 0 || *(isues[0].Comments) > 0{
+	if len(isues) == 0 || *(isues[0].Comments) > 0 {
 		logrus.Info("no orphan issue found...")
 		return nil
 	}
@@ -42,12 +38,15 @@ func (f *Fetcher) CheckOrphanIssue() error {
 func (f *Fetcher) closeOrphanIssue(isue *github.Issue) error {
 	// check comments
 	//var err error // why warn??
-	if *(isue.Comments) == 0 {
+	// TODO: configurable
+	now := time.Now()
+	var thirtyDayAgo = now.AddDate(0, 0, -30)
+	if *(isue.Comments) == 0 && (*isue.CreatedAt).Before(thirtyDayAgo) {
 		s := "closed"
 		parm := &github.IssueRequest{
 			State: &s,
 		}
-		_, err := f.client.EditIssue(parm, *(isue.ID))
+		_, err := f.client.EditIssue(parm, *(isue.Number))
 		return err
 	}
 	return nil
