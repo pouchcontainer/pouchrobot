@@ -98,6 +98,11 @@ func (r *Reporter) constructWeekReport() (WeekReport, error) {
 		return wr, err
 	}
 
+	// get contributor number of repository
+	if contributors, err := r.client.ListContributors(); err == nil {
+		wr.ContributorsCount = len(contributors)
+	}
+
 	wr.Watch = *(repo.SubscribersCount)
 	wr.Star = *(repo.StargazersCount)
 	wr.Fork = *(repo.ForksCount)
@@ -185,19 +190,18 @@ func (wr *WeekReport) String() string {
 # Weekly Report of PouchContainer
 
 This is a weekly report of PouchContainer. It summarizes what have changed in PouchContainer in the passed week, including pr merged, new contributors, and more things in the future. 
-It is all done by @pouchrobot which is an AI robot.
+It is all done by @pouchrobot which is an AI robot. See: https://github.com/pouchcontainer/pouchrobot.
 
 ## Repo Update
 
-| Type      |    Count |
-| :-------- | --------:|
-| Watch     |   %d |
-| Star      |   %d |
-| Fork      |   %d |
+|Watch|Star|Fork|Contributors|
+|:---:|:--:|:--:|:----------:|
+| %d  | %d | %d |     %d     |
 `,
 		wr.Watch,
 		wr.Star,
 		wr.Fork,
+		wr.ContributorsCount,
 	)
 
 	prUpdateSubStr := fmt.Sprintf(`
