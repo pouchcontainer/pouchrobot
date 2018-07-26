@@ -52,6 +52,21 @@ func (c *Client) CreateIssue(title, body string) error {
 	return nil
 }
 
+// CloseIssue the issue
+func (c *Client) CloseIssue(num int) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+	state := "close"
+	issueRequest := &github.IssueRequest{
+		State: &state,
+	}
+	if _, _, err := c.Issues.Edit(context.Background(), c.owner, c.repo, num, issueRequest); err != nil {
+		logrus.Errorf("failed to close issue in repo %s: %v", c.repo, err)
+		return err
+	}
+	return nil
+}
+
 // GetAllLabels gets all labels of a repo, not an issue, nor a pull request
 func (c *Client) GetAllLabels() ([]*github.Label, error) {
 	c.Mutex.Lock()

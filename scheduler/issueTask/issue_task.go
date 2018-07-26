@@ -12,26 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package config
+package issueTask
 
-// Config refers
-type Config struct {
-	Owner       string
-	Repo        string
-	HTTPListen  string
-	AccessToken string
+import (
+	"github.com/pouchcontainer/pouchrobot/gh"
+)
 
+// IssueTask is
+type IssueTask struct {
 	MaxDayOfNoActionIssue int
 	MaxRetryOfScheduler   int
-}
-
-// NewConfig creates a
-func NewConfig() Config {
-	return Config{
-		Owner:                 "",
-		Repo:                  "",
-		HTTPListen:            "",
-		MaxDayOfNoActionIssue: 30,
-		MaxRetryOfScheduler:   10,
-	}
+	Client                *gh.Client
 }
