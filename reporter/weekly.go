@@ -45,6 +45,12 @@ type WeekReport struct {
 	// ContributorsCount defines the number of contributors.
 	ContributorsCount int
 
+	// NumOfNewIssues is the issues number which are created in the last week.
+	NumOfNewIssues int
+
+	// NumOfClosedIssues is the issues number which are closed in the last week.
+	NumOfClosedIssues int
+
 	// MergedPR defines how many pull requests have beem merge between time StartDate and EndDate.
 	MergedPR map[string][]*SimplePR
 
@@ -188,30 +194,55 @@ func (r *Reporter) setContributorAndPRSummary(wr *WeekReport, issueSearchResult 
 func (wr *WeekReport) String() string {
 	totalStr := fmt.Sprintf(`
 # Weekly Report of PouchContainer
-
 This is a weekly report of PouchContainer. It summarizes what have changed in PouchContainer in the passed week, including pr merged, new contributors, and more things in the future. 
-It is all done by @pouchrobot which is an AI robot. See: https://github.com/pouchcontainer/pouchrobot.
+It is all done by @pouchrobot which is an AI robot.  See: https://github.com/pouchcontainer/pouchrobot.
+`)
 
-## Repo Update
+	// get repo update for this week
+	repoUpdateContent := wr.getRepoUpdateContent()
+	totalStr += repoUpdateContent
 
-|Watch|Star|Fork|Contributors|
-|:---:|:--:|:--:|:----------:|
-| %d  | %d | %d |     %d     |
-`,
-		wr.Watch,
-		wr.Star,
-		wr.Fork,
-		wr.ContributorsCount,
-	)
+	// get repo update for this week
+	prUpdateContent := wr.getPRUpdateContent()
+	totalStr += prUpdateContent
 
-	prUpdateSubStr := fmt.Sprintf(`
-## PR Update
+	// construct code review details of the past week
+	prReviewContent := wr.getPRReviewContent()
+	totalStr += prReviewContent
 
-Thanks to contributions from community, PouchContainer team merged %d pull requests in the PouchContainer repositories last week. All these pull requests could be divided into **feature**, **bugfix**, **doc**, **test** and **others**:
+	// calculate new contributors of this week.
+	newContributorsContent := wr.getNewContributorsContent()
+	totalStr += newContributorsContent
 
-`,
-		wr.CountOfPR,
-	)
+	return totalStr
+}
+
+func (wr *WeekReport) getRepoUpdateContent() string {
+	header := "## Repo Update \n"
+
+	foreword := ""
+
+	repoUpdate := `
+| Watch | Star | Fork | Contributors | New Issues | Closed Issues |
+|:-----:|:----:|:----:|:------------:|:----------:|:-------------:|
+`
+	repoUpdate += fmt.Sprintf("|%d|%d|%d|%d|%d|%d|\n\n", wr.Watch, wr.Star, wr.Fork, wr.ContributorsCount, wr.NumOfNewIssues, wr.NumOfClosedIssues)
+
+	wholeContent := header + foreword + repoUpdate
+	return wholeContent
+}
+
+func (wr *WeekReport) getPRUpdateContent() string {
+	header := fmt.Sprintf(`
+		## PR Update
+		
+		Thanks to contributions from community, PouchContainer team merged %d pull requests in the PouchContainer repositories last week. All these pull requests could be divided into **feature**, **bugfix**, **doc**, **test** and **others**:
+		
+		`, wr.CountOfPR)
+
+	foreword := ""
+
+	prUpdateContent := ""
 	for _, typeStr := range []string{"feature", "bugfix", "doc", "test", "others"} {
 		if len(wr.MergedPR[typeStr]) == 0 {
 			// if no this type pr merged, no related thing output.
@@ -230,40 +261,16 @@ Thanks to contributions from community, PouchContainer team merged %d pull reque
 		} else {
 			appendStr = fmt.Sprintf("### %s\n\n", typeStr)
 		}
-		prUpdateSubStr = prUpdateSubStr + appendStr
+
+		prUpdateContent += appendStr
 		for _, pr := range wr.MergedPR[typeStr] {
-			prUpdateSubStr = prUpdateSubStr + fmt.Sprintf("* %s ([#%d](%s))\n", pr.Title, pr.Num, pr.HTMLURL)
+			prUpdateContent += fmt.Sprintf("* %s ([#%d](%s))\n", pr.Title, pr.Num, pr.HTMLURL)
 		}
-		prUpdateSubStr = prUpdateSubStr + "\n"
-	}
-	totalStr = totalStr + prUpdateSubStr
-
-	// construct code review details of the past week
-	prReviewContent := wr.getPRReviewContent()
-	totalStr += prReviewContent
-
-	// calculate new contributors of this week.
-	newContribSubstr := "## New Contributors 🎖 🎖 🎖 \n\n"
-	if len(wr.NewContributors) != 0 {
-		newContribSubstr = newContribSubstr + `It is PouchContainer team's great honor to have new contributors in Pouch's community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share PouchContainer with more people if you could. If you hope to be a contributor as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺
-
-Here is the list of new contributors:
-
-`
-		for _, contributor := range wr.NewContributors {
-			newContribSubstr = newContribSubstr + fmt.Sprintf("@%s\n", contributor)
-		}
-	} else {
-		newContribSubstr = newContribSubstr + `We have no new contributors in PouchContainer project this week.
-PouchContainer team encourages everything about contribution from community.
-For more details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🍻
-`
+		prUpdateContent += "\n"
 	}
 
-	newContribSubstr = newContribSubstr + fmt.Sprintf("\n\n Thank all of you!")
-	totalStr = totalStr + newContribSubstr
-
-	return totalStr
+	wholeContent := header + foreword + prUpdateContent
+	return wholeContent
 }
 
 func (wr *WeekReport) getPRReviewContent() string {
@@ -303,5 +310,29 @@ func (wr *WeekReport) getPRReviewContent() string {
 	tableContent += "\n\n"
 
 	wholeContent := header + foreword + tableHeader + tableContent
+	return wholeContent
+}
+
+func (wr *WeekReport) getNewContributorsContent() string {
+	header := "## New Contributors 🎖 🎖 🎖 \n\n"
+
+	newContributorsContent := ""
+	if len(wr.NewContributors) != 0 {
+		newContributorsContent += `It is PouchContainer team's great honor to have new contributors in Pouch's community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share PouchContainer with more people if you could. If you hope to be a contributor as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺
+Here is the list of new contributors:
+`
+		for _, contributor := range wr.NewContributors {
+			newContributorsContent += fmt.Sprintf("@%s\n", contributor)
+		}
+	} else {
+		newContributorsContent += `We have no new contributors in PouchContainer project this week.
+PouchContainer team encourages everything about contribution from community.
+For more details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🍻
+`
+	}
+
+	newContributorsContent += fmt.Sprintf("\n\n Thank all of you!")
+
+	wholeContent := header + newContributorsContent
 	return wholeContent
 }
