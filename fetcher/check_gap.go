@@ -38,45 +38,51 @@ func (f *Fetcher) CheckPRsGap() error {
 		return err
 	}
 
-	// get master branch info
-	if err := prepareMasterEnv(); err != nil {
-		return err
-	}
-	logrus.Infof("prepare master env done")
-
-	msLogString, err := getLogInfo("master")
-	if err != nil {
-		return fmt.Errorf("failed to get master log info: %v", err)
-	}
-	logrus.Infof("get log info of master branch done")
-
 	for _, pr := range prs {
 		logrus.Info("start to check prs")
-		if err := f.checkPRGap(pr, msLogString); err != nil {
-			logrus.Errorf("failed to check pull request %d gap: %v", *pr.Number, err)
-		}
+		go func(pr *github.PullRequest) {
+			if err := f.checkPRGap(pr); err != nil {
+				logrus.Errorf("failed to check pull request %d gap: %v", *pr.Number, err)
+			}
+		}(pr)
 	}
 	return nil
 }
 
-func (f *Fetcher) checkPRGap(p *github.PullRequest, msLogString string) error {
+func (f *Fetcher) checkPRGap(p *github.PullRequest) error {
 	pr, err := f.client.GetSinglePR(*(p.Number))
 	logrus.Infof("start to check pr %d", *(p.Number))
 	if err != nil {
 		return err
 	}
 
+	// get master branch info
+	if err := prepareMasterEnv(); err != nil {
+		return err
+	}
+	logrus.Infof("prepare master env done :pr %d", *(p.Number))
+
+	msLogString, err := getLogInfo("master")
+	if err != nil {
+		return err
+	}
+	logrus.Infof("get log info done :pr %d", *(p.Number))
+
 	// get pr branch info
 	prNum := strconv.Itoa(*p.Number)
 
+	// FIXME handle the situation when failed to clean existing pr branch.
+	cleanPrBranchEnv(prNum)
+	logrus.Infof("clean exsiting branch done:pr %d", *(p.Number))
+
 	if err = preparePrBranchEnv(prNum); err != nil {
-		return fmt.Errorf("failed to prepare pr branch: %v", err)
+		return err
 	}
 	logrus.Infof("prepare pr branch env done :pr %d", *(p.Number))
 
-	prBrLogString, err := getLogInfo("new-" + prNum)
+	prBrLogString, err := getLogInfo("pr branch " + prNum)
 	if err != nil {
-		logrus.Errorf("failed to get master log info: %v", err)
+		logrus.Error(err)
 		return err
 	}
 	logrus.Infof("get pr log info done :pr %d", *(p.Number))
@@ -178,12 +184,26 @@ func preparePrBranchEnv(prNum string) error {
 		return fmt.Errorf("failed to pull pr %s: %v", prNum, err)
 	}
 
+	cmd = exec.Command("git", "checkout", "new-"+prNum)
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to checkout pr %s branch: %v", prNum, err)
+	}
+
+	return nil
+}
+
+func cleanPrBranchEnv(prNum string) error {
+	cmd := exec.Command("git", "branch", "-D", "new-"+prNum)
+	// TODO ignore not found error
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to remove existing pr %s branch %v", prNum, err)
+	}
 	return nil
 }
 
 func getLogInfo(branch string) (string, error) {
 	var Out bytes.Buffer
-	cmd := exec.Command("git", "log", branch, "--oneline")
+	cmd := exec.Command("git", "log", "--oneline")
 	cmd.Stdout = &Out
 	if err := cmd.Run(); err != nil {
 		return "", fmt.Errorf("failed to get %s log: %v", branch, err)
