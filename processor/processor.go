@@ -28,7 +28,7 @@ import (
 )
 
 type processor interface {
-	// Process processes item automan gets, and then execute operations torwards items on GitHub
+	// Process processes item robot gets, and then execute operations torwards items on GitHub
 	Process(data []byte) error
 }
 
