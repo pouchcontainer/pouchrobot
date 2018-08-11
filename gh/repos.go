@@ -36,11 +36,11 @@ func (c *Client) GetRepository() (*github.Repository, error) {
 }
 
 // ListContributors lists all contributors of a repository.
-func (c *Client) ListContributors() ([]*github.Contributor, error) {
+func (c *Client) ListContributors(opt *github.ListContributorsOptions) ([]*github.Contributor, error) {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	contributors, _, err := c.Repositories.ListContributors(context.Background(), c.owner, c.repo, &github.ListContributorsOptions{})
+	contributors, _, err := c.Repositories.ListContributors(context.Background(), c.owner, c.repo, opt)
 	if err != nil {
 		logrus.Errorf("failed to get contributors from repository c.repo %s: %v", c.repo, err)
 		return nil, err
