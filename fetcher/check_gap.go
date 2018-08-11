@@ -156,27 +156,27 @@ func (f *Fetcher) AddGapCommentToPR(pr *github.PullRequest, gap int) error {
 
 func prepareMasterEnv() error {
 	cmd := exec.Command("git", "checkout", "master")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to checkout master: %v", err)
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to checkout master: %s: %v", string(bytes), err)
 	}
 
 	cmd = exec.Command("git", "fetch", "upstream", "master")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to git fetch upstreanm master: %v", err)
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to git fetch upstreanm master: %s: %v", string(bytes), err)
 	}
 
 	cmd = exec.Command("git", "rebase", "upstream/master")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to git rebase upstreanm/master: %v", err)
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to git rebase upstreanm/master: %s: %v", string(bytes), err)
 	}
 
 	return nil
 }
 
 func preparePrBranchEnv(prNum string) error {
-	cmd := exec.Command("git", "pull", "upstream", "pull/"+prNum+"/head:"+"new-"+prNum)
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to pull pr %s: %v", prNum, err)
+	cmd := exec.Command("git", "pull", "upstream", fmt.Sprintf("pull/%s/head:new-%s", prNum, prNum))
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to pull pr %s: %s: %v", prNum, string(bytes), err)
 	}
 
 	return nil
@@ -184,18 +184,18 @@ func preparePrBranchEnv(prNum string) error {
 
 func handlePrConflict() error {
 	cmd := exec.Command("git", "reset", "--hard", "HEAD^")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to reset HEAD: %v", err)
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to reset HEAD: %v: %v", string(bytes), err)
 	}
 
 	cmd = exec.Command("git", "fetch", "upstream", "master")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to git fetch upstream master: %v", err)
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to git fetch upstream master: %v: %v", string(bytes), err)
 	}
 
 	cmd = exec.Command("git", "rebase", "upstream/master")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to git rebase upstream/master: %v", err)
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to git rebase upstream/master: %v: %v", string(bytes), err)
 	}
 
 	return nil
@@ -205,8 +205,8 @@ func getLogInfo(branch string) (string, error) {
 	var Out bytes.Buffer
 	cmd := exec.Command("git", "log", branch, "--oneline")
 	cmd.Stdout = &Out
-	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("failed to get %s log: %v", branch, err)
+	if bytes, err := cmd.CombinedOutput(); err != nil {
+		return "", fmt.Errorf("failed to get %s log: %v:%v", branch, string(bytes), err)
 	}
 
 	return Out.String(), nil
