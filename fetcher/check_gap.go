@@ -27,7 +27,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// CheckPRsGap checks that if a PR is more than 10 commits behind the branch.
+// CheckPRsGap checks that if a PR is more than fetcher.gapCommits commits behind the branch.
 func (f *Fetcher) CheckPRsGap() error {
 	logrus.Info("start to check PR's gap")
 	opt := &github.PullRequestListOptions{
@@ -84,11 +84,11 @@ func (f *Fetcher) checkPRGap(p *github.PullRequest, msLogString string) error {
 
 	gap := compareAndgetGap(msLogString, prBrLogString)
 	logrus.Infof("the gap is %d", gap)
-	if gap < 10 {
+	if gap < f.gapCommits {
 		return nil
 	}
 
-	// continue if gap between master and pr base is over 10
+	// continue if gap between master and pr base is over gapCommits
 	logrus.Infof("PR %d: found gap %d", *(pr.Number), gap)
 
 	// remove LGTM label if gap happens

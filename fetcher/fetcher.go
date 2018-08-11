@@ -22,19 +22,30 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// FETCHINTERVAL refers the interval of fetch action
-const FETCHINTERVAL = 3 * time.Minute
+// FetchInterval refers the interval of fetch action
+const FetchInterval = 3 * time.Minute
+
+// DefaultCommitGap refers default gap commit number.
+// If the PR is hehind the master branch more DefaultCommitGap commits,
+// robot would tell submitter to rebase.
+const DefaultCommitGap = 20
 
 // Fetcher is a worker to periodically get elements from github.
 type Fetcher struct {
-	client *gh.Client
+	client     *gh.Client
+	gapCommits int
 }
 
 // New initializes a brand new fetch.
-func New(client *gh.Client) *Fetcher {
-	return &Fetcher{
-		client: client,
+func New(client *gh.Client, CommitsGap int) *Fetcher {
+	fetcher := &Fetcher{
+		client:     client,
+		gapCommits: CommitsGap,
 	}
+	if CommitsGap == 0 {
+		fetcher.gapCommits = DefaultCommitGap
+	}
+	return fetcher
 }
 
 // Run starts periodical work
@@ -44,6 +55,6 @@ func (f *Fetcher) Run() {
 	for {
 		f.CheckPRsConflict()
 		f.CheckPRsGap()
-		time.Sleep(FETCHINTERVAL)
+		time.Sleep(FetchInterval)
 	}
 }

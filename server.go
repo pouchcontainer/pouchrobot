@@ -56,7 +56,7 @@ func NewServer(config config.Config) *Server {
 	return &Server{
 		listenAddress: config.HTTPListen,
 		processor:     processor.New(ghClient),
-		fetcher:       fetcher.New(ghClient),
+		fetcher:       fetcher.New(ghClient, config.CommitsGap),
 		ciNotifier:    ci.New(ghClient),
 		reporter:      reporter.New(ghClient),
 		docGenerator:  docgenerator.New(ghClient),
