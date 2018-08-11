@@ -20,6 +20,9 @@ type Config struct {
 	Repo        string
 	HTTPListen  string
 	AccessToken string
+	// Commits Gap is for fetcher to check commit gap between pr and master branch,
+	// if it is larger than CommitsGap, request to rebase this.
+	CommitsGap int
 }
 
 // NewConfig creates a
