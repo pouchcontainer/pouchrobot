@@ -50,7 +50,7 @@ type Server struct {
 	docGenerator *docgenerator.Generator
 }
 
-// NewServer constructs a brand new automan server
+// NewServer constructs a brand new robot server
 func NewServer(config config.Config) *Server {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	return &Server{

@@ -79,7 +79,7 @@ func (c *Client) RmCommentsViaStr(num int, str string) error {
 
 // RmCommentsViaStrAndAttach removes all comments contains the string str and
 // attaches a brand new commnet constructed by body.
-// In automan, many cases needs this actions to fresh the comments.
+// In this robot, many cases needs this actions to fresh the comments.
 func (c *Client) RmCommentsViaStrAndAttach(num int, str string, body string) error {
 	comments, err := c.ListComments(num)
 	if err != nil {

@@ -49,7 +49,9 @@ func (g *Generator) Run() error {
 		// Break the loop if the time passes one clock
 		// Since time zone container maybe has a delta 8 hours from Beijing Time,
 		// It is about 9 o'clock in Beijing Time.
-		if hour, _, _ := time.Now().Clock(); hour == 1 {
+		hour, _, _ := time.Now().Clock()
+		logrus.Infof("DocGenerator: now it is %s", hour)
+		if hour == 3 {
 			break
 		}
 		time.Sleep(30 * time.Minute)
@@ -64,11 +66,11 @@ func (g *Generator) Run() error {
 
 // generateDoc starts to generate all docs.
 func (g *Generator) generateDoc() error {
-	newBranch := generateNewBranch()
-	logrus.Infof("generate a new branch name %s", newBranch)
+	newBranchName := generatenewBranchNameName()
+	logrus.Infof("generate a new branch name %s", newBranchName)
 
 	// do prepare thing before cli and api doc generation.
-	if err := prepareGitEnv(newBranch); err != nil {
+	if err := prepareGitEnv(newBranchName); err != nil {
 		logrus.Errorf("failed to prepare git environment: %v", err)
 		return err
 	}
@@ -89,7 +91,7 @@ func (g *Generator) generateDoc() error {
 	}
 
 	// commit and push branch
-	if err := gitCommitAndPush(newBranch); err != nil {
+	if err := gitCommitAndPush(newBranchName); err != nil {
 		if err == ErrNothingChanged {
 			// if nothing changed, no need to submit pull request.
 			return nil
@@ -98,13 +100,13 @@ func (g *Generator) generateDoc() error {
 	}
 
 	// start to submit pull request
-	if err := g.sumbitPR(newBranch); err != nil {
+	if err := g.sumbitPR(newBranchName); err != nil {
 		return err
 	}
 	return nil
 }
 
-func prepareGitEnv(newBranch string) error {
+func prepareGitEnv(newBranchName string) error {
 	// sync latest master branch and checkout new branch
 
 	// checkout local master branch
@@ -131,16 +133,16 @@ func prepareGitEnv(newBranch string) error {
 		return fmt.Errorf("failed to git push -f origin master: %v", err)
 	}
 
-	// create a new branch named by input newBranch
+	// create a new branch named by input newBranchName
 	// the following doc generation are all on this new branch
-	cmd = exec.Command("git", "checkout", "-b", newBranch)
+	cmd = exec.Command("git", "checkout", "-b", newBranchName)
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to git checkout -b %s: %v", newBranch, err)
+		return fmt.Errorf("failed to git checkout -b %s: %v", newBranchName, err)
 	}
 	return nil
 }
 
-func gitCommitAndPush(newBranch string) error {
+func gitCommitAndPush(newBranchName string) error {
 	// git add all updated files.
 	cmd := exec.Command("git", "add", ".")
 	if err := cmd.Run(); err != nil {
@@ -166,21 +168,21 @@ func gitCommitAndPush(newBranch string) error {
 	}
 
 	// git push forcely to origin repo.
-	cmd = exec.Command("git", "push", "-f", "origin", newBranch)
+	cmd = exec.Command("git", "push", "-f", "origin", newBranchName)
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to git push -f origin %s: %v", newBranch, err)
+		return fmt.Errorf("failed to git push -f origin %s: %v", newBranchName, err)
 	}
 
 	// git branch -D to delete branch to free resources.
 	cmd = exec.Command("git", "checkout", "master")
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to git checkout master before deleting branch %s: %v", newBranch, err)
+		return fmt.Errorf("failed to git checkout master before deleting branch %s: %v", newBranchName, err)
 	}
 
 	// git branch -D to delete branch to free resources.
-	cmd = exec.Command("git", "branch", "-D", newBranch)
+	cmd = exec.Command("git", "branch", "-D", newBranchName)
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to git push branch -D %s: %v", newBranch, err)
+		return fmt.Errorf("failed to git push branch -D %s: %v", newBranchName, err)
 	}
 
 	return nil
@@ -225,7 +227,7 @@ The cli/api doc must be automatically generated.`
 	return nil
 }
 
-func generateNewBranch() string {
+func generatenewBranchNameName() string {
 	timeStr := time.Now().String()
 	dateStrSlice := strings.SplitN(timeStr, " ", 2)
 	dateStr := dateStrSlice[0]

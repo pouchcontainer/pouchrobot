@@ -35,7 +35,7 @@ func main() {
 	flagSet := cmdServe.Flags()
 	flagSet.StringVarP(&cfg.Owner, "owner", "o", "", "github ID to which connect in GitHub")
 	flagSet.StringVarP(&cfg.Repo, "repo", "r", "", "github repo to which connect in GitHub")
-	flagSet.StringVarP(&cfg.HTTPListen, "listen", "l", "", "where does automan listened on")
+	flagSet.StringVarP(&cfg.HTTPListen, "listen", "l", "", "where does robot listen on")
 	flagSet.StringVarP(&cfg.AccessToken, "token", "t", "", "access token to have some control on resources")
 	flagSet.IntVarP(&cfg.CommitsGap, "commits-gap", "cg", 20, "commits gap between pull request and master branch; if the fact is beyond this number, request to rebase")
 
