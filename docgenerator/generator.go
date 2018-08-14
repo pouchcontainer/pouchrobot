@@ -50,7 +50,7 @@ func (g *Generator) Run() error {
 		// Since time zone container maybe has a delta 8 hours from Beijing Time,
 		// It is about 9 o'clock in Beijing Time.
 		hour, _, _ := time.Now().Clock()
-		logrus.Infof("DocGenerator: now it is %s", hour)
+		logrus.Infof("DocGenerator: now it is %d", hour)
 		if hour == 3 {
 			break
 		}
