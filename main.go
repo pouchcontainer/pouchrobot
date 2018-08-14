@@ -37,7 +37,7 @@ func main() {
 	flagSet.StringVarP(&cfg.Repo, "repo", "r", "", "github repo to which connect in GitHub")
 	flagSet.StringVarP(&cfg.HTTPListen, "listen", "l", "", "where does automan listened on")
 	flagSet.StringVarP(&cfg.AccessToken, "token", "t", "", "access token to have some control on resources")
-	flagSet.IntVarP(&cfg.CommitsGap, "commits-gap", "cg", 20, "commits gap between pull request and master branch; if the fact is beyond this number, request to rebase")
+	flagSet.IntVarP(&cfg.CommitsGap, "commits-gap", "c", 20, "commits gap between pull request and master branch; if the fact is beyond this number, request to rebase")
 
 	cmdServe.Execute()
 }
