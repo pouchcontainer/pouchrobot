@@ -45,9 +45,9 @@ func (r *Reporter) Run() {
 	logrus.Infof("start to run reporter")
 	// Wait time goes to Friday.
 	for {
-		if time.Now().Weekday().String() == "Saturday" {
+		if time.Now().Weekday().String() == "Friday" {
 			hour, _, _ := time.Now().Clock()
-			logrus.Infof("now time is %s:%d", "Saturday", hour)
+			logrus.Infof("now time is %s:%d", "Friday", hour)
 			if hour == 3 {
 				break
 			}

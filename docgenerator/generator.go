@@ -51,7 +51,7 @@ func (g *Generator) Run() error {
 		// It is about 9 o'clock in Beijing Time.
 		hour, _, _ := time.Now().Clock()
 		logrus.Infof("DocGenerator: now it is %d", hour)
-		if hour == 3 {
+		if hour == 1 {
 			break
 		}
 		time.Sleep(30 * time.Minute)
