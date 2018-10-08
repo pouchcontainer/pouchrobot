@@ -1,5 +1,7 @@
 # pouchrobot
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/pouchcontainer/pouchrobot)](https://goreportcard.com/report/github.com/pouchcontainer/pouchrobot)
+
 pouchrobot is a cute robot to help collaboration in project [Pouch](https://github.com/alibaba/pouch) become better. Also there is a GitHub user [pouchrobot](https://github.com/pouchrobot) who is the exact instance of project pouchrobot.
 
 Everyone knows that collaboration of a software project is quite trivial, repeated and time-costing. If owner of a project needs to guarantee the efficiency of development and testing, or releasing, he must invest some human resources there. However, if a robot could do him a favor to automatically handle collaborating affairs, it could bring lots of convenience.
