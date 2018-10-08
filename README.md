@@ -1,5 +1,6 @@
 # pouchrobot
-
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+[![GoDoc](https://godoc.org/github.com/pouchcontainer/pouchrobot?status.svg)](https://godoc.org/github.com/pouchcontainer/pouchrobot)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pouchcontainer/pouchrobot)](https://goreportcard.com/report/github.com/pouchcontainer/pouchrobot)
 
 pouchrobot is a cute robot to help collaboration in project [Pouch](https://github.com/alibaba/pouch) become better. Also there is a GitHub user [pouchrobot](https://github.com/pouchrobot) who is the exact instance of project pouchrobot.
