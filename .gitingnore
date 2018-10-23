@@ -1,0 +1,11 @@
+pouchrobot
+*.patch
+coverage.txt
+.*.swp
+.*.swo
+.editorconfig
+.bashrc
+.idea
+.DS_Store
+bin/
+coverage/

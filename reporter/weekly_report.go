@@ -16,6 +16,12 @@ package reporter
 
 // WeekReport contains details about elements to construct a report.
 type WeekReport struct {
+	// Owner is the organization of open source project.
+	owner string
+
+	// Repo is the repository name.
+	repo string
+
 	// time of this weekly report's start time.
 	StartDate string
 

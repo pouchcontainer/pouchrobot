@@ -16,10 +16,18 @@ package config
 
 // Config refers
 type Config struct {
-	Owner       string
-	Repo        string
-	HTTPListen  string
+	// Owner is the organization of open source project.
+	Owner string
+
+	// Repo is the repository name.
+	Repo string
+
+	// HTTPListen is the tcp address the robot listens on.
+	HTTPListen string
+
+	// AccessToken is identify which github user this robot plays the role.
 	AccessToken string
+
 	// Commits Gap is for fetcher to check commit gap between pr and master branch,
 	// if it is larger than CommitsGap, request to rebase this.
 	CommitsGap int

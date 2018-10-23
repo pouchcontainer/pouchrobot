@@ -38,14 +38,19 @@ var DefaultAddress = ":6789"
 type Server struct {
 	// listenAddress is the address which is used to accepting requests.
 	listenAddress string
+
 	// processor processes webhook event from GitHub.
 	processor *processor.Processor
+
 	// fetcher does periodical work to check repo's status on GitHub.
 	fetcher *fetcher.Fetcher
+
 	// ciNotifier handles ci system webhook.
 	ciNotifier *ci.Notifier
+
 	// reporter reports weekly update of repository.
 	reporter *reporter.Reporter
+
 	// docGenerator auto generates docs for repo.
 	docGenerator *docgenerator.Generator
 }
