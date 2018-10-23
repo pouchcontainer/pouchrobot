@@ -159,4 +159,4 @@ We choose GitHub as the primary place for PouchRobot to collaborate. So the late
 * advocate PouchRobot technology beyond GitHub;
 * write blogs on PouchRobot and so on.
 
-In a word, **ANY HELP IS CONTRIBUTION.**
+In a word, **ANY HELP IS CONTRIBUTION**.

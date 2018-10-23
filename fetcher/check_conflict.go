@@ -69,7 +69,7 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 		f.client.AddLabelsToIssue(*(pr.Number), []string{utils.PRConflictLabel})
 	}
 	// attach a comment to the pr,
-	// and attach a lable confilct/need-rebase to pr
+	// and attach a lable conflict/need-rebase to pr
 
 	return f.AddConflictCommentToPR(pr)
 
