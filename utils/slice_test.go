@@ -13,3 +13,134 @@
 // limitations under the License.
 
 package utils
+
+import (
+	"reflect"
+	"testing"
+)
+
+func TestSliceContainsElement(t *testing.T) {
+	type args struct {
+		input []string
+		data  string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "normal contains",
+			args: args{
+				input: []string{"a", "b"},
+				data:  "a",
+			},
+			want: true,
+		},
+		{
+			name: "normal un-contains",
+			args: args{
+				input: []string{"a", "b"},
+				data:  "aa",
+			},
+			want: false,
+		},
+		{
+			name: "normal un-contains",
+			args: args{
+				input: []string{"a", "b"},
+				data:  "",
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SliceContainsElement(tt.args.input, tt.args.data); got != tt.want {
+				t.Errorf("SliceContainsElement() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestUniqueElementSlice(t *testing.T) {
+	type args struct {
+		data []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{
+			name: "already unique",
+			args: args{
+				data: []string{"a", "b"},
+			},
+			want: []string{"a", "b"},
+		},
+		{
+			name: "need to be unique",
+			args: args{
+				data: []string{"a", "a", "b"},
+			},
+			want: []string{"a", "b"},
+		},
+		{
+			name: "nil slice",
+			args: args{
+				data: nil,
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := UniqueElementSlice(tt.args.data); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("UniqueElementSlice() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDeltaSlice(t *testing.T) {
+	type args struct {
+		base    []string
+		compare []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := DeltaSlice(tt.args.base, tt.args.compare); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("DeltaSlice() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSliceContainsSlice(t *testing.T) {
+	type args struct {
+		old []string
+		new []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+	// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SliceContainsSlice(tt.args.old, tt.args.new); got != tt.want {
+				t.Errorf("SliceContainsSlice() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

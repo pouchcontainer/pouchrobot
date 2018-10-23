@@ -26,6 +26,10 @@ func SliceContainsElement(input []string, data string) bool {
 
 // UniqueElementSlice returns a slice with no element duplicated.
 func UniqueElementSlice(data []string) []string {
+	if data == nil {
+		return nil
+	}
+
 	dataMap := make(map[string]struct{}, len(data))
 	for _, value := range data {
 		if _, exist := dataMap[value]; !exist {
