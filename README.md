@@ -51,3 +51,5 @@ You can contribute to pouchrobot in several different ways:
 ## Copyright and License
 
 Copyright © 2017. All rights reserved.
+
+test ci
