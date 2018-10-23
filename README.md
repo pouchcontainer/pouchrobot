@@ -27,7 +27,7 @@ pouchrobot acts as a daemon process on a third-party public cloud. When running,
 
 * receive github webhook of project [Pouch](https://github.com/alibaba/pouch) when events happen;
 * receive CI system webhooks, like travisCI and circleCI;
-* fetch and deal with object on project Pouch, like issue, pull request, comments and so so;
+* fetch and deal with object on project, like issue, pull request, comments and so so;
 
 Here is the simple communication architecture of pouchrobot:
 
