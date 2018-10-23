@@ -31,6 +31,12 @@ type Config struct {
 	// Commits Gap is for fetcher to check commit gap between pr and master branch,
 	// if it is larger than CommitsGap, request to rebase this.
 	CommitsGap int
+
+	// ReportDay representing which is the weekly report generation day.
+	ReportDay string
+
+	// ReportHour representing which is the weekly report generation time on ReportDay.
+	ReportHour int
 }
 
 // NewConfig creates a

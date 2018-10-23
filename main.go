@@ -24,7 +24,7 @@ import (
 func main() {
 	var cfg config.Config
 	var cmdServe = &cobra.Command{
-		Use:  "",
+		Use:  "An collaboration robot based on AI",
 		Args: cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
 			s := NewServer(cfg)
@@ -38,6 +38,8 @@ func main() {
 	flagSet.StringVarP(&cfg.HTTPListen, "listen", "l", "", "where does robot listen on")
 	flagSet.StringVarP(&cfg.AccessToken, "token", "t", "", "access token to have some control on resources")
 	flagSet.IntVarP(&cfg.CommitsGap, "commits-gap", "c", 20, "commits gap between pull request and master branch; if the fact is beyond this number, request to rebase")
+	flagSet.StringVar(&cfg.ReportDay, "report-day", "Friday", "weekly report generation day of a week")
+	flagSet.IntVar(&cfg.ReportHour, "report-hour", 0, "weekly report generation hour on report-day")
 
 	cmdServe.Execute()
 }

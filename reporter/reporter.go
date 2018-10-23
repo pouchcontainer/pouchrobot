@@ -32,6 +32,12 @@ import (
 type Reporter struct {
 	client *gh.Client
 
+	// ReportDay representing which is the weekly report generation day.
+	ReportDay string
+
+	// ReportHour representing which is the weekly report generation time on ReportDay.
+	ReportHour int
+
 	// Owner is the organization of open source project.
 	owner string
 
@@ -42,11 +48,13 @@ type Reporter struct {
 var statsLastWeek = &StatsLastWeek{}
 
 // New initializes a brand new reporter.
-func New(client *gh.Client) *Reporter {
+func New(client *gh.Client, day string, hour int) *Reporter {
 	return &Reporter{
-		client: client,
-		owner:  client.Owner(),
-		repo:   client.Repo(),
+		client:     client,
+		owner:      client.Owner(),
+		repo:       client.Repo(),
+		ReportDay:  day,
+		ReportHour: hour,
 	}
 }
 
@@ -55,10 +63,10 @@ func (r *Reporter) Run() {
 	logrus.Infof("start to run reporter")
 	// Wait time goes to Friday.
 	for {
-		if time.Now().Weekday().String() == "Friday" {
+		if time.Now().Weekday().String() == r.ReportDay {
 			hour, _, _ := time.Now().Clock()
 			logrus.Infof("now time is %s:%d", "Friday", hour)
-			if hour == 3 {
+			if hour == r.ReportHour {
 				break
 			}
 		}
@@ -75,6 +83,7 @@ func (r *Reporter) Run() {
 }
 
 func (r *Reporter) weeklyReport() error {
+	logrus.Infof("weekly report generation is truly starting.....")
 	// first, construct weekly report data via fresh data
 	wr, err := r.constructWeekReport()
 	if err != nil {
