@@ -81,7 +81,7 @@ func (r *Reporter) weeklyReport() error {
 		return err
 	}
 
-	// after contructing weekly report, use this week data to replace stats last week
+	// after constructing weekly report, use this week data to replace stats last week
 	statsLastWeek.Contributors = wr.Contributors
 	statsLastWeek.Star = wr.Star
 	statsLastWeek.Fork = wr.Fork

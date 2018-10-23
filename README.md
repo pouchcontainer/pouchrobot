@@ -11,7 +11,7 @@ Everyone knows that collaboration of a software project is quite trivial, repeat
 
 pouchrobot could help finish lots of work in open source project on GitHub:
 
-* triage newly created issue into catagories by attaching labels;
+* triage newly created issue into categories by attaching labels;
 * triage newly submitted pull request into catagories by attaching labels;
 * auto generate weekly report for project;
 * auto generate api and commandline document;
