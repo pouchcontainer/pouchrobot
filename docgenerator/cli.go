@@ -23,6 +23,9 @@ import (
 // First, use newly built binary pouch to execute `pouch gen-doc` to generate Cli doc.
 // Second, git commit and push to github.
 // Third, use github to create a new pull request.
+//
+// FIXME: this is specific for PouchContainer
+// try to make it general.
 func (g *Generator) generateCliDoc() error {
 	// build a new pouch cli client, since all cli doc is from newly built cli.
 	cmd := exec.Command("make", "build-cli")

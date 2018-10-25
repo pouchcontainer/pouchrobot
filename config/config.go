@@ -32,18 +32,28 @@ type Config struct {
 	// if it is larger than CommitsGap, request to rebase this.
 	CommitsGap int
 
+	// For weekly reporter
+
 	// ReportDay representing which is the weekly report generation day.
 	ReportDay string
 
 	// ReportHour representing which is the weekly report generation time on ReportDay.
 	ReportHour int
+
+	// For doc generator
+
+	// RootDir specifies repo's rootdir which is to generated docs.
+	RootDir string
+
+	// SwaggerPath specifies where the swagger.yml file locates.
+	SwaggerPath string
+
+	// APIDocPath specifies where to generate the doc file corresponding to swagger.yml.
+	// this is a relative path to root dir.
+	APIDocPath string
 }
 
-// NewConfig creates a
+// NewConfig creates a brand new Config instance with default values.
 func NewConfig() Config {
-	return Config{
-		Owner:      "",
-		Repo:       "",
-		HTTPListen: "",
-	}
+	return Config{}
 }

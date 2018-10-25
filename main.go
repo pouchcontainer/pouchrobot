@@ -38,8 +38,15 @@ func main() {
 	flagSet.StringVarP(&cfg.HTTPListen, "listen", "l", "", "where does robot listen on")
 	flagSet.StringVarP(&cfg.AccessToken, "token", "t", "", "access token to have some control on resources")
 	flagSet.IntVarP(&cfg.CommitsGap, "commits-gap", "c", 20, "commits gap between pull request and master branch; if the fact is beyond this number, request to rebase")
+
+	// for weekly reporter
 	flagSet.StringVar(&cfg.ReportDay, "report-day", "Friday", "weekly report generation day of a week")
-	flagSet.IntVar(&cfg.ReportHour, "report-hour", 0, "weekly report generation hour on report-day")
+	flagSet.IntVar(&cfg.ReportHour, "report-hour", 7, "weekly report generation hour on report-day")
+
+	// for doc generator
+	flagSet.StringVar(&cfg.RootDir, "root-dir", "", "specifies repo's rootdir which is to generated docs")
+	flagSet.StringVar(&cfg.SwaggerPath, "swagger-path", "", "specifies where the swagger.yml file locates")
+	flagSet.StringVar(&cfg.APIDocPath, "api-doc-path", "", "specifies where to generate the doc file corresponding to swagger.yml")
 
 	cmdServe.Execute()
 }

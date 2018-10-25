@@ -15,20 +15,64 @@
 package docgenerator
 
 import (
-	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
+
+	"github.com/sirupsen/logrus"
 )
 
+// ContributorsFilePath identifies the contributors path in root dir.
+var ContributorsFilePath = "CONTRIBUTORS"
+
 // generateContributors will generate file CONTRIBUTORS.
-// First, use newly built binary pouch to execute `generate-conrtibutors.sh` to generate Cli doc.
-// Second, git commit and push to github.
-// Third, use github to create a new pull request.
 func (g *Generator) generateContributors() error {
 	// auto generate cli docs
-	cmd := exec.Command("/bin/bash", "-c", "/go/src/github.com/alibaba/pouch/hack/generate-contributors.sh")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to generate contributors: %v", err)
+	// cmd := exec.Command("/bin/bash", "-c", "/go/src/github.com/alibaba/pouch/hack/generate-contributors.sh")
+	// if err := cmd.Run(); err != nil {
+	//	return fmt.Errorf("failed to generate contributors: %v", err)
+	// }
+
+	f, err := os.Create(filepath.Join(g.RootDir, ContributorsFilePath))
+	if err != nil {
+		logrus.Errorf("failed to create CONTRIBUTORS file in target local repo: %v", err)
+		return err
+	}
+
+	header := GetContributorsFileHeader()
+
+	contributorsList, err := GenContributorsList()
+	if err != nil {
+		logrus.Errorf("failed to generate CONTRIBUTORS list by git log: %v", err)
+		return err
+	}
+
+	allContent := header + contributorsList
+
+	if _, err := f.Write([]byte(allContent)); err != nil {
+		logrus.Errorf("failed to write data to CONTRIBUTORS file: %v", err)
+		return err
 	}
 
 	return nil
+}
+
+// GetContributorsFileHeader will return a common header for file CONTRIBUTOR,
+// and show how to get this file.
+func GetContributorsFileHeader() string {
+	return `# This file lists all contributors having contributed to this project.
+# For how it is generated, see command "git log --format='%aN <%aE>' | sort -uf".
+
+`
+}
+
+// GenContributorsList generates the contributors list via git command.
+func GenContributorsList() (string, error) {
+	cmd := exec.Command("/bin/bash", "-c", "git log --format='%aN <%aE>' | sort -uf")
+
+	bytes, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }

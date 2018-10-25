@@ -32,12 +32,26 @@ var ErrNothingChanged = fmt.Errorf("nothing to commit")
 // Generator is a processor that periodically auto generated cli and api docs for github repo.
 type Generator struct {
 	client *gh.Client
+
+	// RootDir specifies repo's rootdir which is to generated docs.
+	RootDir string
+
+	// SwaggerPath specifies that which dir is the swagger.yml file in root dir.
+	// this is a relative path to root dir.
+	SwaggerPath string
+
+	// APIDocPath specifies where to generate the swagger tool.
+	// this is a relative path to root dir.
+	APIDocPath string
 }
 
 // New initializes a brand new doc generator
-func New(client *gh.Client) *Generator {
+func New(client *gh.Client, rootdir, swaggerPath, apiDocPath string) *Generator {
 	return &Generator{
-		client: client,
+		client:      client,
+		RootDir:     rootdir,
+		SwaggerPath: swaggerPath,
+		APIDocPath:  apiDocPath,
 	}
 }
 
