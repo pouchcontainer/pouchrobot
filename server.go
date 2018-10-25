@@ -64,7 +64,7 @@ func NewServer(config config.Config) *Server {
 		fetcher:       fetcher.New(ghClient, config.CommitsGap),
 		ciNotifier:    ci.New(ghClient),
 		reporter:      reporter.New(ghClient, config.ReportDay, config.ReportHour),
-		docGenerator:  docgenerator.New(ghClient, config.RootDir),
+		docGenerator:  docgenerator.New(ghClient, config.Owner, config.Repo, config.RootDir, config.SwaggerPath, config.APIDocPath),
 	}
 }
 
