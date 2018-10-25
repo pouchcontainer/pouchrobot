@@ -33,6 +33,12 @@ var ErrNothingChanged = fmt.Errorf("nothing to commit")
 type Generator struct {
 	client *gh.Client
 
+	// Owner is the organization of open source project.
+	owner string
+
+	// Repo is the repository name.
+	repo string
+
 	// RootDir specifies repo's rootdir which is to generated docs.
 	RootDir string
 
@@ -46,9 +52,11 @@ type Generator struct {
 }
 
 // New initializes a brand new doc generator
-func New(client *gh.Client, rootdir, swaggerPath, apiDocPath string) *Generator {
+func New(client *gh.Client, owner, repo, rootdir, swaggerPath, apiDocPath string) *Generator {
 	return &Generator{
 		client:      client,
+		owner:       owner,
+		repo:        repo,
 		RootDir:     rootdir,
 		SwaggerPath: swaggerPath,
 		APIDocPath:  apiDocPath,
@@ -203,20 +211,20 @@ func gitCommitAndPush(newBranchName string) error {
 }
 
 func (g *Generator) sumbitPR(branch string) error {
-	title := "docs: auto generate pouch cli/api docs via code"
+	title := fmt.Sprintf("docs: auto generate %s cli/api docs via code", g.repo)
 	head := fmt.Sprintf("pouchrobot:%s", branch)
 	base := "master"
 	body := `Signed-off-by: pouchrobot <pouch-dev@alibaba-inc.com>
 
 **1.Describe what this PR did**
-This PR is automatically done by AI-based collaborating robot.
+This PR is automatically done by AI-based collaborating [robot](https://github.com/pouchcontainer/pouchrobot).
 Pouchrobot will auto-generate cli/api document via https://github.com/spf13/cobra/tree/master/doc every day.
 
 **2.Does this pull request fix one issue?**
 None
 
 **3.Describe how you did it**
-First, execute command "make client" to build new pouch cli;
+First, execute command "make client" to build cli;
 Second, execute command "./pouch gen-doc" to generate new cli docs.
 
 For API part, we use a tool swagger2markup to make it.
