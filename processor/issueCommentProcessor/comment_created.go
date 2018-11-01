@@ -22,7 +22,7 @@ import (
 
 // ActToIssueCommentCreated acts to issue comment.
 // It covers the following parts:
-// assign to user if he comments `#dibs`
+// assign to user if he comments `#dibs` or `/assign`
 func (icp *IssueCommentProcessor) ActToIssueCommentCreated(issue *github.Issue, comment *github.IssueComment) error {
 	if comment.Body == nil || comment.User == nil || comment.User.Login == nil {
 		return nil
@@ -33,9 +33,9 @@ func (icp *IssueCommentProcessor) ActToIssueCommentCreated(issue *github.Issue, 
 
 	users := []string{commentUser}
 
-	if !strings.HasPrefix(strings.ToLower(commentBody), "#dibs") {
-		return nil
+	if strings.HasPrefix(strings.ToLower(commentBody), "#dibs") || strings.HasPrefix(strings.ToLower(commentBody), "/assign") {
+		return icp.Client.AssignIssueToUsers(*(issue.Number), users)
 	}
 
-	return icp.Client.AssignIssueToUsers(*(issue.Number), users)
+	return nil
 }
