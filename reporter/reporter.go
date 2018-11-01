@@ -61,6 +61,10 @@ func New(client *gh.Client, day string, hour int) *Reporter {
 // Run starts to work on reporting things for repo.
 func (r *Reporter) Run() {
 	logrus.Infof("start to run reporter")
+
+	// initialize fork, star and watch informations
+	go r.initRepoInfo(statsLastWeek)
+
 	// Wait time goes to Friday.
 	for {
 		if time.Now().Weekday().String() == r.ReportDay {
@@ -90,16 +94,16 @@ func (r *Reporter) weeklyReport() error {
 		return err
 	}
 
+	// start to post an issue which represents the weekly report, like:
+	// https://github.com/alibaba/pouch/issues/2067
+	issueTitle := fmt.Sprintf("WeeklyReport of %s from %s to %s", wr.repo, wr.StartDate, wr.EndDate)
+	issueBody := wr.String()
+
 	// after constructing weekly report, use this week data to replace stats last week
 	statsLastWeek.Contributors = wr.Contributors
 	statsLastWeek.Star = wr.Star
 	statsLastWeek.Fork = wr.Fork
 	statsLastWeek.Watch = wr.Watch
-
-	// start to post an issue which represents the weekly report, like:
-	// https://github.com/alibaba/pouch/issues/2067
-	issueTitle := fmt.Sprintf("WeeklyReport of %s from %s to %s", wr.repo, wr.StartDate, wr.EndDate)
-	issueBody := wr.String()
 
 	return r.client.CreateIssue(issueTitle, issueBody)
 }
@@ -222,156 +226,28 @@ func (r *Reporter) setContributorAndPRSummary(wr *WeekReport, issueSearchResult 
 	return
 }
 
-// String returns a string of Week Report
-func (wr *WeekReport) String() string {
-	totalStr := fmt.Sprintf(`
-# Weekly Report of %s
-
-This is a weekly report of %s. It summarizes what have changed in the project during the passed week, including pr merged, new contributors, and more things in the future. 
-It is all done by @pouchrobot which is an AI robot.  See: https://github.com/pouchcontainer/pouchrobot.
-`, wr.repo, wr.repo)
-
-	// get repo update for this week
-	repoUpdateContent := wr.getRepoUpdateContent()
-	totalStr += repoUpdateContent
-
-	// get repo update for this week
-	prUpdateContent := wr.getPRUpdateContent()
-	totalStr += prUpdateContent
-
-	// construct code review details of the past week
-	prReviewContent := wr.getPRReviewContent()
-	totalStr += prReviewContent
-
-	// calculate new contributors of this week.
-	newContributorsContent := wr.getNewContributorsContent()
-	totalStr += newContributorsContent
-
-	return totalStr
-}
-
-func (wr *WeekReport) getRepoUpdateContent() string {
-	header := "## Repo Update \n"
-
-	foreword := ""
-
-	repoUpdate := `
-| Watch | Star | Fork | Contributors | New Issues | Closed Issues |
-|:-----:|:----:|:----:|:------------:|:----------:|:-------------:|
-`
-	repoUpdate += fmt.Sprintf("|%d (↑%d)|%d (↑%d)|%d (↑%d)|%d (↑%d)|%d|%d|\n\n",
-		wr.Watch, wr.Watch-statsLastWeek.Watch,
-		wr.Star, wr.Star-statsLastWeek.Star,
-		wr.Fork, wr.Fork-statsLastWeek.Fork,
-		wr.Contributors, wr.Contributors-statsLastWeek.Contributors,
-		wr.NumOfNewIssues, wr.NumOfClosedIssues)
-
-	wholeContent := header + foreword + repoUpdate
-	return wholeContent
-}
-
-func (wr *WeekReport) getPRUpdateContent() string {
-	header := fmt.Sprintf(`
-## PR Update
-		
-Thanks to contributions from community, %s team merged **%d** pull requests in the repository last week. All these pull requests could be divided into **feature**, **bugfix**, **doc**, **test** and **others**:
-		
-`, wr.repo, wr.CountOfPR)
-
-	foreword := ""
-
-	prUpdateContent := ""
-	for _, typeStr := range []string{"feature", "bugfix", "doc", "test", "others"} {
-		if len(wr.MergedPR[typeStr]) == 0 {
-			// if no this type pr merged, no related thing output.
-			continue
-		}
-
-		var appendStr string
-		if typeStr == "feature" {
-			appendStr = fmt.Sprintf("### %s 🆕 🔫 \n\n", typeStr)
-		} else if typeStr == "bugfix" {
-			appendStr = fmt.Sprintf("### %s 🐛 🔪 \n\n", typeStr)
-		} else if typeStr == "doc" {
-			appendStr = fmt.Sprintf("### %s 📜 📝 \n\n", typeStr)
-		} else if typeStr == "test" {
-			appendStr = fmt.Sprintf("### %s ✅ ☑️ \n\n", typeStr)
-		} else {
-			appendStr = fmt.Sprintf("### %s\n\n", typeStr)
-		}
-
-		prUpdateContent += appendStr
-		for _, pr := range wr.MergedPR[typeStr] {
-			prUpdateContent += fmt.Sprintf("* %s ([#%d](%s))\n", pr.Title, pr.Num, pr.HTMLURL)
-		}
-		prUpdateContent += "\n"
+// initRepoInfo gets repo's status at the start time of robot.
+// This will leads to inaccuracy of first week.
+// But week after first one will be correct.
+func (r *Reporter) initRepoInfo(lastweek *StatsLastWeek) {
+	// get repository details
+	repo, err := r.client.GetRepository()
+	if err != nil {
+		return
 	}
 
-	wholeContent := header + foreword + prUpdateContent
-	return wholeContent
-}
-
-func (wr *WeekReport) getPRReviewContent() string {
-	header := "## Code Review Statistics 🐞 🐞 🐞 \n"
-
-	foreword := "This project encourages everyone to participant in code review, in order to improve software quality. Every week @pouchrobot would automatically help to count pull request reviews of single github user as the following. So, try to help review code in this project.\n\n"
-
-	tableHeader := `| Contributor ID | Pull Request Reviews |
-|:--------: | :--------:|
-`
-
-	tableContent := ""
-
-	// sort the users
-	length := len(wr.PRReviewsByUser)
-	users := make([]string, 0, length)
-	reviewNums := make([]int, 0, length)
-	for user, num := range wr.PRReviewsByUser {
-		users = append(users, user)
-		reviewNums = append(reviewNums, num)
+	// list contributors of repository
+	listContributorsOpt := &github.ListContributorsOptions{
+		ListOptions: github.ListOptions{
+			PerPage: 120,
+		},
 	}
-	for i := 0; i < length-1; i++ {
-		for j := i + 1; j < length; j++ {
-			if reviewNums[i] < reviewNums[j] {
-				reviewNums[i], reviewNums[j] = reviewNums[j], reviewNums[i]
-				users[i], users[j] = users[j], users[i]
-			}
-		}
+	if contributors, err := r.client.ListContributors(listContributorsOpt); err == nil {
+		lastweek.Contributors = len(contributors)
 	}
 
-	// after sorting, construct table content via sorted data
-	for i := 0; i < length; i++ {
-		tableRow := fmt.Sprintf("|@%s|%d|\n", users[i], reviewNums[i])
-		tableContent += tableRow
-	}
-
-	tableContent += "\n\n"
-
-	wholeContent := header + foreword + tableHeader + tableContent
-	return wholeContent
-}
-
-func (wr *WeekReport) getNewContributorsContent() string {
-	header := "## New Contributors 🎖 🎖 🎖 \n\n"
-
-	newContributorsContent := ""
-	if len(wr.NewContributors) != 0 {
-		newContributorsContent += fmt.Sprintf(`It is %s team's great honor to have new contributors from community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share this open source project with more people if you could. If you hope to be a contributor as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺
-Here is the list of new contributors:
-
-`, wr.repo)
-		for _, contributor := range wr.NewContributors {
-			newContributorsContent += fmt.Sprintf("@%s\n", contributor)
-		}
-	} else {
-		newContributorsContent += fmt.Sprintf(`We have no new contributors in this project this week.
-%s team encourages everything about contribution from community.
-For more details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🍻
-`, wr.repo)
-	}
-
-	newContributorsContent += fmt.Sprintf("\n\n Thank all of you!")
-
-	wholeContent := header + newContributorsContent
-	return wholeContent
+	lastweek.Watch = *(repo.SubscribersCount)
+	lastweek.Star = *(repo.StargazersCount)
+	lastweek.Fork = *(repo.ForksCount)
+	return
 }
