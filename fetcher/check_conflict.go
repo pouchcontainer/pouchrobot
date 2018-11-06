@@ -58,7 +58,7 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 		return nil
 	}
 
-	logrus.Infof("PR %d: found conflict", *(pr.Number))
+	logrus.Debugf("PR %d: found conflict", *(pr.Number))
 	// remove LGTM label if conflict happens
 	if f.client.IssueHasLabel(*(pr.Number), "LGTM") {
 		f.client.RemoveLabelForIssue(*(pr.Number), "LGTM")

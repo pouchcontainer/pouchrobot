@@ -42,7 +42,7 @@ func (f *Fetcher) CheckPRsGap() error {
 	if err := prepareMasterEnv(); err != nil {
 		return err
 	}
-	logrus.Infof("prepare master env done")
+	logrus.Debugf("prepare master env done in gap checking")
 
 	msLogString, err := getLogInfo("master")
 	if err != nil {
