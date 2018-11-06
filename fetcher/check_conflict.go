@@ -26,7 +26,7 @@ import (
 
 // CheckPRsConflict checks that if a PR is conflict with the against branch.
 func (f *Fetcher) CheckPRsConflict() error {
-	logrus.Info("start to check PR's conflict")
+	logrus.Debug("start to check PR's conflict")
 	opt := &github.PullRequestListOptions{
 		State: "open",
 	}

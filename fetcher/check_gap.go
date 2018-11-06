@@ -29,7 +29,7 @@ import (
 
 // CheckPRsGap checks that if a PR is more than fetcher.gapCommits commits behind the branch.
 func (f *Fetcher) CheckPRsGap() error {
-	logrus.Info("start to check PR's gap")
+	logrus.Debug("start to check PR's gap")
 	opt := &github.PullRequestListOptions{
 		State: "open",
 	}
