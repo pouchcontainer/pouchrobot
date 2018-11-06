@@ -26,7 +26,7 @@ import (
 
 // CheckPRsConflict checks that if a PR is conflict with the against branch.
 func (f *Fetcher) CheckPRsConflict() error {
-	logrus.Info("start to check PR's conflict")
+	logrus.Debug("start to check PR's conflict")
 	opt := &github.PullRequestListOptions{
 		State: "open",
 	}
@@ -58,7 +58,7 @@ func (f *Fetcher) checkPRConflict(p *github.PullRequest) error {
 		return nil
 	}
 
-	logrus.Infof("PR %d: found conflict", *(pr.Number))
+	logrus.Debugf("PR %d: found conflict", *(pr.Number))
 	// remove LGTM label if conflict happens
 	if f.client.IssueHasLabel(*(pr.Number), "LGTM") {
 		f.client.RemoveLabelForIssue(*(pr.Number), "LGTM")

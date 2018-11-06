@@ -29,7 +29,7 @@ import (
 
 // CheckPRsGap checks that if a PR is more than fetcher.gapCommits commits behind the branch.
 func (f *Fetcher) CheckPRsGap() error {
-	logrus.Info("start to check PR's gap")
+	logrus.Debug("start to check PR's gap")
 	opt := &github.PullRequestListOptions{
 		State: "open",
 	}
@@ -42,7 +42,7 @@ func (f *Fetcher) CheckPRsGap() error {
 	if err := prepareMasterEnv(); err != nil {
 		return err
 	}
-	logrus.Infof("prepare master env done")
+	logrus.Debugf("prepare master env done in gap checking")
 
 	msLogString, err := getLogInfo("master")
 	if err != nil {
