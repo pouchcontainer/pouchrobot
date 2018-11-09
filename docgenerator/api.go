@@ -51,8 +51,8 @@ func (g *Generator) generateAPIDoc() error {
 		swagger2markupConfig,
 	}
 	cmd := exec.Command("java", args...)
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to use swagger2markdown to generate API docs: %v", err)
+	if data, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to use swagger2markdown to generate API docs: output(%s), err(%v)", string(data), err)
 	}
 	return nil
 }
