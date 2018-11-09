@@ -29,14 +29,14 @@ import (
 func (g *Generator) generateCliDoc() error {
 	// build a new pouch cli client, since all cli doc is from newly built cli.
 	cmd := exec.Command("make", "build-cli")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to make client: %v", err)
+	if data, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to make client: output(%s), err(%v)", string(data), err)
 	}
 
 	// auto generate cli docs
 	cmd = exec.Command("./bin/pouch", "gen-doc")
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to gen doc via cobra: %v", err)
+	if data, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to gen doc via cobra: output(%s), err(%v)", string(data), err)
 	}
 
 	return nil
