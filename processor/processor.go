@@ -27,11 +27,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type processor interface {
-	// Process processes item robot gets, and then execute operations torwards items on GitHub
-	Process(data []byte) error
-}
-
 // Processor contains several specific processors
 type Processor struct {
 	IssueProcessor        *issueProcessor.IssueProcessor

@@ -35,21 +35,21 @@ var Maintainers = []string{
 // TitleMatches is a map in which key is the label, and value is a slice of string
 // which can be treated as the label.
 var TitleMatches = map[string][]string{
-	"areas/cli": []string{
+	"areas/cli": {
 		"cli:",
 		"cli :",
 		"command",
 		"command line",
 		"command-line",
 	},
-	"areas/docs": []string{
+	"areas/docs": {
 		"doc:",
 		"docs:",
 		"doc :",
 		"docs :",
 		"document",
 	},
-	"areas/log": []string{
+	"areas/log": {
 		"gelf",
 		"fluentd",
 		"journald",
@@ -57,17 +57,17 @@ var TitleMatches = map[string][]string{
 		"splunk",
 		"syslog",
 	},
-	"areas/images": []string{
+	"areas/images": {
 		"docker image",
 		"image-spec",
 		"pouch pull",
 	},
-	"areas/monitoring": []string{
+	"areas/monitoring": {
 		"monitoring",
 		"prometheus",
 		"health check",
 	},
-	"areas/network": []string{
+	"areas/network": {
 		"cni",
 		"ipvlan",
 		"ipsec",
@@ -77,29 +77,29 @@ var TitleMatches = map[string][]string{
 		"vlan",
 		"vxlan",
 	},
-	"areas/orchestration": []string{
+	"areas/orchestration": {
 		"kubernetes",
 		"marathon",
 		"mesos",
 		"swarm",
 		"swarmkit",
 	},
-	"areas/runv": []string{
+	"areas/runv": {
 		"runv",
 	},
-	"areas/storage": []string{
+	"areas/storage": {
 		"csi",
 		"storage",
 		"volume",
 	},
-	"areas/test": []string{
+	"areas/test": {
 		"ci",
 		"test",
 	},
-	"areas/typo": []string{
+	"areas/typo": {
 		"typo",
 	},
-	"kind/bug": []string{
+	"kind/bug": {
 		"bug",
 		"bugfix",
 		"cannot",
@@ -110,28 +110,28 @@ var TitleMatches = map[string][]string{
 		"failed to ",
 		"fix:",
 	},
-	"kind/design": []string{
+	"kind/design": {
 		"design",
 	},
-	"kind/feature": []string{
+	"kind/feature": {
 		"feature",
 	},
-	"kind/feature-request": []string{
+	"kind/feature-request": {
 		"feature request",
 		"feature-request",
 		"feature_request",
 	},
-	"kind/panic": []string{
+	"kind/panic": {
 		"invalid memory address or nil pointer",
 		"panic",
 	},
-	"kind/performance": []string{
+	"kind/performance": {
 		"performance",
 	},
-	"kind/proposal": []string{
+	"kind/proposal": {
 		"proposal",
 	},
-	"kind/question": []string{
+	"kind/question": {
 		"can i",
 		"can you",
 		"confusion",
@@ -140,43 +140,43 @@ var TitleMatches = map[string][]string{
 		"question",
 		"where to",
 	},
-	"kind/refactor": []string{
+	"kind/refactor": {
 		"refactor",
 	},
-	"os/windows": []string{
+	"os/windows": {
 		"windows",
 		"windows server",
 		".net",
 	},
-	"os/ubuntu": []string{
+	"os/ubuntu": {
 		"ubuntu",
 	},
-	"os/macos": []string{
+	"os/macos": {
 		"macos",
 		"osx",
 	},
-	"os/centos": []string{
+	"os/centos": {
 		"centos",
 	},
-	"os/fedora": []string{
+	"os/fedora": {
 		"fedora",
 	},
-	"os/suse": []string{
+	"os/suse": {
 		"suse",
 	},
-	"os/freebsd": []string{
+	"os/freebsd": {
 		"freebsd",
 	},
-	"priority/P1": []string{
+	"priority/P1": {
 		"panic",
 		"invalid memory address or nil pointer",
 	},
-	"DO-NOT-MERGE": []string{
+	"DO-NOT-MERGE": {
 		"do not merge",
 		"do-not-merge",
 		"don't merge",
 	},
-	"WeeklyReport": []string{
+	"WeeklyReport": {
 		"weekly report",
 		"weeklyreport",
 		"weekreport",
@@ -187,7 +187,7 @@ var TitleMatches = map[string][]string{
 // BodyMatches is a map in which key is the label, and value is a slice of string
 // which can be treated as the label.
 var BodyMatches = map[string][]string{
-	"kind/panic": []string{
+	"kind/panic": {
 		"panic",
 		"invalid memory address or nil pointer",
 	},
