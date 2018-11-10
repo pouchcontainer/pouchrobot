@@ -51,6 +51,10 @@ type Config struct {
 	// APIDocPath specifies where to generate the doc file corresponding to swagger.yml.
 	// this is a relative path to root dir.
 	APIDocPath string
+
+	// GenerationHour represents doc generation time every day.
+	// Valid range is [0, 23].
+	GenerationHour int
 }
 
 // NewConfig creates a brand new Config instance with default values.

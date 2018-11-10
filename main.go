@@ -24,10 +24,13 @@ import (
 func main() {
 	var cfg config.Config
 	var cmdServe = &cobra.Command{
-		Use:  "A AI-based collaboration robot applied to open source project",
+		Use:  "An AI-based collaboration robot applied to open source project on GitHub",
 		Args: cobra.MinimumNArgs(0),
 		Run: func(cmd *cobra.Command, args []string) {
-			s := NewServer(cfg)
+			s, err := NewServer(cfg)
+			if err != nil {
+				logrus.Fatal(err)
+			}
 			logrus.Fatal(s.Run())
 		},
 	}
@@ -49,6 +52,7 @@ func main() {
 	flagSet.StringVar(&cfg.RootDir, "root-dir", "", "specifies repo's root directory which is to generated docs")
 	flagSet.StringVar(&cfg.SwaggerPath, "swagger-path", "", "specifies where the swagger.yml file locates")
 	flagSet.StringVar(&cfg.APIDocPath, "api-doc-path", "", "specifies where to generate the doc file corresponding to swagger.yml")
+	flagSet.IntVar(&cfg.GenerationHour, "doc-generation-hour", 1, "specifies doc generation hour of every day.")
 
 	cmdServe.Execute()
 }

@@ -56,16 +56,21 @@ type Server struct {
 }
 
 // NewServer constructs a brand new robot server
-func NewServer(config config.Config) *Server {
+func NewServer(config config.Config) (*Server, error) {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
+
+	docGenerator, err := docgenerator.New(ghClient, config.Owner, config.Repo, config.RootDir, config.SwaggerPath, config.APIDocPath, config.GenerationHour)
+	if err != nil {
+		return nil, err
+	}
 	return &Server{
 		listenAddress: config.HTTPListen,
 		processor:     processor.New(ghClient),
 		fetcher:       fetcher.New(ghClient, config.CommitsGap),
 		ciNotifier:    ci.New(ghClient),
 		reporter:      reporter.New(ghClient, config.ReportDay, config.ReportHour),
-		docGenerator:  docgenerator.New(ghClient, config.Owner, config.Repo, config.RootDir, config.SwaggerPath, config.APIDocPath),
-	}
+		docGenerator:  docGenerator,
+	}, nil
 }
 
 // Run runs the server.
