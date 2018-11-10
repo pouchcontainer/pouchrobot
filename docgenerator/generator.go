@@ -122,10 +122,7 @@ func (g *Generator) generateDoc() error {
 	}
 
 	// start to submit pull request
-	if err := g.sumbitPR(newBranchName); err != nil {
-		return err
-	}
-	return nil
+	return g.sumbitPR(newBranchName)
 }
 
 func prepareGitEnv(newBranchName string) error {
