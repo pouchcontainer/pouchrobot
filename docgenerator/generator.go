@@ -49,31 +49,38 @@ type Generator struct {
 	// APIDocPath specifies where to generate the swagger tool.
 	// this is a relative path to root dir.
 	APIDocPath string
+
+	// GenerationHour represents doc generation time every day.
+	GenerationHour int
 }
 
 // New initializes a brand new doc generator
-func New(client *gh.Client, owner, repo, rootdir, swaggerPath, apiDocPath string) *Generator {
-	return &Generator{
-		client:      client,
-		owner:       owner,
-		repo:        repo,
-		RootDir:     rootdir,
-		SwaggerPath: swaggerPath,
-		APIDocPath:  apiDocPath,
+func New(client *gh.Client, owner, repo, rootdir, swaggerPath, apiDocPath string, generationHour int) (*Generator, error) {
+	if generationHour < 0 || generationHour > 23 {
+		return nil, fmt.Errorf("flag doc-generation-hour must be in range [0, 23]")
 	}
+	g := &Generator{
+		client:         client,
+		owner:          owner,
+		repo:           repo,
+		RootDir:        rootdir,
+		SwaggerPath:    swaggerPath,
+		APIDocPath:     apiDocPath,
+		GenerationHour: generationHour,
+	}
+	return g, nil
 }
 
-// Run starts periodical work
+// Run starts periodical work of doc generator.
 // currently generator generates doc every day.
 func (g *Generator) Run() error {
 	logrus.Infof("start to run doc generator")
 	for {
 		// Break the loop if the time passes one clock
-		// Since time zone container maybe has a delta 8 hours from Beijing Time,
-		// It is about 9 o'clock in Beijing Time.
+		// Since time zone container maybe has a delta 8 hours from Beijing Time.
 		hour, _, _ := time.Now().Clock()
-		logrus.Infof("DocGenerator: now it is %d", hour)
-		if hour == 1 {
+		logrus.Infof("DocGenerator: now it is %d o'clock.", hour)
+		if hour == g.GenerationHour {
 			break
 		}
 		time.Sleep(30 * time.Minute)
