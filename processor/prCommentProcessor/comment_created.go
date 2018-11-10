@@ -78,11 +78,11 @@ func isMaintainer(user string) bool {
 	return false
 }
 
-func hasLGTMInLabels(issue *github.Issue) bool {
+/*func hasLGTMInLabels(issue *github.Issue) bool {
 	for _, label := range issue.Labels {
 		if label.GetName() == "LGTM" {
 			return true
 		}
 	}
 	return false
-}
+}*/
