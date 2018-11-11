@@ -16,7 +16,7 @@ Security issues are always treated seriously. As our usual principle, we discour
 
 ## Reporting general issues
 
-To be honest, we regard every user of PouchRobot as a very kind contributor. After experiencing PouchRobot, you may have some feedback for the project. Then feel free to open an issue via [NEW ISSUE](https://github.com/alibaba/pouch/issues/new).
+To be honest, we regard every user of PouchRobot as a very kind contributor. After experiencing PouchRobot, you may have some feedback for the project. Then feel free to open an issue via [NEW ISSUE](https://github.com/pouchcontainer/pouchrobot/issues/new).
 
 Since we collaborate project PouchRobot in a distributed way, we appreciate **WELL-WRITTEN**, **DETAILED**, **EXPLICIT** issue reports. To make the communication more efficient, we wish everyone could search if your issue is an existing one in the searching list. If you find it existing, please add your details in comments under the existing issue instead of opening a brand new one.
 
@@ -92,7 +92,7 @@ Adding this, we can easily synchronize local branches with upstream branches.
 
 ### Branch Definition
 
-Right now we assume every contribution via pull request is for [branch master](https://github.com/alibaba/pouch/tree/master) in PouchRobot. Before contributing, be aware of branch definition would help a lot.
+Right now we assume every contribution via pull request is for [branch master](https://github.com/pouchcontainer/pouchrobot/master) in PouchRobot. Before contributing, be aware of branch definition would help a lot.
 
 As a contributor, keep in mind again that every contribution via pull request is for branch master. While in project PouchRobot, there are several other branches, we generally call them rc (release candidate) branches, release branches and backport branches.
 
