@@ -27,12 +27,6 @@ var ContributorsFilePath = "CONTRIBUTORS"
 
 // generateContributors will generate file CONTRIBUTORS.
 func (g *Generator) generateContributors() error {
-	// auto generate cli docs
-	// cmd := exec.Command("/bin/bash", "-c", "/go/src/github.com/alibaba/pouch/hack/generate-contributors.sh")
-	// if err := cmd.Run(); err != nil {
-	//	return fmt.Errorf("failed to generate contributors: %v", err)
-	// }
-
 	f, err := os.Create(filepath.Join(g.RootDir, ContributorsFilePath))
 	if err != nil {
 		logrus.Errorf("failed to create CONTRIBUTORS file in target local repo: %v", err)

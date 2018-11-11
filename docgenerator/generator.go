@@ -120,7 +120,7 @@ func (g *Generator) generateDoc() error {
 	}
 
 	// commit and push branch
-	if err := gitCommitAndPush(newBranchName); err != nil {
+	if err := g.gitCommitAndPush(newBranchName); err != nil {
 		if err == ErrNothingChanged {
 			// if nothing changed, no need to submit pull request.
 			return nil
@@ -168,7 +168,7 @@ func prepareGitEnv(newBranchName string) error {
 	return nil
 }
 
-func gitCommitAndPush(newBranchName string) error {
+func (g *Generator) gitCommitAndPush(newBranchName string) error {
 	// git add all updated files.
 	cmd := exec.Command("git", "add", ".")
 	if data, err := cmd.CombinedOutput(); err != nil {
@@ -188,7 +188,7 @@ func gitCommitAndPush(newBranchName string) error {
 	}
 
 	// git commit all the staged files.
-	cmd = exec.Command("git", "commit", "-s", "-m", "docs: auto generate pouch cli docs via code")
+	cmd = exec.Command("git", "commit", "-s", "-m", fmt.Sprintf("docs: auto generate %s cli/api docs via code", g.repo))
 	if data, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("failed to git commit -s -m : output(%s), err(%v)", string(data), err)
 	}
