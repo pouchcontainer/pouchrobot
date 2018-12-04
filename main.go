@@ -54,5 +54,9 @@ func main() {
 	flagSet.StringVar(&cfg.APIDocPath, "api-doc-path", "", "specifies where to generate the doc file corresponding to swagger.yml")
 	flagSet.IntVar(&cfg.GenerationHour, "doc-generation-hour", 1, "specifies doc generation hour of every day.")
 
+	// baidu translator
+	flagSet.StringVar(&cfg.BaiduTranslatorAppID, "baidu-trans-appid", "", "specifies the appid for baidu translator")
+	flagSet.StringVar(&cfg.BaiduTranslatorKey, "baidu-trans-key", "", "specifies the key for baidu translator")
+
 	cmdServe.Execute()
 }

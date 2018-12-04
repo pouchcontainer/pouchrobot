@@ -23,6 +23,7 @@ import (
 	"github.com/pouchcontainer/pouchrobot/processor/prCommentProcessor"
 	"github.com/pouchcontainer/pouchrobot/processor/pullRequestProcessor"
 	"github.com/pouchcontainer/pouchrobot/utils"
+	"github.com/pouchcontainer/pouchrobot/utils/translators"
 
 	"github.com/sirupsen/logrus"
 )
@@ -36,10 +37,11 @@ type Processor struct {
 }
 
 // New initializes a brand new processor.
-func New(client *gh.Client) *Processor {
+func New(client *gh.Client, translator translators.Translator) *Processor {
 	return &Processor{
 		IssueProcessor: &issueProcessor.IssueProcessor{
-			Client: client,
+			Client:     client,
+			Translator: translator,
 		},
 		PullRequestProcessor: &pullRequestProcessor.PullRequestProcessor{
 			Client: client,
