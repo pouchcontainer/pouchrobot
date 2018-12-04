@@ -31,7 +31,24 @@ import (
 func (ip *IssueProcessor) ActToIssueOpened(issue *github.Issue) error {
 	ip.attachLabels(issue)
 	ip.attachComments(issue)
+	ip.autoTranslate(issue)
+	return nil
+}
 
+func (ip *IssueProcessor) autoTranslate(issue *github.Issue) error {
+	translateTitle := ip.Translator.Translate(*issue.Title)
+	translateBody := ip.Translator.Translate(*issue.Body)
+	if translateTitle != "" && translateBody != "" {
+		newIssue := &github.IssueRequest{}
+		if translateTitle != "" {
+			newIssue.Title = &translateTitle
+		}
+		if translateBody != "" {
+			translateBody += "\r\n\r\n***!!!!WE STRONGLY ENCOURAGE YOU TO DESCRIBE YOUR ISSUE IN ENGLISH!!!!***\r\nTranslation service: Baidu."
+			newIssue.Body = &translateBody
+		}
+		return ip.Client.EditIssue(*issue.Number, newIssue)
+	}
 	return nil
 }
 
