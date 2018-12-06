@@ -223,3 +223,16 @@ func (c *Client) SearchIssues(query string, opt *github.SearchOptions, all bool)
 
 	return issueSearchResult, nil
 }
+
+// EditIssue edit a specific issue
+func (c *Client) EditIssue(number int, issue *github.IssueRequest) error {
+	c.Mutex.Lock()
+	defer c.Mutex.Unlock()
+
+	if _, _, err := c.Client.Issues.Edit(context.Background(), c.owner, c.repo, number, issue); err != nil {
+		logrus.Errorf("failed to edit issue %d: %v", number, err)
+		return err
+	}
+	logrus.Debugf("succeed edit issue %d", number)
+	return nil
+}

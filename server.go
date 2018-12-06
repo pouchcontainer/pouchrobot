@@ -26,6 +26,7 @@ import (
 	"github.com/pouchcontainer/pouchrobot/gh"
 	"github.com/pouchcontainer/pouchrobot/processor"
 	"github.com/pouchcontainer/pouchrobot/reporter"
+	"github.com/pouchcontainer/pouchrobot/utils/translators"
 
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
@@ -58,6 +59,10 @@ type Server struct {
 // NewServer constructs a brand new robot server
 func NewServer(config config.Config) (*Server, error) {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
+	translator := translators.NewBaiduTranslator(translators.BaiduTranslatorOptions{
+		Appid: config.BaiduTranslatorAppID,
+		Key:   config.BaiduTranslatorKey,
+	})
 
 	docGenerator, err := docgenerator.New(ghClient, config.Owner, config.Repo, config.RootDir, config.SwaggerPath, config.APIDocPath, config.GenerationHour)
 	if err != nil {
@@ -65,7 +70,7 @@ func NewServer(config config.Config) (*Server, error) {
 	}
 	return &Server{
 		listenAddress: config.HTTPListen,
-		processor:     processor.New(ghClient),
+		processor:     processor.New(ghClient, translator),
 		fetcher:       fetcher.New(ghClient, config.CommitsGap),
 		ciNotifier:    ci.New(ghClient),
 		reporter:      reporter.New(ghClient, config.ReportDay, config.ReportHour),

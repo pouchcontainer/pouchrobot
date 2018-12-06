@@ -55,6 +55,12 @@ type Config struct {
 	// GenerationHour represents doc generation time every day.
 	// Valid range is [0, 23].
 	GenerationHour int
+
+	// BaiduTranslatorAppID is the appid for baidu translator init
+	BaiduTranslatorAppID string
+
+	// BaiduTranslatorKey is the appid for baidu translator init
+	BaiduTranslatorKey string
 }
 
 // NewConfig creates a brand new Config instance with default values.

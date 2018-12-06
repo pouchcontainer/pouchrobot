@@ -20,6 +20,7 @@ import (
 	"github.com/pouchcontainer/pouchrobot/gh"
 	"github.com/pouchcontainer/pouchrobot/processor/issueProcessor/open"
 	"github.com/pouchcontainer/pouchrobot/utils"
+	"github.com/pouchcontainer/pouchrobot/utils/translators"
 
 	"github.com/google/go-github/github"
 	"github.com/sirupsen/logrus"
@@ -48,7 +49,8 @@ func init() {
 
 // IssueProcessor is
 type IssueProcessor struct {
-	Client *gh.Client
+	Client     *gh.Client
+	Translator translators.Translator
 }
 
 // Process processes
