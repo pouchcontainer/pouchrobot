@@ -29,7 +29,7 @@ Everyone knows that collaboration of a software project is quite trivial, repeat
 pouchrobot could help finish lots of work in open source project on GitHub. If we divide all these practical feature into categories, we can find the following four parts:
 
 - issue/pull request triage
-- weeklyreport auto generating via a filed issue
+- weekly report auto generating via a filed issue
 - some doc auto generation for project via pull request
 - friendly notice for pull request's status change
 
