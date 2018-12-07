@@ -14,56 +14,40 @@
 
 package config
 
-// Config refers
-type Config struct {
-	// Owner is the organization of open source project.
-	Owner string
-
-	// Repo is the repository name.
-	Repo string
-
-	// HTTPListen is the tcp address the robot listens on.
-	HTTPListen string
-
-	// AccessToken is identify which github user this robot plays the role.
-	AccessToken string
-
-	// Commits Gap is for fetcher to check commit gap between pr and master branch,
-	// if it is larger than CommitsGap, request to rebase this.
-	CommitsGap int
-
-	// For weekly reporter
-
-	// ReportDay representing which is the weekly report generation day.
-	ReportDay string
-
-	// ReportHour representing which is the weekly report generation time on ReportDay.
-	ReportHour int
-
-	// For doc generator
-
-	// RootDir specifies repo's rootdir which is to generated docs.
-	RootDir string
-
-	// SwaggerPath specifies where the swagger.yml file locates.
-	SwaggerPath string
-
-	// APIDocPath specifies where to generate the doc file corresponding to swagger.yml.
-	// this is a relative path to root dir.
-	APIDocPath string
-
-	// GenerationHour represents doc generation time every day.
-	// Valid range is [0, 23].
-	GenerationHour int
-
-	// BaiduTranslatorAppID is the appid for baidu translator init
-	BaiduTranslatorAppID string
-
-	// BaiduTranslatorKey is the appid for baidu translator init
-	BaiduTranslatorKey string
+// CmdConfig refers the start command line config needed
+type CmdConfig struct {
+	// ConfigFilePath is the path of config json file
+	ConfigFilePath string
 }
 
-// NewConfig creates a brand new Config instance with default values.
+// Config refers the config values for the project
+type Config struct {
+	// Owner is the organization of open source project.
+	Owner string `json:"owner"`
+
+	// Repo is the repository name.
+	Repo string `json:"repo"`
+
+	// HTTPListen is the tcp address the robot listens on.
+	HTTPListen string `json:"httpListen"`
+
+	// AccessToken is identify which github user this robot plays the role.
+	AccessToken string `json:"accessToken"`
+
+	// FetcherConfig is configs for fetcher module
+	FetcherConfig FetcherConfig `json:"fetcher"`
+
+	// DocGenerateConfig is configs for doc generate module
+	DocGenerateConfig DocGenerateConfig `json:"docGenerator"`
+
+	// TranslatorConfig is configs for translate module
+	TranslatorConfig TranslatorConfig `json:"translator"`
+
+	// WeeklyReportConfig is configs for weekly report module
+	WeeklyReportConfig WeeklyReportConfig `json:"weeklyReport"`
+}
+
+// NewConfig creates a brand new Config instance
 func NewConfig() Config {
 	return Config{}
 }

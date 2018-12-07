@@ -115,25 +115,14 @@ Usage:
   An AI-based collaboration robot applied to open source project on GitHub [flags]
 
 Flags:
-      --api-doc-path string       specifies where to generate the doc file corresponding to swagger.yml
-  -c, --commits-gap int           commits gap between pull request and master branch; if the fact is beyond this number, requestto rebase (default 20)
-      --doc-generation-hour int   specifies doc generation hour of every day. (default 1)
-  -h, --help                      help for An
-  -l, --listen string             where does robot listen on
-  -o, --owner string              GitHub username to which this robot connects
-  -r, --repo string               GitHub code repository to which this robot connects
-      --report-day string         weekly report generation day of a week (default "Friday")
-      --report-hour int           weekly report generation hour on report-day (default 7)
-      --root-dir string           specifies repo's root directory which is to generated docs
-      --swagger-path string       specifies where the swagger.yml file locates
-  -t, --token string              access token which identifies robot username in GitHub having write access on repo
+  -c, --config string           Config file path for robot (default "config.json")
 ```
 
 pouchrobot is totally fitable in running a container. In this repo, we can find a Dockerfile to build the corresponding image. When finishing the building, the following command could help to setup a brand new robot:
 
-> pouch run -d -v /root/newssh:/root/.ssh -p 6789:6789 pouchrobot:v1.0 pouchrobot -o alibaba -r pouch -l 0.0.0.0:6789 --token TOKEN
+> pouch run -d -v /root/newssh:/root/.ssh -v /config:/root/config -p 6789:6789 pouchrobot:v1.0 --config /root/config/config.json
 
-In which TOKEN is a github token for a specific user.
+You can make your own config file by following the format of `config_template.json` file
 
 ## Contributing
 
