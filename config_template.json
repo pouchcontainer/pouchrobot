@@ -1,0 +1,25 @@
+{
+    "owner": "%Your github owner%",
+    "repo": "%Your github repo%",
+    "httpListen": "0.0.0.0:6789",
+    "accessToken": "%Your github access token%",
+    "fetcher": {
+        "commitsGap": 20
+    },
+    "docGenerator": {
+        "rootDir": "",
+        "swaggerPath": "",
+        "APIDocPath": "",
+        "GenerationHour": 6
+    },
+    "translator": {
+        "baidu": {
+            "appID": "%Your baidu appid%",
+            "key": "%Your baidu key%"
+        }
+    },
+    "weeklyReport": {
+        "reportDay": "Friday",
+        "reportHour": 17
+    }
+}

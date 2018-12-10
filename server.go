@@ -60,20 +60,20 @@ type Server struct {
 func NewServer(config config.Config) (*Server, error) {
 	ghClient := gh.NewClient(config.Owner, config.Repo, config.AccessToken)
 	translator := translators.NewBaiduTranslator(translators.BaiduTranslatorOptions{
-		Appid: config.BaiduTranslatorAppID,
-		Key:   config.BaiduTranslatorKey,
+		Appid: config.TranslatorConfig.BaiduConfig.AppID,
+		Key:   config.TranslatorConfig.BaiduConfig.Key,
 	})
 
-	docGenerator, err := docgenerator.New(ghClient, config.Owner, config.Repo, config.RootDir, config.SwaggerPath, config.APIDocPath, config.GenerationHour)
+	docGenerator, err := docgenerator.New(ghClient, config.Owner, config.Repo, config.DocGenerateConfig.RootDir, config.DocGenerateConfig.SwaggerPath, config.DocGenerateConfig.APIDocPath, config.DocGenerateConfig.GenerationHour)
 	if err != nil {
 		return nil, err
 	}
 	return &Server{
 		listenAddress: config.HTTPListen,
 		processor:     processor.New(ghClient, translator),
-		fetcher:       fetcher.New(ghClient, config.CommitsGap),
+		fetcher:       fetcher.New(ghClient, config.FetcherConfig.CommitsGap),
 		ciNotifier:    ci.New(ghClient),
-		reporter:      reporter.New(ghClient, config.ReportDay, config.ReportHour),
+		reporter:      reporter.New(ghClient, config.WeeklyReportConfig.ReportDay, config.WeeklyReportConfig.ReportHour),
 		docGenerator:  docGenerator,
 	}, nil
 }
