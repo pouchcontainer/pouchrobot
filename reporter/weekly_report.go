@@ -221,8 +221,8 @@ Here is the list of new contributors:
 	} else {
 		newContributorsContent += fmt.Sprintf(`We have no new contributors in this project this week.
 %s team encourages everything about contribution from community.
-For more details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🍻
-`, wr.repo)
+For more details, please refer to https://github.com/%s/%s/blob/master/CONTRIBUTING.md . 🍻
+`, wr.repo, wr.owner, wr.repo)
 	}
 
 	newContributorsContent += fmt.Sprintf("\n\n Thank all of you!")
