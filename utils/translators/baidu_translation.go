@@ -26,6 +26,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/pouchcontainer/pouchrobot/utils"
+
 	"github.com/sirupsen/logrus"
 )
 
@@ -80,12 +82,15 @@ type baiduTranslateResult struct {
 
 // translate a single line for there could be mixed language which will affect language detection
 func (bt baiduTranslator) translateLine(text string) (string, error) {
+	if !utils.HasChineseChar(text) {
+		return "", nil
+	}
 	req, err := http.NewRequest("GET", "http://api.fanyi.baidu.com/api/trans/vip/translate", nil)
 	if err != nil {
 		return "", err
 	}
 
-	from := "auto"
+	from := "zh"
 	if bt.From != "" {
 		from = bt.From
 	}

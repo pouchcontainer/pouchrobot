@@ -14,7 +14,10 @@
 
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"unicode"
+)
 
 // CIFailureLable is a label which means ci failure.
 var CIFailureLable = "CI-failure"
@@ -155,3 +158,13 @@ var CIFailsComment = fmt.Sprintf(
 	"%s",
 	CIFailsCommentSubStr,
 )
+
+// HasChineseChar is function return whether str has Chinese character or not
+func HasChineseChar(str string) bool {
+	for _, r := range str {
+		if unicode.Is(unicode.Scripts["Han"], r) {
+			return true
+		}
+	}
+	return false
+}
