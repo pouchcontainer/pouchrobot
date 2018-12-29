@@ -95,7 +95,7 @@ func (prp *PullRequestProcessor) updateBodyComment(pr *github.PullRequest) error
 			return nil
 		}
 
-		body := fmt.Sprintf(utils.PRDescriptionTooShort, *(pr.User.Login))
+		body := fmt.Sprintf(utils.PRDescriptionTooShort, *(pr.User.Login), prp.Owner, prp.Repo)
 		newComment := &github.IssueComment{
 			Body: &body,
 		}

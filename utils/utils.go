@@ -37,7 +37,7 @@ var SizeLabelPrefix = "size/"
 // IssueTitleTooShortSubStr is a sub string used to construct the comment.
 var IssueTitleTooShortSubStr = `While we thought **ISSUE TITLE** could be more specific, longer than 20 chars.
 Please edit issue title instead of opening a new one.
-More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`
+More details, please refer to https://github.com/%s/%s/blob/master/CONTRIBUTING.md`
 
 // IssueTitleTooShort is a string used to construct the comment.
 var IssueTitleTooShort = fmt.Sprintf(
@@ -48,9 +48,9 @@ var IssueTitleTooShort = fmt.Sprintf(
 
 // IssueDescriptionTooShortSubStr is a sub string used to construct the comment.
 var IssueDescriptionTooShortSubStr = `While we thought **ISSUE DESCRIPTION** could be more specific, longer than 100 chars.
-Here is a template at https://github.com/alibaba/pouch/blob/master/.github/ISSUE_TEMPLATE.md
+Here is a template at https://github.com/%s/%s/blob/master/.github/ISSUE_TEMPLATE.md
 Please edit this issue description instead of opening a new one.
-More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`
+More details, please refer to https://github.com/%s/%s/blob/master/CONTRIBUTING.md`
 
 // IssueDescriptionTooShort is a string used to construct the comment.
 var IssueDescriptionTooShort = fmt.Sprintf(
@@ -62,7 +62,7 @@ var IssueDescriptionTooShort = fmt.Sprintf(
 // PRTitleTooShortSubStr is a sub string used to construct the comment.
 var PRTitleTooShortSubStr = `While we thought **PR TITLE** could be more specific, longer than 20 chars.
 Please edit this PR title instead of opening a new one.
-More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`
+More details, please refer to https://github.com/%s/%s/blob/master/CONTRIBUTING.md`
 
 // PRTitleTooShort is a string used to construct the comment.
 var PRTitleTooShort = fmt.Sprintf(
@@ -74,7 +74,7 @@ var PRTitleTooShort = fmt.Sprintf(
 // PRDescriptionTooShortSubStr is a sub string used to construct the comment.
 var PRDescriptionTooShortSubStr = `While we thought **PR Description** could be more specific, longer than 100 chars.
 Please edit this PR title instead of opening a new one.
-More details, please refer to https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md`
+More details, please refer to https://github.com/%s/%s/blob/master/CONTRIBUTING.md`
 
 // PRDescriptionTooShort is a string used to construct the comment.
 var PRDescriptionTooShort = fmt.Sprintf(
@@ -97,7 +97,7 @@ var PRNeedsSignOff = fmt.Sprintf(
 // IssueNeedP1CommentSubStr is a string used to attach comment on P1 issue.
 var IssueNeedP1CommentSubStr = `😱 This is a **priority/P1** issue which is highest.
 Seems to be severe enough.
-ping @alibaba/pouch , PTAL.
+ping @%s/%s , PTAL.
 `
 
 // IssueNeedP1Comment is a string used to attach comment on P1 issue.
@@ -109,13 +109,14 @@ var IssueNeedP1Comment = fmt.Sprintf(
 
 // FirstCommitCommentSubStr is a string which is substring of FirstCommitComment
 var FirstCommitCommentSubStr = `👏  We really appreciate it.
-Just remind that you have read the contribution guide: https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md
+Just remind that you have read the contribution guide: https://github.com/%s/%s/blob/master/CONTRIBUTING.md
 If you didn't, you should do that first. If done, welcome again and please enjoy hacking! 🍻
 `
 
 // FirstCommitComment is a comment used to thank a user's first contribution.
 var FirstCommitComment = fmt.Sprintf(
-	"We found this is your first time to contribute to Pouch, @%s \n%s",
+	"We found this is your first time to contribute to %s, @%s \n%s",
+	"%s",
 	"%s",
 	FirstCommitCommentSubStr,
 )
@@ -149,7 +150,7 @@ var CIFailsCommentSubStr = `
 CI fails according integration system.
 Please refer to the CI failure Details button to corresponding test, and update your PR to pass CI.
 
-If this is flaky test, welcome to track this with [profiling an issue](https://github.com/alibaba/pouch/issues/new).
+If this is flaky test, welcome to track this with [profiling an issue](https://github.com/%s/%s/issues/new).
 `
 
 // CIFailsComment is a string used to attach comment to CI failed PRs.

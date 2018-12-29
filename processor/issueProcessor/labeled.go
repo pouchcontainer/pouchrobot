@@ -41,7 +41,7 @@ func (ip *IssueProcessor) actToPriority(issue *github.Issue) error {
 		return nil
 	}
 
-	body := fmt.Sprintf(utils.IssueNeedP1Comment, *(issue.User.Login))
+	body := fmt.Sprintf(utils.IssueNeedP1Comment, *(issue.User.Login), ip.Owner, ip.Repo)
 	newComment := &github.IssueComment{
 		Body: &body,
 	}

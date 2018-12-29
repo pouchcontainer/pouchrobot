@@ -31,12 +31,16 @@ import (
 // and act to the messages to periodically get elements from github
 type Notifier struct {
 	client *gh.Client
+	owner  string
+	repo   string
 }
 
 // New initializes a brand new notifier
-func New(client *gh.Client) *Notifier {
+func New(client *gh.Client, owner string, repo string) *Notifier {
 	return &Notifier{
 		client: client,
+		owner:  owner,
+		repo:   repo,
 	}
 }
 
@@ -86,7 +90,7 @@ func (n *Notifier) Process(input string) error {
 
 func (n *Notifier) addCIFailureComments(pr *github.PullRequest, wh Webhook) error {
 	// add a brand new one CI failure comments
-	body := fmt.Sprintf(utils.CIFailsComment, *(pr.User.Login))
+	body := fmt.Sprintf(utils.CIFailsComment, *(pr.User.Login), n.owner, n.repo)
 	detailsStr := fmt.Sprintf("build url: %s\nbuild duration: %ds\n", wh.BuildURL, wh.Duration)
 	body = body + "\n" + detailsStr
 

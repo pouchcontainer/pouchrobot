@@ -76,7 +76,7 @@ func (ip *IssueProcessor) attachTitleComments(issue *github.Issue) error {
 	}
 
 	// attach comment
-	body := fmt.Sprintf(utils.IssueTitleTooShort, *(issue.User.Login))
+	body := fmt.Sprintf(utils.IssueTitleTooShort, *(issue.User.Login), ip.Owner, ip.Repo)
 	newComment := &github.IssueComment{
 		Body: &body,
 	}
@@ -95,7 +95,7 @@ func (ip *IssueProcessor) attachBodyComments(issue *github.Issue) error {
 	}
 
 	// attach comment
-	body := fmt.Sprintf(utils.IssueDescriptionTooShort, *(issue.User.Login))
+	body := fmt.Sprintf(utils.IssueDescriptionTooShort, *(issue.User.Login), ip.Owner, ip.Repo, ip.Owner, ip.Repo)
 	newComment := &github.IssueComment{
 		Body: &body,
 	}

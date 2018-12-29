@@ -70,9 +70,9 @@ func NewServer(config config.Config) (*Server, error) {
 	}
 	return &Server{
 		listenAddress: config.HTTPListen,
-		processor:     processor.New(ghClient, translator),
+		processor:     processor.New(ghClient, translator, config.Owner, config.Repo),
 		fetcher:       fetcher.New(ghClient, config.FetcherConfig.CommitsGap),
-		ciNotifier:    ci.New(ghClient),
+		ciNotifier:    ci.New(ghClient, config.Owner, config.Repo),
 		reporter:      reporter.New(ghClient, config.WeeklyReportConfig.ReportDay, config.WeeklyReportConfig.ReportHour),
 		docGenerator:  docGenerator,
 	}, nil

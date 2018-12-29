@@ -32,6 +32,8 @@ var (
 // PullRequestProcessor is
 type PullRequestProcessor struct {
 	Client *gh.Client
+	Owner  string
+	Repo   string
 }
 
 // Process processes pull request events
