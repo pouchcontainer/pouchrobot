@@ -37,14 +37,18 @@ type Processor struct {
 }
 
 // New initializes a brand new processor.
-func New(client *gh.Client, translator translators.Translator) *Processor {
+func New(client *gh.Client, translator translators.Translator, owner string, repo string) *Processor {
 	return &Processor{
 		IssueProcessor: &issueProcessor.IssueProcessor{
 			Client:     client,
 			Translator: translator,
+			Owner:      owner,
+			Repo:       repo,
 		},
 		PullRequestProcessor: &pullRequestProcessor.PullRequestProcessor{
 			Client: client,
+			Owner:  owner,
+			Repo:   repo,
 		},
 		IssueCommentProcessor: &issueCommentProcessor.IssueCommentProcessor{
 			Client: client,

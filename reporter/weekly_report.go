@@ -83,7 +83,7 @@ func (wr *WeekReport) String() string {
 # Weekly Report of %s
 
 This is a weekly report of %s. It summarizes what have changed in the project during the passed week, including pr merged, new contributors, and more things in the future. 
-It is all done by @pouchrobot which is an AI robot.  See: https://github.com/pouchcontainer/pouchrobot.
+It is all done by @AliGHRobot which is an AI robot.  See: https://github.com/pouchcontainer/pouchrobot.
 `, wr.repo, wr.repo)
 
 	// get repo update for this week
@@ -211,10 +211,10 @@ func (wr *WeekReport) getNewContributorsContent() string {
 
 	newContributorsContent := ""
 	if len(wr.NewContributors) != 0 {
-		newContributorsContent += fmt.Sprintf(`It is %s team's great honor to have new contributors from community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share this open source project with more people if you could. If you hope to be a contributor as well, please start from https://github.com/alibaba/pouch/blob/master/CONTRIBUTING.md . 🎁 👏 🍺
+		newContributorsContent += fmt.Sprintf(`It is %s team's great honor to have new contributors from community. We really appreciate your contributions. Feel free to tell us if you have any opinion and please share this open source project with more people if you could. If you hope to be a contributor as well, please start from https://github.com/%s/%s/blob/master/CONTRIBUTING.md . 🎁 👏 🍺
 Here is the list of new contributors:
 
-`, wr.repo)
+`, wr.repo, wr.owner, wr.repo)
 		for _, contributor := range wr.NewContributors {
 			newContributorsContent += fmt.Sprintf("@%s\n", contributor)
 		}

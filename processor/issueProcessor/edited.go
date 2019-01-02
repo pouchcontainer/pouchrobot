@@ -53,7 +53,7 @@ func (fIP *IssueProcessor) ActToIssueEdited(issue *github.Issue) error {
 
 	// check if the title is too short or the body empty.
 	if issue.Title == nil || len(*(issue.Title)) < 20 {
-		body := fmt.Sprintf(utils.IssueTitleTooShort, *(issue.User.Login))
+		body := fmt.Sprintf(utils.IssueTitleTooShort, *(issue.User.Login), fIP.Owner, fIP.Repo)
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
 			return err
@@ -67,7 +67,7 @@ func (fIP *IssueProcessor) ActToIssueEdited(issue *github.Issue) error {
 	}
 
 	if issue.Body == nil || len(*(issue.Body)) < 50 {
-		body := fmt.Sprintf(utils.IssueDescriptionTooShort, *(issue.User.Login))
+		body := fmt.Sprintf(utils.IssueDescriptionTooShort, *(issue.User.Login), fIP.Owner, fIP.Repo, fIP.Owner, fIP.Repo)
 		newComment.Body = &body
 		if err := fIP.Client.AddCommentToIssue(*(issue.Number), newComment); err != nil {
 			return err

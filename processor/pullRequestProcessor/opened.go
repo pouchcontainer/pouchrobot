@@ -62,7 +62,7 @@ func (prp *PullRequestProcessor) attachTitleComments(pr *github.PullRequest) err
 	}
 
 	// attach comment
-	body := fmt.Sprintf(utils.PRTitleTooShort, *(pr.User.Login))
+	body := fmt.Sprintf(utils.PRTitleTooShort, *(pr.User.Login), prp.Owner, prp.Repo)
 	newComment := &github.IssueComment{
 		Body: &body,
 	}
@@ -75,7 +75,7 @@ func (prp *PullRequestProcessor) attachBodyComments(pr *github.PullRequest) erro
 		return nil
 	}
 
-	body := fmt.Sprintf(utils.PRDescriptionTooShort, *(pr.User.Login))
+	body := fmt.Sprintf(utils.PRDescriptionTooShort, *(pr.User.Login), prp.Owner, prp.Repo)
 	newComment := &github.IssueComment{
 		Body: &body,
 	}
@@ -130,7 +130,7 @@ func (prp *PullRequestProcessor) attachFirstContributionComments(pullRequest *gi
 	}
 
 	// generate PR comment body
-	body := fmt.Sprintf(utils.FirstCommitComment, *(pr.User.Login))
+	body := fmt.Sprintf(utils.FirstCommitComment, prp.Repo, *(pr.User.Login), prp.Owner, prp.Repo)
 	newComment := &github.IssueComment{
 		Body: &body,
 	}

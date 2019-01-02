@@ -51,6 +51,8 @@ func init() {
 type IssueProcessor struct {
 	Client     *gh.Client
 	Translator translators.Translator
+	Owner      string
+	Repo       string
 }
 
 // Process processes
