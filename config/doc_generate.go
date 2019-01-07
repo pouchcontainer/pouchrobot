@@ -29,4 +29,8 @@ type DocGenerateConfig struct {
 	// GenerationHour represents doc generation time every day.
 	// Valid range is [0, 23].
 	GenerationHour int `json:"generationHour"`
+
+	// CliDocGeneratorCmd represents the command users input to generate cli
+	// related document.
+	CliDocGeneratorCmd string
 }

@@ -23,20 +23,12 @@ import (
 // First, use newly built binary to execute `binary gen-doc` to generate Cli doc.
 // Second, git commit and push to github.
 // Third, use github to create a new pull request.
-//
-// FIXME: this is specific for PouchContainer
-// try to make it general.
 func (g *Generator) generateCliDoc() error {
-	// build a new binary cli client, since all cli doc is from newly built cli.
-	cmd := exec.Command("make", "build-cli")
+	// We execute the user input cli document generation command which is stored
+	// in Generator.CliDocGeneratorCmd
+	cmd := exec.Command("bash", "-c", g.CliDocGeneratorCmd)
 	if data, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to make client: output(%s), err(%v)", string(data), err)
-	}
-
-	// auto generate cli docs
-	cmd = exec.Command("./bin/pouch", "gen-doc")
-	if data, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to gen doc via cobra: output(%s), err(%v)", string(data), err)
+		return fmt.Errorf("failed to generate cli document via command(%s): output(%s), err(%v)", g.CliDocGeneratorCmd, string(data), err)
 	}
 
 	return nil
