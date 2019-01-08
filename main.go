@@ -18,10 +18,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/pouchcontainer/pouchrobot/config"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-
-	"github.com/pouchcontainer/pouchrobot/config"
 )
 
 func main() {
@@ -33,19 +33,18 @@ func main() {
 			configContent, err := ioutil.ReadFile(cmdCfg.ConfigFilePath)
 			if err != nil {
 				logrus.Fatal(err)
-				return
 			}
+
 			var cfg config.Config
-			err = json.Unmarshal(configContent, &cfg)
-			if err != nil {
+			if err := json.Unmarshal(configContent, &cfg); err != nil {
 				logrus.Fatal(err)
-				return
 			}
+
 			s, err := NewServer(cfg)
 			if err != nil {
 				logrus.Fatal(err)
-				return
 			}
+
 			logrus.Fatal(s.Run())
 		},
 	}

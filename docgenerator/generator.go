@@ -52,21 +52,30 @@ type Generator struct {
 
 	// GenerationHour represents doc generation time every day.
 	GenerationHour int
+
+	// CliDocGeneratorCmd represents the command users input to generate cli
+	// related document.
+	CliDocGeneratorCmd string
 }
 
 // New initializes a brand new doc generator
-func New(client *gh.Client, owner, repo, rootdir, swaggerPath, apiDocPath string, generationHour int) (*Generator, error) {
+func New(client *gh.Client,
+	owner, repo string,
+	rootdir, swaggerPath, apiDocPath string,
+	generationHour int,
+	cliDocGeneratorCmd string) (*Generator, error) {
 	if generationHour < 0 || generationHour > 23 {
 		return nil, fmt.Errorf("flag doc-generation-hour must be in range [0, 23]")
 	}
 	g := &Generator{
-		client:         client,
-		owner:          owner,
-		repo:           repo,
-		RootDir:        rootdir,
-		SwaggerPath:    swaggerPath,
-		APIDocPath:     apiDocPath,
-		GenerationHour: generationHour,
+		client:             client,
+		owner:              owner,
+		repo:               repo,
+		RootDir:            rootdir,
+		SwaggerPath:        swaggerPath,
+		APIDocPath:         apiDocPath,
+		GenerationHour:     generationHour,
+		CliDocGeneratorCmd: cliDocGeneratorCmd,
 	}
 	return g, nil
 }
@@ -215,10 +224,10 @@ func (g *Generator) gitCommitAndPush(newBranchName string) error {
 }
 
 func (g *Generator) sumbitPR(branch string) error {
-	title := fmt.Sprintf("docs: auto generate %s cli/api docs via code", g.repo)
+	title := fmt.Sprintf("docs: auto generate %s cli/api/contributors docs via code", g.repo)
 	head := fmt.Sprintf("pouchrobot:%s", branch)
 	base := "master"
-	body := `Signed-off-by: pouchrobot <pouch-dev@alibaba-inc.com>
+	body := fmt.Sprintf(`Signed-off-by: pouchrobot <pouch-dev@alibaba-inc.com>
 
 **1.Describe what this PR did**
 This PR is automatically done by AI-based collaborating [robot](https://github.com/pouchcontainer/pouchrobot).
@@ -228,8 +237,8 @@ Pouchrobot will auto-generate cli/api document via https://github.com/spf13/cobr
 None
 
 **3.Describe how you did it**
-First, execute command "make client" to build cli;
-Second, execute command "./pouch gen-doc" to generate new cli docs.
+We use the following user input CLI document generating command in pouchrobot to generate CLI doc: 
+%s
 
 For API part, we use a tool swagger2markup to make it.
 
@@ -237,7 +246,9 @@ For API part, we use a tool swagger2markup to make it.
 None
 
 **5.Special notes for reviews**
-The cli/api doc must be automatically generated.`
+The cli/api doc must be automatically generated.`,
+		g.CliDocGeneratorCmd,
+	)
 
 	newPR := &github.NewPullRequest{
 		Title: &title,

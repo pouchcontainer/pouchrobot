@@ -10,7 +10,8 @@
         "rootDir": "",
         "swaggerPath": "",
         "APIDocPath": "",
-        "GenerationHour": 6
+        "GenerationHour": 6,
+        "CliDocGeneratorCmd": "make build-cli & ./bin/pouch gen-doc"
     },
     "translator": {
         "baidu": {

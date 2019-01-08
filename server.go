@@ -64,7 +64,12 @@ func NewServer(config config.Config) (*Server, error) {
 		Key:   config.TranslatorConfig.BaiduConfig.Key,
 	})
 
-	docGenerator, err := docgenerator.New(ghClient, config.Owner, config.Repo, config.DocGenerateConfig.RootDir, config.DocGenerateConfig.SwaggerPath, config.DocGenerateConfig.APIDocPath, config.DocGenerateConfig.GenerationHour)
+	docGenerator, err := docgenerator.New(ghClient,
+		config.Owner, config.Repo,
+		config.DocGenerateConfig.RootDir, config.DocGenerateConfig.SwaggerPath, config.DocGenerateConfig.APIDocPath,
+		config.DocGenerateConfig.GenerationHour,
+		config.DocGenerateConfig.CliDocGeneratorCmd,
+	)
 	if err != nil {
 		return nil, err
 	}
