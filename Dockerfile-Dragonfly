@@ -34,13 +34,13 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 # try to skip StrictHostKeyChecking when executing git
 RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 
-RUN mkdir -p /go/src/github.com/alibaba \
-    && cd /go/src/github.com/alibaba \
+RUN mkdir -p /go/src/github.com/dragonflyoss \
+    && cd /go/src/github.com/dragonflyoss \
     && git clone https://github.com/pouchrobot/Dragonfly.git \
     && cd Dragonfly \
     && git remote remove origin \
     && git remote add origin git@github.com:pouchrobot/Dragonfly.git \
-    && git remote add upstream https://github.com/alibaba/Dragonfly.git \
+    && git remote add upstream https://github.com/dragonflyoss/Dragonfly.git \
     && git config user.name "pouchrobot" \ 
     && git config user.email "pouch-dev@list.alibaba-inc.com"
 
@@ -48,6 +48,8 @@ EXPOSE 6789
 
 COPY . /go/src/github.com/pouchcontainer/pouchrobot
 
-RUN go get github.com/pouchcontainer/pouchrobot
+RUN cd /go/src/github.com/pouchcontainer/pouchrobot \
+    && go build \
+    && mv pouchrobot /usr/local/bin/pouchrobot
 
-WORKDIR /go/src/github.com/alibaba/Dragonfly
+WORKDIR /go/src/github.com/dragonflyoss/Dragonfly
