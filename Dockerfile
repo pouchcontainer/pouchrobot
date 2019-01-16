@@ -48,6 +48,8 @@ EXPOSE 6789
 
 COPY . /go/src/github.com/pouchcontainer/pouchrobot
 
-RUN go get github.com/pouchcontainer/pouchrobot
+RUN cd /go/src/github.com/pouchcontainer/pouchrobot \
+    && go build \
+    && mv pouchrobot /usr/local/bin/pouchrobot
 
 WORKDIR /go/src/github.com/alibaba/pouch
