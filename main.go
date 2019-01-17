@@ -17,6 +17,7 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 
 	"github.com/pouchcontainer/pouchrobot/config"
 
@@ -24,35 +25,52 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var rootCmd *cobra.Command
+var cmdCfg config.CmdConfig
+
 func main() {
-	var cmdCfg config.CmdConfig
-	cmdExecutor := &cobra.Command{
-		Use:  "An AI-based collaboration robot applied to open source project on GitHub",
-		Args: cobra.MinimumNArgs(0),
-		Run: func(cmd *cobra.Command, args []string) {
-			configContent, err := ioutil.ReadFile(cmdCfg.ConfigFilePath)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-
-			var cfg config.Config
-			if err := json.Unmarshal(configContent, &cfg); err != nil {
-				logrus.Fatal(err)
-			}
-
-			s, err := NewServer(cfg)
-			if err != nil {
-				logrus.Fatal(err)
-			}
-
-			logrus.Fatal(s.Run())
+	rootCmd = &cobra.Command{
+		Use:               "pouchrobot",
+		Short:             "An AI-based collaboration robot applied to open source project on GitHub",
+		Args:              cobra.NoArgs,
+		SilenceUsage:      true,
+		SilenceErrors:     true,
+		DisableAutoGenTag: true, // disable displaying auto generation tag in cli docs
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runDaemon(cmd)
 		},
 	}
-	cmdExecutor.SilenceUsage = true
-	cmdExecutor.SilenceErrors = true
 
-	flagSet := cmdExecutor.Flags()
+	flagSet := rootCmd.Flags()
 	flagSet.StringVarP(&cmdCfg.ConfigFilePath, "config", "c", "config.json", "Config file path for robot")
+	flagSet.BoolVarP(&cmdCfg.Debug, "debug", "D", false, "Switch daemon log level to DEBUG mode")
 
-	cmdExecutor.Execute()
+	if err := rootCmd.Execute(); err != nil {
+		logrus.Error(err)
+		os.Exit(1)
+	}
+}
+
+func runDaemon(cmd *cobra.Command) error {
+	if cmdCfg.Debug {
+		logrus.Infof("start daemon at debug level")
+		logrus.SetLevel(logrus.DebugLevel)
+	}
+
+	configContent, err := ioutil.ReadFile(cmdCfg.ConfigFilePath)
+	if err != nil {
+		return err
+	}
+
+	var cfg config.Config
+	if err := json.Unmarshal(configContent, &cfg); err != nil {
+		return err
+	}
+
+	s, err := NewServer(cfg)
+	if err != nil {
+		return err
+	}
+
+	return s.Run()
 }

@@ -33,6 +33,7 @@ import (
 
 // NewBaiduTranslator returns a translator of Baidu API
 func NewBaiduTranslator(options BaiduTranslatorOptions) Translator {
+	logrus.Info("start to initialize Baidu Translator")
 	translator := baiduTranslator{
 		Appid:  options.Appid,
 		Key:    options.Key,

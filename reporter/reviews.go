@@ -76,6 +76,4 @@ func (r *Reporter) CalculateReviews(wr *WeekReport) {
 	wr.PRReviewsByUser = prReviewsByUser
 
 	logrus.Info("succeed in calculating pull request reviews, see: %v", prReviewsByUser)
-
-	return
 }

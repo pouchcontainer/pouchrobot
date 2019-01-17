@@ -115,7 +115,6 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 	logrus.Debug("/_ping request received")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte{'O', 'K'})
-	return
 }
 
 // gitHubEventHandler handles webhook events from github.
@@ -137,7 +136,6 @@ func (s *Server) gitHubEventHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	return
 }
 
 // ciNotificationHandler handles webhook events from CI system.
@@ -160,5 +158,4 @@ func (s *Server) ciNotificationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	return
 }
