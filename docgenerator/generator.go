@@ -257,11 +257,8 @@ The cli/api doc must be automatically generated.`,
 		Body:  &body,
 	}
 
-	if _, err := g.client.CreatePR(newPR); err != nil {
-		return err
-	}
-
-	return nil
+	_, err := g.client.CreatePR(newPR)
+	return err
 }
 
 func generatenewBranchNameName() string {

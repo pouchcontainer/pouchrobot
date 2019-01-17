@@ -18,6 +18,9 @@ package config
 type CmdConfig struct {
 	// ConfigFilePath is the path of config json file
 	ConfigFilePath string
+
+	// Debug refers to the log mode.
+	Debug bool
 }
 
 // Config refers the config values for the project

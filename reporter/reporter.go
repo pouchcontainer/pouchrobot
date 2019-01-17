@@ -222,8 +222,6 @@ func (r *Reporter) setContributorAndPRSummary(wr *WeekReport, issueSearchResult 
 
 	// make contributor name unique in weekly report.
 	wr.NewContributors = utils.UniqueElementSlice(wr.NewContributors)
-
-	return
 }
 
 // initRepoInfo gets repo's status at the start time of robot.
@@ -249,5 +247,4 @@ func (r *Reporter) initRepoInfo(lastweek *StatsLastWeek) {
 	lastweek.Watch = *(repo.SubscribersCount)
 	lastweek.Star = *(repo.StargazersCount)
 	lastweek.Fork = *(repo.ForksCount)
-	return
 }
