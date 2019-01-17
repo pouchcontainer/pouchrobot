@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var rootCmd *cobra.Command
+var rootCmd = &cobra.Command{}
 var cmdCfg config.CmdConfig
 
 func main() {
@@ -67,7 +67,7 @@ func runDaemon(cmd *cobra.Command) error {
 		return err
 	}
 
-	logrus.Debugf("config value is %v", config)
+	logrus.Debugf("config value is %v", cfg)
 
 	s, err := NewServer(cfg)
 	if err != nil {
