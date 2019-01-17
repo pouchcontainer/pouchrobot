@@ -67,6 +67,8 @@ func runDaemon(cmd *cobra.Command) error {
 		return err
 	}
 
+	logrus.Debugf("config value is %v", config)
+
 	s, err := NewServer(cfg)
 	if err != nil {
 		return err
