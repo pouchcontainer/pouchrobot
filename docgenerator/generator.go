@@ -109,31 +109,33 @@ func (g *Generator) generateDoc() error {
 
 	// do prepare thing before cli and api doc generation.
 	if err := prepareGitEnv(newBranchName); err != nil {
-		logrus.Errorf("failed to prepare git environment: %v", err)
+		logrus.Errorf("failed to prepare git environment on branch %s: %v", newBranchName, err)
 		return err
 	}
 
 	// auto generate API docs on local filesystem.
 	if err := g.generateAPIDoc(); err != nil {
-		logrus.Errorf("failed to generate API doc: %v", err)
+		logrus.Errorf("failed to generate API doc on branch %s: %v", newBranchName, err)
 	}
 
 	// auto generate Cli docs on local filesystem.
 	if err := g.generateCliDoc(); err != nil {
-		logrus.Errorf("failed to generate cli doc: %v", err)
+		logrus.Errorf("failed to generate cli doc on branch %s: %v", newBranchName, err)
 	}
 
 	// auto generate file CONTRIBUTORS on local filesystem.
 	if err := g.generateContributors(); err != nil {
-		logrus.Errorf("failed to generate CONTRIBUTORS: %v", err)
+		logrus.Errorf("failed to generate CONTRIBUTORS on branch %s: %v", newBranchName, err)
 	}
 
 	// commit and push branch
 	if err := g.gitCommitAndPush(newBranchName); err != nil {
 		if err == ErrNothingChanged {
 			// if nothing changed, no need to submit pull request.
+			logrus.Infof("nothing changed on when git commit on branch %s and do no git push", newBranchName)
 			return nil
 		}
+		logrus.Errorf("failed to git commit and git push branch %s: %v", newBranchName, err)
 		return err
 	}
 
@@ -192,7 +194,7 @@ func (g *Generator) gitCommitAndPush(newBranchName string) error {
 
 	// if nothing changes, return nil to quit git procedure.
 	if strings.Contains(string(out), "nothing to commit") {
-		logrus.Infof("no cli doc changes happened, quit git procedure")
+		logrus.Infof("no cli doc changes happened, quit git procedure on branch %s", newBranchName)
 		return ErrNothingChanged
 	}
 
