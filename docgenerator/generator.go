@@ -128,6 +128,13 @@ func (g *Generator) generateDoc() error {
 		logrus.Errorf("failed to generate CONTRIBUTORS on branch %s: %v", newBranchName, err)
 	}
 
+	// create a new branch named by input newBranchName
+	// the following doc generation are all on this new branch
+	cmd := exec.Command("git", "checkout", "-b", newBranchName)
+	if data, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("failed to git checkout -b %s: output(%s), err(%v)", newBranchName, string(data), err)
+	}
+
 	// commit and push branch
 	if err := g.gitCommitAndPush(newBranchName); err != nil {
 		if err == ErrNothingChanged {
@@ -170,12 +177,6 @@ func prepareGitEnv(newBranchName string) error {
 		return fmt.Errorf("failed to git push -f origin master: output(%s), err(%v)", string(data), err)
 	}
 
-	// create a new branch named by input newBranchName
-	// the following doc generation are all on this new branch
-	cmd = exec.Command("git", "checkout", "-b", newBranchName)
-	if data, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to git checkout -b %s: output(%s), err(%v)", newBranchName, string(data), err)
-	}
 	return nil
 }
 
@@ -211,16 +212,16 @@ func (g *Generator) gitCommitAndPush(newBranchName string) error {
 	}
 
 	// git branch -D to delete branch to free resources.
-	cmd = exec.Command("git", "checkout", "master")
-	if data, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to git checkout master before deleting branch %s: output(%s), err(%v)", newBranchName, string(data), err)
-	}
+	//cmd = exec.Command("git", "checkout", "master")
+	//if data, err := cmd.CombinedOutput(); err != nil {
+	//	return fmt.Errorf("failed to git checkout master before deleting branch %s: output(%s), err(%v)", newBranchName, string(data), err)
+	//}
 
 	// git branch -D to delete branch to free resources.
-	cmd = exec.Command("git", "branch", "-D", newBranchName)
-	if data, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to git push branch -D %s: output(%s), err(%v)", newBranchName, string(data), err)
-	}
+	//cmd = exec.Command("git", "branch", "-D", newBranchName)
+	//if data, err := cmd.CombinedOutput(); err != nil {
+	//	return fmt.Errorf("failed to git push branch -D %s: output(%s), err(%v)", newBranchName, string(data), err)
+	//}
 
 	return nil
 }
