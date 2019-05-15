@@ -217,10 +217,10 @@ func (g *Generator) gitCommitAndPush(newBranchName string) error {
 	}
 
 	// git branch -D to delete branch to free resources.
-	cmd = exec.Command("git", "branch", "-D", newBranchName)
-	if data, err := cmd.CombinedOutput(); err != nil {
-		return fmt.Errorf("failed to git push branch -D %s: output(%s), err(%v)", newBranchName, string(data), err)
-	}
+	// cmd = exec.Command("git", "branch", "-D", newBranchName)
+	// if data, err := cmd.CombinedOutput(); err != nil {
+	// return fmt.Errorf("failed to git push branch -D %s: output(%s), err(%v)", newBranchName, string(data), err)
+	// }
 
 	return nil
 }
