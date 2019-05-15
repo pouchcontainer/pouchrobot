@@ -107,6 +107,7 @@ func (s *Server) Run() error {
 	// travisCI webhook API
 	r.HandleFunc("/ci_notifications", s.ciNotificationHandler).Methods("POST")
 
+	logrus.Infof("start http server on address %s", listenAddress)
 	return http.ListenAndServe(listenAddress, r)
 }
 
